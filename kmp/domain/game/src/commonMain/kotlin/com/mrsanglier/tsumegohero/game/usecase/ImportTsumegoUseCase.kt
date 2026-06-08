@@ -17,18 +17,18 @@ class ImportTsumegoUseCase(
     ): THResult<String> = THResult.catchResult {
 
         // test parsing
-        parseSgfTsumego(sgfData)
+        val tsumego = parseSgfTsumego(sgfData)
 
-        val tsumego = RawTsumego(
+        val rawTsumego = RawTsumego(
             id = sgfData.hashCode().toString(),
             name = fileName,
             data = sgfData,
             updatedAt = Clock.System.now(),
+            rank = tsumego.rank,
         )
 
+        repository.upsert(listOf(rawTsumego))
 
-        repository.upsert(listOf(tsumego))
-
-        return@catchResult tsumego.id
+        return@catchResult rawTsumego.id
     }
 }

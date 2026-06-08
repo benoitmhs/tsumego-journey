@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import com.mrsanglier.tsumegohero.app.coreui.resources.tsumego_icon
 import com.mrsanglier.tsumegohero.coreui.componants.icon.IconSize
 import com.mrsanglier.tsumegohero.coreui.componants.icon.THIcon
+import com.mrsanglier.tsumegohero.coreui.componants.spacer.THSpacerWeight
 import com.mrsanglier.tsumegohero.coreui.componants.text.THText
 import com.mrsanglier.tsumegohero.coreui.extension.thClickable
 import com.mrsanglier.tsumegohero.coreui.extension.toIconSpec
@@ -45,6 +46,12 @@ internal fun TsumegoItemCell(
         THText(
             text = tsumegoItem.title.toTextSpec(),
             style = THTheme.typography.label200,
+        )
+        THSpacerWeight()
+        THText(
+            text = tsumegoItem.rank.rawValue.toTextSpec(),
+            style = THTheme.typography.label100,
+            color = THTheme.colors.contentSecondary,
         )
     }
 }

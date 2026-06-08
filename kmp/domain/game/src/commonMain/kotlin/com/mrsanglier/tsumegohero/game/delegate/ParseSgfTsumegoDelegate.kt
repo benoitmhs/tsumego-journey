@@ -2,6 +2,7 @@ package com.mrsanglier.tsumegohero.game.delegate
 
 import com.mrsanglier.tsumegohero.core.error.THGameError
 import com.mrsanglier.tsumegohero.core.error.toError
+import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.game.model.Board
 import com.mrsanglier.tsumegohero.game.model.BoardSize
 import com.mrsanglier.tsumegohero.game.model.Stone
@@ -20,6 +21,11 @@ class ParseSgfTsumegoDelegateImpl : ParseSgfTsumegoDelegate {
 
         val size = Regex("SZ\\[(\\d+)]")
             .find(cleaned)?.groupValues?.get(1)?.toInt() ?: 19
+        val difficulty = Regex("C\\[([^]]*)]")
+            .find(cleaned)?.groupValues?.get(1)
+            ?.uppercase()
+            ?.let(Rank::safeValueOf)
+            ?: throw THGameError.Code.SgfFormatNotSupported.toError("Tsumego rank is missing")
         val boardSize = BoardSize.fromValue(size)
             ?: throw THGameError.Code.SgfFormatNotSupported.toError("Invalid board size", "Board size: $size")
 
@@ -50,6 +56,7 @@ class ParseSgfTsumegoDelegateImpl : ParseSgfTsumegoDelegate {
         return Tsumego(
             initialBoard = board,
             root = root,
+            rank = difficulty,
         )
     }
 }
