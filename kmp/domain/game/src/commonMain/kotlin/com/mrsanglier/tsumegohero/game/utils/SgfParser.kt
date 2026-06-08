@@ -70,10 +70,7 @@ object SgfParser {
             Regex("C\\[([^]]+)]")
                 .find(token)?.groupValues?.get(1)?.lowercase() ?: ""
 
-        val outcome = when {
-            comment == "+" -> SgfNodeOutcome.SUCCESS
-            else -> SgfNodeOutcome.NONE
-        }
+        val outcome = if (SUCCESS_COMMENT.contains(comment)) SgfNodeOutcome.SUCCESS else SgfNodeOutcome.NONE
 
         return MoveNode(
             move = Move(stone, point),
@@ -88,3 +85,5 @@ object SgfParser {
         }
     }
 }
+
+private val SUCCESS_COMMENT: Set<String> = setOf("+", "correct")
