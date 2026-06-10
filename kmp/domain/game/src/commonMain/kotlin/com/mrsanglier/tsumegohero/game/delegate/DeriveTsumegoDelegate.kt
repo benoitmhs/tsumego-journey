@@ -35,6 +35,7 @@ class DeriveTsumegoDelegateImpl : DeriveTsumegoDelegate {
                 boardSize = tsumego.initialBoard.boardSize,
             ),
             root = RootNode(newRoot),
+            rank = tsumego.rank,
         )
     }
 

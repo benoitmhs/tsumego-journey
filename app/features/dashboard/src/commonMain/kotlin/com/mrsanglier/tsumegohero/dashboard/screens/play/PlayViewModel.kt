@@ -34,7 +34,7 @@ class PlayViewModel(
         viewModelScope.launch {
             prepopulateTsumegoDBUseCase()
             getTsumegoItemUseCase().collect { items ->
-                _uiState.value = uiState.value.copy(tsugemoItems = items)
+                _uiState.value = uiState.value.copy(tsugemoItems = items.sortedBy { it.rank })
             }
         }
     }

@@ -18,6 +18,7 @@ class GetTsumegoItemUseCase(
                         title = sgf.name,
                         tsumegoId = sgf.id,
                         updatedAt = sgf.updatedAt,
+                        rank = sgf.rank,
                     )
                 }
                     .sortedByDescending { it.updatedAt }

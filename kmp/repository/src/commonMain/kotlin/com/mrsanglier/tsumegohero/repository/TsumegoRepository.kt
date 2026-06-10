@@ -17,6 +17,9 @@ class TsumegoRepository(
     fun observeGame(id: String): Flow<RawTsumego> =
         localTsumegoDatasource.observeGame(id)
 
+    suspend fun countRanks(): Map<String, Int> =
+        localTsumegoDatasource.countRanks()
+
     suspend fun clean() {
         localTsumegoDatasource.clean()
     }

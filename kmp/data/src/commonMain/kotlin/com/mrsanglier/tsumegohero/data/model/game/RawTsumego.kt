@@ -6,5 +6,6 @@ data class RawTsumego(
     val id: String,
     val name: String,
     val data: String,
+    val rank: Rank,
     val updatedAt: Instant,
 )
