@@ -4,6 +4,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.driver.bundled.BundledSQLiteDriver
 import com.mrsanglier.tsumegohero.localdatasources.room.AppDatabase
+import com.mrsanglier.tsumegohero.localdatasources.utils.TsumegoDatabasePath
 import kotlinx.cinterop.ExperimentalForeignApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -12,7 +13,7 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 fun getAppDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
-    val dbFilePath = documentDirectory() + "/focus.db"
+    val dbFilePath = documentDirectory() + "/$TsumegoDatabasePath"
     return Room.databaseBuilder<AppDatabase>(
         name = dbFilePath,
     )

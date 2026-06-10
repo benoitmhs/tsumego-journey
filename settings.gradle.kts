@@ -46,5 +46,6 @@ include(":kmp:domain:common")
 include(":kmp:domain:dashboard-game")
 include(":kmp:domain:profile")
 include(":kmp:domain:game")
+include("database-generator")
 
 rootProject.name = "TsumegoHero"
