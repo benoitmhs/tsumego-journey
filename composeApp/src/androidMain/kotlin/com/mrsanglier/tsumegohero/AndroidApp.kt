@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.core.content.edit
 import com.mrsanglier.tsumegohero.app.coreui.resources.Res
 import com.mrsanglier.tsumegohero.localdatasources.utils.TsumegoDatabasePath
-import com.mrsanglier.tsumegohero.utils.PreferenceKey
+import com.mrsanglier.tsumegohero.utils.PreferenceKeyAndroid
 import com.mrsanglier.tsumegohero.utils.TsumegoAsset
 import com.mrsanglier.tsumegohero.utils.TsumegoAssetVersion
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +28,7 @@ class AndroidApp : Application() {
     }
 
     private suspend fun initTsumegoDatabase() {
-        val currentAssetVersion = sharedPref.getInt(PreferenceKey.CURRENT_TSUMEGO_DATABASE_VERSION, -1)
+        val currentAssetVersion = sharedPref.getInt(PreferenceKeyAndroid.CURRENT_TSUMEGO_DATABASE_VERSION, -1)
         if (TsumegoAssetVersion > currentAssetVersion) {
             try {
                 val inputStream = Res.readBytes("files/$TsumegoAsset").inputStream()
@@ -43,7 +43,7 @@ class AndroidApp : Application() {
                 }
 
                 sharedPref.edit {
-                    putInt(PreferenceKey.CURRENT_TSUMEGO_DATABASE_VERSION, TsumegoAssetVersion)
+                    putInt(PreferenceKeyAndroid.CURRENT_TSUMEGO_DATABASE_VERSION, TsumegoAssetVersion)
                 }
             } catch (e: Exception) {
                 println("INIT: failed to copy dictionary asset: ${e.message}")

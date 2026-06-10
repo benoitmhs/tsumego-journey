@@ -13,9 +13,8 @@ import platform.Foundation.NSFileManager
 import platform.Foundation.NSUserDomainMask
 
 fun getAppDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
-    val dbFilePath = documentDirectory() + "/$TsumegoDatabasePath"
     return Room.databaseBuilder<AppDatabase>(
-        name = dbFilePath,
+        name = databasePath(),
     )
         .fallbackToDestructiveMigrationOnDowngrade(true)
         .setDriver(BundledSQLiteDriver())
@@ -23,15 +22,17 @@ fun getAppDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
 }
 
 @OptIn(ExperimentalForeignApi::class)
-private fun documentDirectory(): String {
-    val documentDirectory = NSFileManager.defaultManager.URLForDirectory(
-        directory = NSDocumentDirectory,
-        inDomain = NSUserDomainMask,
-        appropriateForURL = null,
-        create = false,
-        error = null,
-    )
-    return requireNotNull(documentDirectory?.path)
+fun databasePath(): String {
+    val documentDirectory =
+        NSFileManager.defaultManager.URLForDirectory(
+            directory = NSDocumentDirectory,
+            inDomain = NSUserDomainMask,
+            appropriateForURL = null,
+            create = true,
+            error = null,
+        )
+
+    return requireNotNull(documentDirectory?.path) + "/$TsumegoDatabasePath"
 }
 
 fun getDatabase(): AppDatabase {
