@@ -31,4 +31,7 @@ class ImportTsumegoUseCase(
 
         return@catchResult rawTsumego.id
     }
+
+    suspend fun countRank(): Map<String, Int> =
+        repository.countRanks()
 }
