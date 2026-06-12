@@ -1,0 +1,16 @@
+package com.mrsanglier.tsumegohero.repository
+
+import com.mrsanglier.tsumegohero.data.model.game.Attempt
+import com.mrsanglier.tsumegohero.localdatasources.datasource.LocalAttemptDataSource
+import kotlinx.coroutines.flow.Flow
+
+class AttemptRepository(
+    private val localAttemptDataSource: LocalAttemptDataSource,
+) {
+    suspend fun upsert(attempt: Attempt) {
+        localAttemptDataSource.upsert(attempt)
+    }
+
+    fun observeLastSucceedAttempt(): Flow<Attempt?> =
+        localAttemptDataSource.observeLastSucceedAttempt()
+}

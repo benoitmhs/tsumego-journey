@@ -1,4 +1,4 @@
-package com.mrsanglier.tsumegohero.dashboard.screens.play
+package com.mrsanglier.tsumegohero.dashboard.screens.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,34 +7,69 @@ import com.mrsanglier.tsumegohero.coreui.componants.loading.LoadingManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.THSnackbarState
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showDone
+import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
-import com.mrsanglier.tsumegohero.dashboardgame.usecase.GetTsumegoItemUseCase
-import com.mrsanglier.tsumegohero.dashboardgame.usecase.PrepopulateTsumegoDBUseCase
+import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveDailyStreakUseCase
+import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveProgressDataUseCase
+import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveUserUseCase
+import com.mrsanglier.tsumegohero.dashboardgame.usecase.UpdateUserRankUseCase
+import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.game.usecase.ImportTsumegoUseCase
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.nameWithoutExtension
 import io.github.vinceglb.filekit.readString
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class PlayViewModel(
-    getTsumegoItemUseCase: GetTsumegoItemUseCase,
-    prepopulateTsumegoDBUseCase: PrepopulateTsumegoDBUseCase,
+class HomeViewModel(
     private val importTsumegoUseCase: ImportTsumegoUseCase,
     private val loadingManager: LoadingManager,
     private val snackbarManager: SnackbarManager,
+    private val updateUserRankUseCase: UpdateUserRankUseCase,
+    observeUserUseCase: ObserveUserUseCase,
+    observeProgressDataUseCase: ObserveProgressDataUseCase,
+    observeDailyStreakUseCase: ObserveDailyStreakUseCase,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(PlayViewModelState())
-    val uiState: StateFlow<PlayViewModelState> get() = _uiState.asStateFlow()
+    val uiState: StateFlow<HomeViewModelState> = combine(
+        observeProgressDataUseCase(),
+        observeDailyStreakUseCase(),
+        observeUserUseCase().map { it?.rank == null }.distinctUntilChanged(),
+    ) { progressData, dailyStreak, rankIsNull ->
+        HomeViewModelState(
+            dailyStreakData = dailyStreak.data?.toCellData() ?: PlaceHolder.DailyStreak,
+            rankProgressBarData = progressData?.getRankProgressBarData() ?: PlaceHolder.RankProgressBar,
+            problemStreakData = progressData?.getProblemStreakData() ?: PlaceHolder.ProblemStreak,
+            mainAction = getMainAction(rankIsNull),
+        )
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        HomeViewModelState(),
+    )
 
-    init {
+    internal fun openRankBottomSheet() {
         viewModelScope.launch {
-            prepopulateTsumegoDBUseCase()
-            getTsumegoItemUseCase().collect { items ->
-                _uiState.value = uiState.value.copy(tsugemoItems = items.sortedBy { it.rank })
+            updateUserRankUseCase(Rank.`5K`).handleResult(
+                onSuccess = { snackbarManager.showDone("rank update".toTextSpec()) },
+                onError = snackbarManager::showError
+            )
+        }
+    }
+
+    internal fun startTsumego() {
+
+    }
+
+    fun displayCountByRank() {
+        viewModelScope.launch {
+            importTsumegoUseCase.countRank().forEach { (rank, count) ->
+                println("$rank: $count")
             }
         }
     }

@@ -3,7 +3,6 @@ package com.mrsanglier.tsumegohero.dashboard.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -15,8 +14,8 @@ import com.mrsanglier.tsumegohero.coreui.animation.fadeOutPopExitTransition
 import com.mrsanglier.tsumegohero.coreui.componants.modalbottomsheet.Composable
 import com.mrsanglier.tsumegohero.coreui.componants.navigationbar.THNavigationBarScaffold
 import com.mrsanglier.tsumegohero.coreui.componants.screen.ProvideScreenContext
-import com.mrsanglier.tsumegohero.dashboard.screens.play.PlayDestination
-import com.mrsanglier.tsumegohero.dashboard.screens.play.PlayNavScope
+import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
+import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeNavScope
 import com.mrsanglier.tsumegohero.dashboard.screens.profile.ProfileDestination
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -51,15 +50,15 @@ fun DashboardRoute(
         ) {
             NavHost(
                 navController = navController,
-                startDestination = PlayDestination,
+                startDestination = HomeDestination,
                 enterTransition = fadeInEnterTransition,
                 exitTransition = fadeOutExitTransition,
                 popEnterTransition = fadeInPopEnterTransition,
                 popExitTransition = fadeOutPopExitTransition,
             ) {
-                PlayDestination.composable(
+                HomeDestination.composable(
                     navGraphBuilder = this,
-                    navScope = PlayNavScope(
+                    navScope = HomeNavScope(
                         navigateToGame = navScope.navigateToGame,
                     )
                 )

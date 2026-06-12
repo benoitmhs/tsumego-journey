@@ -57,6 +57,7 @@ sealed class THResult<out T> {
                 Success(block())
             } catch (e: THError) {
                 val piError = mapError(e)
+                Logger.e { e.message.toString() }
                 Logger.e { piError.stackTraceToString() }
                 Failure(piError)
             }

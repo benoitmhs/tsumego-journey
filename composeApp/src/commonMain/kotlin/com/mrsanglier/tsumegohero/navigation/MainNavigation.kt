@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
 import com.mrsanglier.tsumegohero.dashboard.navigation.DashboardDestination
 import com.mrsanglier.tsumegohero.dashboard.navigation.DashboardNavScope
+import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
+import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeNavScope
 import com.mrsanglier.tsumegohero.game.game.GameDestination
 import com.mrsanglier.tsumegohero.game.game.GameNavScope
 import com.mrsanglier.tsumegohero.navigation.animation.THNavHost
@@ -17,11 +19,11 @@ fun MainNavigation(
 
     THNavHost(
         navController = navController,
-        startDestination = DashboardDestination,
+        startDestination = HomeDestination,
     ) {
-        DashboardDestination.composable(
+        HomeDestination.composable(
             this,
-            DashboardNavScope(
+            HomeNavScope(
                 navigateToGame = { tsumegoId ->
                     navController.navigate(GameDestination(tsumegoId))
                 },

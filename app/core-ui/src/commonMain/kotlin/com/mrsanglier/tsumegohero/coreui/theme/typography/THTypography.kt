@@ -7,6 +7,17 @@ import androidx.compose.ui.unit.sp
 
 object THTypography {
     // Header
+    val header200: TextStyle
+        @Composable
+        get() = TextStyle(
+            fontFamily = AntonFontFamily,
+            fontSize = 30.sp,
+            lineHeight = 45.sp,
+            fontWeight = FontWeight.Normal,
+            letterSpacing = (0.9).sp,
+        )
+
+    // Header
     val header100: TextStyle
         @Composable
         get() = TextStyle(

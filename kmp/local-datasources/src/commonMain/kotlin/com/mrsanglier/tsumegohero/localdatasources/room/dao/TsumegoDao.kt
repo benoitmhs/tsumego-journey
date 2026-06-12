@@ -15,8 +15,18 @@ interface TsumegoDao {
     @Query("SELECT * FROM tsumego")
     fun observeAllGames(): Flow<List<RoomTsumego>>
 
-    @Query("SELECT * FROM tsumego WHERE id = :id LIMIT 1000")
+    @Query("SELECT * FROM tsumego WHERE id = :id LIMIT 1")
     fun observeGame(id: String): Flow<RoomTsumego>
+
+    @Query(
+        """
+        SELECT * FROM tsumego 
+        WHERE rank = :rank 
+        AND id NOT IN (SELECT tsumegoId FROM attempt) 
+        LIMIT 1
+    """
+    )
+    suspend fun getNextTsumego(rank: String): RoomTsumego?
 
     @Query(
         """

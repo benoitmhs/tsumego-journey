@@ -2,6 +2,7 @@ package com.mrsanglier.tsumegohero.repository
 
 import com.mrsanglier.tsumegohero.localdatasources.datasource.LocalTsumegoDatasource
 import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
+import com.mrsanglier.tsumegohero.data.model.game.Rank
 import kotlinx.coroutines.flow.Flow
 
 class TsumegoRepository(
@@ -16,6 +17,9 @@ class TsumegoRepository(
 
     fun observeGame(id: String): Flow<RawTsumego> =
         localTsumegoDatasource.observeGame(id)
+
+    suspend fun getNextTsumego(rank: Rank): RawTsumego? =
+        localTsumegoDatasource.getNextTsumego(rank)
 
     suspend fun countRanks(): Map<String, Int> =
         localTsumegoDatasource.countRanks()

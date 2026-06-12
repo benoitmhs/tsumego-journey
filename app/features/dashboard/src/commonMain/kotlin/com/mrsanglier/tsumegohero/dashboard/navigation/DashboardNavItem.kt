@@ -18,7 +18,7 @@ import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.navigation.THDestination
 import com.mrsanglier.tsumegohero.coreui.resources.THDrawable
 import com.mrsanglier.tsumegohero.coreui.resources.THString
-import com.mrsanglier.tsumegohero.dashboard.screens.play.PlayDestination
+import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
 import com.mrsanglier.tsumegohero.dashboard.screens.profile.ProfileDestination
 
 sealed interface DashboardNavItem {
@@ -31,7 +31,7 @@ sealed interface DashboardNavItem {
         override val label: TextSpec = THString.dashboard_navigationBarItem_play.toTextSpec()
         override val selectedIcon: IconSpec = THDrawable.ic_home_filled.toIconSpec()
         override val unselectedIcon: IconSpec = THDrawable.ic_home.toIconSpec()
-        override val destination: THDestination = PlayDestination
+        override val destination: THDestination = HomeDestination
     }
 
     data object Profile : DashboardNavItem {

@@ -1,4 +1,4 @@
-package com.mrsanglier.tsumegohero.dashboard.screens.play.composable
+package com.mrsanglier.tsumegohero.dashboard.screens.home.composable
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

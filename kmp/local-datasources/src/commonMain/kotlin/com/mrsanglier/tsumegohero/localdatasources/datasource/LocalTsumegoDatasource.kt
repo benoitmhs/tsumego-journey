@@ -23,6 +23,9 @@ class LocalTsumegoDatasource(
     fun observeGame(id: String): Flow<RawTsumego> =
         dao.observeGame(id).map { roomModel -> roomModel.toAppModel() }
 
+    suspend fun getNextTsumego(rank: Rank): RawTsumego? =
+        dao.getNextTsumego(rank.rawValue)?.toAppModel()
+
     suspend fun countRanks(): Map<String, Int> =
         dao.countRanks()
             .sortedBy { Rank.safeValueOf(it.rank) }
