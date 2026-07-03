@@ -3,13 +3,16 @@ package com.mrsanglier.tsumegohero.localdatasources.room.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.mrsanglier.tsumegohero.data.model.game.Rank
+import com.mrsanglier.tsumegohero.data.model.user.Level
 import com.mrsanglier.tsumegohero.data.model.user.User
 
 @Entity(tableName = "user")
 data class RoomUser(
     @PrimaryKey val userId: String,
     val username: String,
-    val rank: String?,
+    val flashRank: String?,
+    val classicalRank: String?,
+    val difficultRank: String?,
     val dailyStreak: Int,
     val problemStreak: Int,
     val nbRankStepCompleted: Int,
@@ -19,7 +22,7 @@ data class RoomUser(
     fun toAppModel(): User = User(
         userId = userId,
         username = username,
-        rank = rank?.let(Rank::safeValueOf),
+        level = getLevel(),
         dailyStreak = dailyStreak,
         problemStreak = problemStreak,
         nbRankStepCompleted = nbRankStepCompleted,
@@ -27,11 +30,24 @@ data class RoomUser(
         nbTsumegoSolved = nbTsumegoSolved,
     )
 
+    private fun getLevel(): Level? {
+        val flash = flashRank?.let(Rank::safeValueOf) ?: return null
+        val classical = classicalRank?.let(Rank::safeValueOf) ?: return null
+        val difficult = difficultRank?.let(Rank::safeValueOf) ?: return null
+        return Level(
+            flashRank = flash,
+            classicalRank = classical,
+            difficultRank = difficult,
+        )
+    }
+
     companion object {
         fun fromAppModel(appModel: User): RoomUser = RoomUser(
             userId = appModel.userId,
             username = appModel.username,
-            rank = appModel.rank?.rawValue,
+            flashRank = appModel.level?.flashRank?.rawValue,
+            classicalRank = appModel.level?.classicalRank?.rawValue,
+            difficultRank = appModel.level?.difficultRank?.rawValue,
             dailyStreak = appModel.dailyStreak,
             problemStreak = appModel.problemStreak,
             nbRankStepCompleted = appModel.nbRankStepCompleted,

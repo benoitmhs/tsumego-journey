@@ -19,7 +19,7 @@ class InitUserUseCase(
         val newUser = User(
             userId = Uuid.random().toString(),
             username = "",
-            rank = null,
+            level = null,
             dailyStreak = 0,
             problemStreak = 0,
             nbRankStepCompleted = 0,

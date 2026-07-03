@@ -12,7 +12,7 @@ class GetNextTsumegoIdUseCase(
     private val userRepository: UserRepository,
 ) {
     suspend operator fun invoke(): THResult<String> = THResult.catchResult {
-        val rank = userRepository.observeUser().first()?.rank
+        val rank = userRepository.observeUser().first()?.level?.classicalRank
             ?: throw THAppError.Code.ObjectNotFound.toError(message = "User rank not found")
 
         val tsumego = tsumegoRepository.getNextNeverAttempted(rank)

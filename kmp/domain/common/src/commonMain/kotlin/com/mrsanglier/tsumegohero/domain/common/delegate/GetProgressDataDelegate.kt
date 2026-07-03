@@ -10,7 +10,7 @@ interface GetProgressDataDelegate {
 
 class GetProgressDataDelegateImpl : GetProgressDataDelegate {
     override fun getProgressData(user: User): ProgressData {
-        val currentRank = user.rank ?: return ProgressData(
+        val currentRank = user.level?.classicalRank ?: return ProgressData(
             rank = Rank.`15K`,
             rankStepCompleted = 0,
             rankStepRequired = getRankStepRequired(Rank.`15K`),

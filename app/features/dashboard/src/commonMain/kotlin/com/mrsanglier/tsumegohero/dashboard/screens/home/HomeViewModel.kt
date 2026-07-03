@@ -12,7 +12,6 @@ import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveDailyStreakUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveProgressDataUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveUserUseCase
-import com.mrsanglier.tsumegohero.dashboardgame.usecase.UpdateUserRankUseCase
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.ImportTsumegoUseCase
@@ -32,7 +31,6 @@ class HomeViewModel(
     private val importTsumegoUseCase: ImportTsumegoUseCase,
     private val loadingManager: LoadingManager,
     private val snackbarManager: SnackbarManager,
-    private val updateUserRankUseCase: UpdateUserRankUseCase,
     private val getNextTsumegoIdUseCase: GetNextTsumegoIdUseCase,
     observeUserUseCase: ObserveUserUseCase,
     observeProgressDataUseCase: ObserveProgressDataUseCase,
@@ -42,13 +40,13 @@ class HomeViewModel(
     internal val uiState: StateFlow<HomeViewModelState> = combine(
         observeProgressDataUseCase(),
         observeDailyStreakUseCase(),
-        observeUserUseCase().map { it?.rank == null }.distinctUntilChanged(),
-    ) { progressData, dailyStreak, rankIsNull ->
+        observeUserUseCase().map { it?.level == null }.distinctUntilChanged(),
+    ) { progressData, dailyStreak, levelIsNull ->
         HomeViewModelState(
             dailyStreakData = dailyStreak.data?.toCellData() ?: PlaceHolder.DailyStreak,
             rankProgressBarData = progressData?.getRankProgressBarData() ?: PlaceHolder.RankProgressBar,
             problemStreakData = progressData?.getProblemStreakData() ?: PlaceHolder.ProblemStreak,
-            mainAction = getMainAction(rankIsNull),
+            mainAction = getMainAction(levelIsNull),
         )
     }.stateIn(
         viewModelScope,
@@ -59,12 +57,7 @@ class HomeViewModel(
     internal val navEvent = MutableStateFlow<NavEvent?>(null)
 
     internal fun openRankBottomSheet() {
-        viewModelScope.launch {
-            updateUserRankUseCase(Rank.`5K`).handleResult(
-                onSuccess = { snackbarManager.showDone("rank update".toTextSpec()) },
-                onError = snackbarManager::showError
-            )
-        }
+
     }
 
     internal fun startTsumego() {
