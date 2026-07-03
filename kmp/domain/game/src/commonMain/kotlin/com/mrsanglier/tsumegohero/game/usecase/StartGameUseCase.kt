@@ -7,6 +7,7 @@ import com.mrsanglier.tsumegohero.game.delegate.GetCropBoardDelegate
 import com.mrsanglier.tsumegohero.game.delegate.GetCropBoardDelegateImpl
 import com.mrsanglier.tsumegohero.game.delegate.ParseSgfTsumegoDelegate
 import com.mrsanglier.tsumegohero.game.delegate.ParseSgfTsumegoDelegateImpl
+import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.game.model.Game
 import com.mrsanglier.tsumegohero.repository.TsumegoRepository
 import kotlinx.coroutines.flow.first
@@ -20,7 +21,10 @@ class StartGameUseCase(
     GetCropBoardDelegate by getCropBoardDelegateImpl,
     DeriveTsumegoDelegate by deriveTsumegoDelegateImpl {
 
-    suspend operator fun invoke(tsumegoId: String): THResult<Game> = THResult.catchResult {
+    suspend operator fun invoke(
+        tsumegoId: String,
+        mode: Attempt.Mode = Attempt.Mode.Standard,
+    ): THResult<Game> = THResult.catchResult {
         val sgf = tsumegoRepository.observeGame(tsumegoId).first()
         val tsumego = parseSgfTsumego(sgf.data)
         val derivedTsumego = deriveTsumego(tsumego)
@@ -31,6 +35,7 @@ class StartGameUseCase(
             board = derivedTsumego.initialBoard,
             moveStack = emptyList(),
             cropBoard = getCropBoard(derivedTsumego),
+            mode = mode,
         )
     }
 }

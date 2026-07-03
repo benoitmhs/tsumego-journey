@@ -1,5 +1,6 @@
 package com.mrsanglier.tsumegohero.game.model
 
+import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 
 data class Game(
@@ -10,7 +11,12 @@ data class Game(
     val cropBoard: CropBoard,
     val reviewRoot: RootNode? = null,
     val reviewIndex: Int = 0,
+    val mode: Attempt.Mode = Attempt.Mode.Standard,
+    val isGhostSubmitted: Boolean = false,
 ) {
+    val isGhostMode: Boolean
+        get() = mode == Attempt.Mode.Ghost
+
     val playerStone: Stone
         get() = tsumego.playerStone
 
@@ -22,10 +28,15 @@ data class Game(
         }
 
     val isOpponentTurn: Boolean
-        get() = lastMove?.move?.stone == playerStone
+        get() = !isGhostMode && lastMove?.move?.stone == playerStone
 
     val outcome: SgfNodeOutcome
-        get() = lastMove?.outcome ?: SgfNodeOutcome.NONE
+        get() = when {
+            !isGhostMode -> lastMove?.outcome ?: SgfNodeOutcome.NONE
+            !isGhostSubmitted -> SgfNodeOutcome.NONE
+            moveStack.any { it.outcome == SgfNodeOutcome.SUCCESS } -> SgfNodeOutcome.SUCCESS
+            else -> SgfNodeOutcome.FAILURE
+        }
 
     val isReview: Boolean
         get() = reviewRoot != null

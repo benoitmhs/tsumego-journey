@@ -28,4 +28,6 @@ data class GameViewModelState(
     val reviewResetButton: THButtonState? = null,
     val goodMoves: Set<Cell>? = null,
     val badMoves: Set<Cell>? = null,
+    val isGhostMode: Boolean = false,
+    val submitButton: THButtonState? = null,
 )

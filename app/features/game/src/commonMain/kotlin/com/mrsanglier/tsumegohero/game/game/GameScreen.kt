@@ -106,6 +106,8 @@ private fun GameScreen(
                         lastMove = uiState.lastMove,
                         goodMoves = uiState.goodMoves,
                         badMoves = uiState.badMoves,
+                        isGhostMode = uiState.isGhostMode,
+                        isReview = uiState.isReview,
                         modifier = Modifier
                             .border(
                                 width = THTheme.stroke.regular,
@@ -155,9 +157,15 @@ private fun GameScreen(
                         .weight(1f)
                 )
 
-                uiState.nextButton.Content(
-                    modifier = Modifier.animateContentSize()
-                )
+                if (uiState.submitButton != null) {
+                    uiState.submitButton.Content(
+                        modifier = Modifier.animateContentSize()
+                    )
+                } else {
+                    uiState.nextButton.Content(
+                        modifier = Modifier.animateContentSize()
+                    )
+                }
             }
         }
     }

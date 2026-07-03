@@ -1,5 +1,8 @@
 package com.mrsanglier.tsumegohero.game.game.composable
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -7,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -15,6 +19,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.toSize
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
+import com.mrsanglier.tsumegohero.game.game.GHOST_STONE_FADE_DURATION
 import com.mrsanglier.tsumegohero.game.game.uimodel.BoardStyle
 import com.mrsanglier.tsumegohero.game.model.BoardSize
 import com.mrsanglier.tsumegohero.game.model.Cell
@@ -37,12 +42,28 @@ internal fun Board(
     goodMoves: Set<Cell>? = null,
     badMoves: Set<Cell>? = null,
     lastMove: Move? = null,
+    isGhostMode: Boolean = false,
+    isReview: Boolean = false,
     onClickCell: (Cell) -> Unit = {},
 ) {
     val blackStoneImageBitmap = imageResource(style.blackStoneRes)
     val whiteStoneImageBitmap = imageResource(style.whiteStoneRes)
     val scaleFactor = remember(boardSize, cropBoard) {
         cropBoard.getScaleFactor(boardSize)
+    }
+    val lastMoveAlphaAnimatable = remember { Animatable(1f) }
+
+    LaunchedEffect(lastMove, isGhostMode, isReview) {
+        lastMoveAlphaAnimatable.animateTo(
+            targetValue = 1f,
+            animationSpec = snap(0),
+        )
+        if (isGhostMode && !isReview) {
+            lastMoveAlphaAnimatable.animateTo(
+                targetValue = 0f,
+                animationSpec = tween(GHOST_STONE_FADE_DURATION.inWholeMilliseconds.toInt()),
+            )
+        }
     }
 
     Box(
@@ -86,6 +107,7 @@ internal fun Board(
                     lastMove = lastMove,
                     goodMoves = goodMoves,
                     badMoves = badMoves,
+                    lastMoveAlpha = lastMoveAlphaAnimatable.value,
                 )
             }
         }

@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class GameDestination(
     val tsumegoId: String,
+    val isGhostMode: Boolean = true,
 ) : THDestination {
 
     companion object {

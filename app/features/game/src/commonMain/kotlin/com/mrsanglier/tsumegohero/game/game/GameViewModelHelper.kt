@@ -25,6 +25,13 @@ internal val GameViewModel.defaultNextButton: THButtonState
         onClick = ::next,
     )
 
+internal val GameViewModel.defaultSubmitButton: THButtonState
+    get() = THButtonState(
+        text = "Submit".toTextSpec(), // TODO: loco
+        style = ButtonStyle.Primary,
+        onClick = ::submitGhostSequence,
+    )
+
 internal val GameViewModel.defaultReviewButton: THButtonState
     get() = THButtonState(
         text = "📖 Review".toTextSpec(), // TODO: loco

@@ -11,6 +11,6 @@ class Attempt(
     val date: Instant,
 ) {
     enum class Mode {
-        Standard, Blind;
+        Standard, Ghost;
     }
 }

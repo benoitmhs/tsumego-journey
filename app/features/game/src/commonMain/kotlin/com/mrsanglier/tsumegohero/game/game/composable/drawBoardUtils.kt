@@ -24,6 +24,7 @@ internal fun DrawScope.drawBoard(
     lastMove: Move?,
     goodMoves: Set<Cell>?,
     badMoves: Set<Cell>?,
+    lastMoveAlpha: Float = 1f,
 ) {
     val cellSpacing = minOf(size.width, size.height) / (boardSize.size - 1 + 2 * BORDER_SPACING_COEF)
     val boarderSpacing = cellSpacing * BORDER_SPACING_COEF
@@ -105,6 +106,13 @@ internal fun DrawScope.drawBoard(
 
     // Draw last stone marker
     lastMove?.let { move ->
+        drawStone(
+            imageBitmap = if (move.stone == Stone.BLACK) blackStoneImageBitmap else whiteStoneImageBitmap,
+            cell = move.gameMove,
+            cellSpacing = cellSpacing,
+            startOffset = startOffset,
+            alpha = lastMoveAlpha,
+        )
         val circleColor = when (move.stone) {
             Stone.BLACK -> Color.White
             Stone.WHITE -> Color.Black
@@ -114,6 +122,7 @@ internal fun DrawScope.drawBoard(
             radius = stoneSize / 2 * LAST_STONE_RATIO,
             style = Stroke(width = LINE_STROKE),
             center = Offset(move.gameMove.x * cellSpacing, move.gameMove.y * cellSpacing) + startOffset,
+            alpha = lastMoveAlpha,
         )
     }
 }
@@ -123,11 +132,12 @@ private fun DrawScope.drawStone(
     cell: Cell,
     cellSpacing: Float,
     startOffset: Offset,
+    alpha: Float = 1f,
 ) {
     val stoneSize = cellSpacing * STONE_SIZE_RATIO
     // Shadow
     drawCircle(
-        color = Color.Black.copy(alpha = 0.2f),
+        color = Color.Black.copy(alpha = 0.2f * alpha),
         radius = stoneSize / 2 * STONE_SHADOW_RATIO,
         center = Offset(
             x = cell.x * cellSpacing,
@@ -146,6 +156,7 @@ private fun DrawScope.drawStone(
             x = (cell.x * cellSpacing) - stoneSize / 2,
             y = (cell.y * cellSpacing) - stoneSize / 2,
         ) + startOffset).round(),
+        alpha = alpha,
     )
 }
 
