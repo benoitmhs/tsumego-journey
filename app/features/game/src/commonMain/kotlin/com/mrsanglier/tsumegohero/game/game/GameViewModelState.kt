@@ -30,4 +30,5 @@ data class GameViewModelState(
     val badMoves: Set<Cell>? = null,
     val isGhostMode: Boolean = false,
     val submitButton: THButtonState? = null,
+    val skipButton: THButtonState? = null,
 )

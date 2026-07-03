@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4a36c42344b1c9ebafc469c31a2d46e2",
+    "identityHash": "0b37c736bae763a6fb770c794c780fbc",
     "entities": [
       {
         "tableName": "attempt",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `userId` TEXT NOT NULL, `tsumegoId` TEXT NOT NULL, `success` INTEGER NOT NULL, `mode` TEXT NOT NULL, `date` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `userId` TEXT NOT NULL, `tsumegoId` TEXT NOT NULL, `result` TEXT NOT NULL, `mode` TEXT NOT NULL, `context` TEXT NOT NULL, `date` INTEGER NOT NULL, `resolutionTimeMs` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -27,9 +27,9 @@
             "notNull": true
           },
           {
-            "fieldPath": "success",
-            "columnName": "success",
-            "affinity": "INTEGER",
+            "fieldPath": "result",
+            "columnName": "result",
+            "affinity": "TEXT",
             "notNull": true
           },
           {
@@ -39,8 +39,20 @@
             "notNull": true
           },
           {
+            "fieldPath": "context",
+            "columnName": "context",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
             "fieldPath": "date",
             "columnName": "date",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "resolutionTimeMs",
+            "columnName": "resolutionTimeMs",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -96,7 +108,7 @@
       },
       {
         "tableName": "user",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `username` TEXT NOT NULL, `rank` TEXT, `dailyStreak` INTEGER NOT NULL, `problemStreak` INTEGER NOT NULL, `nbRankStepCompleted` INTEGER NOT NULL, `bestDailyStreak` INTEGER NOT NULL, `nbTsumegoSolved` INTEGER NOT NULL, PRIMARY KEY(`userId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `username` TEXT NOT NULL, `flashRank` TEXT, `classicalRank` TEXT, `difficultRank` TEXT, `dailyStreak` INTEGER NOT NULL, `problemStreak` INTEGER NOT NULL, `nbRankStepCompleted` INTEGER NOT NULL, `bestDailyStreak` INTEGER NOT NULL, `nbTsumegoSolved` INTEGER NOT NULL, PRIMARY KEY(`userId`))",
         "fields": [
           {
             "fieldPath": "userId",
@@ -111,8 +123,18 @@
             "notNull": true
           },
           {
-            "fieldPath": "rank",
-            "columnName": "rank",
+            "fieldPath": "flashRank",
+            "columnName": "flashRank",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "classicalRank",
+            "columnName": "classicalRank",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "difficultRank",
+            "columnName": "difficultRank",
             "affinity": "TEXT"
           },
           {
@@ -156,7 +178,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4a36c42344b1c9ebafc469c31a2d46e2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0b37c736bae763a6fb770c794c780fbc')"
     ]
   }
 }

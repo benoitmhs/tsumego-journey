@@ -25,6 +25,7 @@ import com.mrsanglier.tsumegohero.coreui.componants.topbar.TopBarAction
 import com.mrsanglier.tsumegohero.coreui.extension.rememberTopBarElevation
 import com.mrsanglier.tsumegohero.coreui.extension.toIconSpec
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
+import com.mrsanglier.tsumegohero.coreui.navigation.safeNavigation
 import com.mrsanglier.tsumegohero.coreui.resources.THDrawable
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import com.mrsanglier.tsumegohero.game.game.composable.Board
@@ -39,11 +40,16 @@ fun GameRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    safeNavigation(viewModel.navEvent, viewModel::consumeNavigation) { event ->
+        when (event) {
+            GameViewModel.NavEvent.Finished -> navScope.navigateBack()
+        }
+    }
+
     GameScreen(
         uiState = uiState,
         navigateBack = navScope.navigateBack,
         onClickCell = viewModel::onClickCell,
-        onClickPrevious = viewModel::previous,
     )
 }
 
@@ -52,7 +58,6 @@ private fun GameScreen(
     uiState: GameViewModelState,
     navigateBack: () -> Unit,
     onClickCell: (Cell) -> Unit,
-    onClickPrevious: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     val topBarHazeState = remember { HazeState() }
@@ -145,16 +150,13 @@ private fun GameScreen(
                 horizontalArrangement = Arrangement.spacedBy(THTheme.spacing.large),
             ) {
 
-                THButton(
-                    icon = THDrawable.ic_arrow_back.toIconSpec(),
-                    style = ButtonStyle.Secondary,
-                    text = null,
-                    onClick = onClickPrevious,
-                )
-
                 uiState.resetButton.Content(
                     modifier = Modifier
                         .weight(1f)
+                )
+
+                uiState.skipButton?.Content(
+                    modifier = Modifier.animateContentSize()
                 )
 
                 if (uiState.submitButton != null) {

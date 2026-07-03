@@ -5,22 +5,19 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.mrsanglier.tsumegohero.app.coreui.resources.ic_arrow_forward
-import com.mrsanglier.tsumegohero.app.coreui.resources.ic_next
-import com.mrsanglier.tsumegohero.app.coreui.resources.ic_previous
-import com.mrsanglier.tsumegohero.app.coreui.resources.ic_refresh
 import com.mrsanglier.tsumegohero.core.error.THGameError
 import com.mrsanglier.tsumegohero.core.extension.handleResult
+import com.mrsanglier.tsumegohero.core.extension.suspendHandleResult
 import com.mrsanglier.tsumegohero.coreui.componants.button.ButtonStyle
-import com.mrsanglier.tsumegohero.coreui.componants.button.THButtonState
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
+import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showDone
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.coreui.extension.composed
-import com.mrsanglier.tsumegohero.coreui.extension.toIconSpec
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
-import com.mrsanglier.tsumegohero.coreui.resources.THDrawable
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
+import com.mrsanglier.tsumegohero.data.model.game.GameContext
+import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.game.model.Cell
 import com.mrsanglier.tsumegohero.game.model.Game
 import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
@@ -37,17 +34,20 @@ import com.mrsanglier.tsumegohero.game.usecase.SendGameResultUseCase
 import com.mrsanglier.tsumegohero.game.usecase.StartGameUseCase
 import com.mrsanglier.tsumegohero.game.usecase.StartReviewUseCase
 import com.mrsanglier.tsumegohero.game.usecase.SubmitGhostSequenceUseCase
+import com.mrsanglier.tsumegohero.rankestimation.usecase.GetNextRankEstimationTsumegoUseCase
+import com.mrsanglier.tsumegohero.rankestimation.usecase.GetRankEstimationResultUseCase
+import com.mrsanglier.tsumegohero.rankestimation.usecase.SubmitRankEstimationAnswerUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Instant
 
 internal val OPPONENT_TURN_DELAY: Duration = 300.milliseconds
 internal val GHOST_STONE_FADE_DURATION: Duration = 1000.milliseconds
@@ -66,6 +66,9 @@ class GameViewModel(
     private val snackbarManager: SnackbarManager,
     private val getNextTsumegoIdUseCase: GetNextTsumegoIdUseCase,
     private val navigateReviewUseCase: NavigateReviewUseCase,
+    private val getNextRankEstimationTsumegoUseCase: GetNextRankEstimationTsumegoUseCase,
+    private val submitRankEstimationAnswerUseCase: SubmitRankEstimationAnswerUseCase,
+    private val getRankEstimationResultUseCase: GetRankEstimationResultUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -73,13 +76,16 @@ class GameViewModel(
 
     private val gameFlow = MutableStateFlow<Game?>(null)
     private val lockTouch = MutableStateFlow(false)
+    private var problemStartedAt: Instant? = null
+
+    internal val navEvent = MutableStateFlow<NavEvent?>(null)
 
     init {
 
         viewModelScope.launch {
             loadTsumego(
                 tsumegoId = args.tsumegoId,
-                mode = if (args.isGhostMode) Attempt.Mode.Ghost else Attempt.Mode.Standard,
+                mode = args.gameMode,
             )
         }
 
@@ -92,14 +98,7 @@ class GameViewModel(
                 }
 
                 data?.let {
-                    val outcome = data.outcome
-                    if (outcome != SgfNodeOutcome.NONE) {
-                        sendGameResult(
-                            isSuccess = outcome == SgfNodeOutcome.SUCCESS,
-                            tsumegoId = data.sgf.id,
-                            mode = data.mode,
-                        )
-                    }
+                    sendGameResult(data)
                 }
             }
         }
@@ -168,6 +167,7 @@ class GameViewModel(
             submitButton = defaultSubmitButton
                 .takeIf { game.isGhostMode && !game.isGhostSubmitted }
                 ?.copy(enabled = game.moveStack.isNotEmpty()),
+            skipButton = defaultSkipButton.takeIf { outcome == SgfNodeOutcome.NONE },
         )
     }
         .stateIn(
@@ -251,14 +251,48 @@ class GameViewModel(
     }
 
     internal fun next() {
-        loadNextTsumego(isPrevious = false)
+        viewModelScope.launch {
+            when (args.context) {
+                GameContext.RankEstimation -> loadNextRankEstimationTsumego()
+                GameContext.Training -> loadNextTsumego()
+            }
+        }
     }
 
-    fun previous() {
-        loadNextTsumego(isPrevious = true)
+    internal fun skip() {
+        val game = gameFlow.value ?: return
+
+        viewModelScope.launch {
+            when (args.context) {
+                GameContext.RankEstimation -> {
+                    submitRankEstimationAnswerUseCase(
+                        tsumegoId = game.sgf.id,
+                        resolutionTimeMs = elapsedResolutionTimeMs(),
+                        result = Attempt.Result.Skip,
+                        gameMode = args.gameMode,
+                    ).suspendHandleResult(
+                        onSuccess = { loadNextRankEstimationTsumego() },
+                        onError = snackbarManager::showError,
+                    )
+                }
+
+                GameContext.Training -> {
+                    sendGameResultUseCase(
+                        result = Attempt.Result.Skip,
+                        tsumegoId = args.tsumegoId,
+                        mode = args.gameMode,
+                        resolutionTimeMs = elapsedResolutionTimeMs(),
+                        gameContext = args.context,
+                    ).handleResult(
+                        onSuccess = {},
+                        onError = snackbarManager::showError,
+                    )
+                }
+            }
+        }
     }
 
-    private fun loadNextTsumego(isPrevious: Boolean) { // TODO handle previous
+    private fun loadNextTsumego() {
         gameFlow.value?.let { currentGame ->
             viewModelScope.launch {
                 getNextTsumegoIdUseCase().handleResult(
@@ -289,13 +323,56 @@ class GameViewModel(
         resetButton = defaultRestartButton,
     )
 
-    private suspend fun loadTsumego(tsumegoId: String, mode: Attempt.Mode = Attempt.Mode.Standard) {
+    private suspend fun loadTsumego(tsumegoId: String, mode: GameMode = GameMode.Ghost) {
         startGameUseCase(tsumegoId, mode).handleResult(
             onSuccess = { data ->
                 gameFlow.value = data
+                problemStartedAt = Clock.System.now()
             },
             onError = snackbarManager::showError,
         )
+    }
+
+    internal suspend fun loadNextRankEstimationTsumego() {
+        getNextRankEstimationTsumegoUseCase().handleResult(
+            onSuccess = { tsumegoId ->
+                if (tsumegoId == null) {
+                    finishRankEstimation()
+                } else {
+                    loadTsumego(
+                        tsumegoId = tsumegoId,
+                        mode = GameMode.Ghost,
+                    )
+                }
+            },
+            onError = snackbarManager::showError,
+        )
+    }
+
+    private fun elapsedResolutionTimeMs(): Long =
+        problemStartedAt?.let { (Clock.System.now() - it).inWholeMilliseconds } ?: 0L
+
+    private suspend fun finishRankEstimation() {
+        getRankEstimationResultUseCase().handleResult(
+            onSuccess = { level ->
+                val message = if (level != null) {
+                    "Level determined — difficult: ${level.difficultRank.rawValue}".toTextSpec() // TODO: loco
+                } else {
+                    "No rank validated yet, try again later".toTextSpec() // TODO: loco
+                }
+                snackbarManager.showDone(message)
+                navEvent.value = NavEvent.Finished
+            },
+            onError = snackbarManager::showError,
+        )
+    }
+
+    internal fun consumeNavigation() {
+        navEvent.value = null
+    }
+
+    internal sealed interface NavEvent {
+        data object Finished : NavEvent
     }
 
     private suspend fun playOpponentTurn(game: Game) {
@@ -312,19 +389,37 @@ class GameViewModel(
         }
     }
 
-    private suspend fun sendGameResult(
-        isSuccess: Boolean,
-        tsumegoId: String,
-        mode: Attempt.Mode,
-    ) {
-        sendGameResultUseCase(
-            isSuccess = isSuccess,
-            tsumegoId = tsumegoId,
-            mode = mode,
-        ).handleResult(
-            onSuccess = {},
-            onError = snackbarManager::showError,
-        )
-    }
+    private suspend fun sendGameResult(data: Game) {
+        val outcome = data.outcome
+        if (outcome != SgfNodeOutcome.NONE) {
+            val elapsedMs = elapsedResolutionTimeMs()
+            val result = if (outcome == SgfNodeOutcome.SUCCESS) Attempt.Result.Success else Attempt.Result.Failure
+            when (args.context) {
+                GameContext.RankEstimation -> {
+                    submitRankEstimationAnswerUseCase(
+                        tsumegoId = data.sgf.id,
+                        resolutionTimeMs = elapsedMs,
+                        result = result,
+                        gameMode = args.gameMode,
+                    ).handleResult(
+                        onSuccess = {},
+                        onError = snackbarManager::showError,
+                    )
+                }
 
+                GameContext.Training -> {
+                    sendGameResultUseCase(
+                        result = result,
+                        tsumegoId = data.sgf.id,
+                        mode = args.gameMode,
+                        resolutionTimeMs = elapsedMs,
+                        gameContext = args.context,
+                    ).handleResult(
+                        onSuccess = {},
+                        onError = snackbarManager::showError,
+                    )
+                }
+            }
+        }
+    }
 }

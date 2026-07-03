@@ -1,6 +1,8 @@
 package com.mrsanglier.tsumegohero.localdatasources.datasource
 
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
+import com.mrsanglier.tsumegohero.data.model.game.GameContext
+import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.localdatasources.room.dao.AttemptDao
 import com.mrsanglier.tsumegohero.localdatasources.room.model.RoomAttempt
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +20,13 @@ class LocalAttemptDataSource(
 
     suspend fun getTsumegoSolvedCount(): Int =
         dao.getTsumegoSolvedCount()
+
+    suspend fun getRankEstimationAttempts(): List<Pair<Rank, Attempt>> =
+        dao.getRankEstimationAttempts(GameContext.RankEstimation).map { it.toAppModel() }
+
+    suspend fun deleteRankEstimationAttempts() {
+        dao.deleteByContext(GameContext.RankEstimation)
+    }
 
     suspend fun clean() {
         dao.clean()

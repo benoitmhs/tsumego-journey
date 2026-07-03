@@ -15,6 +15,7 @@ fun getDatabaseBuilder(ctx: Context): RoomDatabase.Builder<AppDatabase> {
         context = appContext,
         name = dbFile.absolutePath
     )
+        .fallbackToDestructiveMigration(dropAllTables = true)
         .fallbackToDestructiveMigrationOnDowngrade(true)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)

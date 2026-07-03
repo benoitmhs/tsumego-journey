@@ -50,6 +50,7 @@ kotlin {
             implementation(projects.kmp.core)
             implementation(projects.kmp.data)
             implementation(projects.kmp.domain.game)
+            implementation(projects.kmp.domain.rankEstimation)
         }
     }
 }

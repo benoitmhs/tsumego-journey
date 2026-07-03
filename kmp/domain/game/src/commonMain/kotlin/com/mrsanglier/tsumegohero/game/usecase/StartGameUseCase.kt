@@ -1,13 +1,13 @@
 package com.mrsanglier.tsumegohero.game.usecase
 
 import com.mrsanglier.tsumegohero.core.result.THResult
+import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.game.delegate.DeriveTsumegoDelegate
 import com.mrsanglier.tsumegohero.game.delegate.DeriveTsumegoDelegateImpl
 import com.mrsanglier.tsumegohero.game.delegate.GetCropBoardDelegate
 import com.mrsanglier.tsumegohero.game.delegate.GetCropBoardDelegateImpl
 import com.mrsanglier.tsumegohero.game.delegate.ParseSgfTsumegoDelegate
 import com.mrsanglier.tsumegohero.game.delegate.ParseSgfTsumegoDelegateImpl
-import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.game.model.Game
 import com.mrsanglier.tsumegohero.repository.TsumegoRepository
 import kotlinx.coroutines.flow.first
@@ -23,7 +23,7 @@ class StartGameUseCase(
 
     suspend operator fun invoke(
         tsumegoId: String,
-        mode: Attempt.Mode = Attempt.Mode.Standard,
+        mode: GameMode,
     ): THResult<Game> = THResult.catchResult {
         val sgf = tsumegoRepository.observeGame(tsumegoId).first()
         val tsumego = parseSgfTsumego(sgf.data)

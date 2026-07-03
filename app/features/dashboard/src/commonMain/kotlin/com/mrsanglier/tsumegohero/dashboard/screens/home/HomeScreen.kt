@@ -39,7 +39,7 @@ fun HomeRoute(
 
     safeNavigation(viewModel.navEvent, viewModel::consumeNavigation) { event ->
         when (event) {
-            is HomeViewModel.NavEvent.Game -> navScope.navigateToGame(event.tsumegoId)
+            is HomeViewModel.NavEvent.Game -> navScope.navigateToGame(event.tsumegoId, event.gameContext)
         }
     }
 

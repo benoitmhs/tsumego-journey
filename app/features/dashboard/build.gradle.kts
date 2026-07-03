@@ -57,6 +57,7 @@ kotlin {
             implementation(projects.kmp.domain.dashboardGame)
             implementation(projects.kmp.domain.game)
             implementation(projects.kmp.domain.common)
+            implementation(projects.kmp.domain.rankEstimation)
         }
     }
 }

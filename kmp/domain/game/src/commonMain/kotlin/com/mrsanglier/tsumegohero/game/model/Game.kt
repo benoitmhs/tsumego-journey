@@ -1,6 +1,7 @@
 package com.mrsanglier.tsumegohero.game.model
 
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
+import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 
 data class Game(
@@ -11,11 +12,11 @@ data class Game(
     val cropBoard: CropBoard,
     val reviewRoot: RootNode? = null,
     val reviewIndex: Int = 0,
-    val mode: Attempt.Mode = Attempt.Mode.Standard,
+    val mode: GameMode = GameMode.Standard,
     val isGhostSubmitted: Boolean = false,
 ) {
     val isGhostMode: Boolean
-        get() = mode == Attempt.Mode.Ghost
+        get() = mode == GameMode.Ghost
 
     val playerStone: Stone
         get() = tsumego.playerStone

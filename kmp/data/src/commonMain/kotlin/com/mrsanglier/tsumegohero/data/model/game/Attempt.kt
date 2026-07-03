@@ -6,11 +6,13 @@ class Attempt(
     val id: String,
     val userId: String,
     val tsumegoId: String,
-    val success: Boolean,
-    val mode: Mode,
+    val result: Result,
+    val mode: GameMode,
     val date: Instant,
+    val context: GameContext,
+    val resolutionTimeMs: Long,
 ) {
-    enum class Mode {
-        Standard, Ghost;
+    enum class Result {
+        Success, Failure, Skip;
     }
 }

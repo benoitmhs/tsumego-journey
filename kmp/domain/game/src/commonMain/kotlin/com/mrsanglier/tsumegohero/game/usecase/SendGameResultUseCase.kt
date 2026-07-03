@@ -5,6 +5,8 @@ import com.mrsanglier.tsumegohero.core.error.toError
 import com.mrsanglier.tsumegohero.core.extension.daysUntil
 import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
+import com.mrsanglier.tsumegohero.data.model.game.GameContext
+import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.user.User
 import com.mrsanglier.tsumegohero.repository.AttemptRepository
 import com.mrsanglier.tsumegohero.repository.UserRepository
@@ -22,9 +24,11 @@ class SendGameResultUseCase(
 
     @OptIn(ExperimentalUuidApi::class)
     suspend operator fun invoke(
-        isSuccess: Boolean,
+        result: Attempt.Result,
         tsumegoId: String,
-        mode: Attempt.Mode,
+        mode: GameMode,
+        gameContext: GameContext,
+        resolutionTimeMs: Long,
     ): THResult<User> = THResult.catchResult {
         val user = userRepository.observeUser().first()
             ?: throw THAppError.Code.ObjectNotFound.toError("User not found")
@@ -34,13 +38,15 @@ class SendGameResultUseCase(
             id = Uuid.random().toString(),
             userId = user.userId,
             tsumegoId = tsumegoId,
-            success = isSuccess,
+            result = result,
             mode = mode,
             date = Clock.System.now(),
+            resolutionTimeMs = resolutionTimeMs,
+            context = gameContext,
         )
         attemptRepository.upsert(newAttempt)
 
-        val updatedUser = if (isSuccess) {
+        val updatedUser = if (result == Attempt.Result.Success) {
             val newDailyStreak = calculateDailyStreak(lastAttempt, user.dailyStreak)
             user.copy(
                 dailyStreak = newDailyStreak,

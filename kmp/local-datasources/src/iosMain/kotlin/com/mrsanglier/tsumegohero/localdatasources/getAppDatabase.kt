@@ -16,6 +16,7 @@ fun getAppDatabaseBuilder(): RoomDatabase.Builder<AppDatabase> {
     return Room.databaseBuilder<AppDatabase>(
         name = databasePath(),
     )
+        .fallbackToDestructiveMigration(dropAllTables = true)
         .fallbackToDestructiveMigrationOnDowngrade(true)
         .setDriver(BundledSQLiteDriver())
         .setQueryCoroutineContext(Dispatchers.IO)

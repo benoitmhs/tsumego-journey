@@ -12,3 +12,13 @@ inline fun <T> THResult<T>.handleResult(
         is THResult.Success<T> -> onSuccess(successData)
     }
 }
+
+suspend inline fun <T> THResult<T>.suspendHandleResult(
+    onSuccess: suspend (data: T) -> Unit,
+    onError: (error: THError?) -> Unit,
+) {
+    when (this) {
+        is THResult.Failure<T> -> onError(error)
+        is THResult.Success<T> -> onSuccess(successData)
+    }
+}

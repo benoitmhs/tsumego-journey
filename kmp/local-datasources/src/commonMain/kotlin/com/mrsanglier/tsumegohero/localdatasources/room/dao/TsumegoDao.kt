@@ -32,7 +32,7 @@ interface TsumegoDao {
         """
         SELECT * FROM tsumego 
         WHERE rank = :rank 
-        AND id NOT IN (SELECT tsumegoId FROM attempt WHERE success = 1) 
+        AND id NOT IN (SELECT tsumegoId FROM attempt WHERE result = 'Success')
         LIMIT 1
     """
     )
