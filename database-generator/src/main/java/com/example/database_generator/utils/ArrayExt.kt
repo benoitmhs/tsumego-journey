@@ -29,13 +29,13 @@ private object ArrayExt {
 }
 
 internal fun Grid.copy(): Grid {
-    val yLenght = this.size
-    val xLenght = this.firstOrNull()?.size ?: 0
-    val newGrid: Grid = Array(yLenght) {
-        Array(xLenght) { null }
+    val yLength = this.size
+    val xLength = this.firstOrNull()?.size ?: 0
+    val newGrid: Grid = Array(yLength) {
+        Array(xLength) { null }
     }
-    for (y in 0 until yLenght)
-        for (x in 0 until xLenght)
+    for (y in 0 until yLength)
+        for (x in 0 until xLength)
             newGrid[y][x] = this[y][x]
 
     return newGrid
