@@ -1,7 +1,6 @@
 package com.mrsanglier.tsumegohero.rankestimation
 
 import com.mrsanglier.tsumegohero.rankestimation.delegate.ComputeFinalLevelDelegate
-import com.mrsanglier.tsumegohero.rankestimation.delegate.EvaluateRankBlockDelegate
 import com.mrsanglier.tsumegohero.rankestimation.usecase.GetNextRankEstimationTsumegoUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.GetRankEstimationResultUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.SubmitRankEstimationAnswerUseCase
@@ -16,6 +15,5 @@ val domainRankEstimationModule: Module = module {
     singleOf(::GetRankEstimationResultUseCase)
 
     // Delegate
-    singleOf(::EvaluateRankBlockDelegate)
     singleOf(::ComputeFinalLevelDelegate)
 }

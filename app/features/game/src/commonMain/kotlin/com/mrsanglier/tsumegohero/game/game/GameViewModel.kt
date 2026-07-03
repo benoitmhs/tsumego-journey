@@ -394,6 +394,7 @@ class GameViewModel(
         if (outcome != SgfNodeOutcome.NONE) {
             val elapsedMs = elapsedResolutionTimeMs()
             val result = if (outcome == SgfNodeOutcome.SUCCESS) Attempt.Result.Success else Attempt.Result.Failure
+
             when (args.context) {
                 GameContext.RankEstimation -> {
                     submitRankEstimationAnswerUseCase(

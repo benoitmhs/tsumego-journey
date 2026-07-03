@@ -9,7 +9,6 @@ import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.rankestimation.RankEstimationConfig
 import com.mrsanglier.tsumegohero.rankestimation.delegate.ComputeFinalLevelDelegate
-import com.mrsanglier.tsumegohero.rankestimation.delegate.EvaluateRankBlockDelegate
 import com.mrsanglier.tsumegohero.repository.AttemptRepository
 import com.mrsanglier.tsumegohero.repository.TsumegoRepository
 import com.mrsanglier.tsumegohero.repository.UserRepository
@@ -22,7 +21,6 @@ class SubmitRankEstimationAnswerUseCase(
     private val userRepository: UserRepository,
     private val attemptRepository: AttemptRepository,
     private val tsumegoRepository: TsumegoRepository,
-    private val evaluateRankBlockDelegate: EvaluateRankBlockDelegate,
     private val computeFinalLevelDelegate: ComputeFinalLevelDelegate,
 ) {
     @OptIn(ExperimentalUuidApi::class)
@@ -50,13 +48,20 @@ class SubmitRankEstimationAnswerUseCase(
         )
 
         val attempts = attemptRepository.getRankEstimationAttempts()
+        computeFinalLevelDelegate(attempts)
+
         val rankAttempts = attempts.filter { it.first == tsumego.rank }.map { it.second }
+
         if (rankAttempts.size < RankEstimationConfig.BLOCK_SIZE) return@catchResult
 
-        val evaluation = evaluateRankBlockDelegate(rankAttempts)
+        val averageResTime = rankAttempts.map { it.resolutionTimeMs }.average()
+        val successRate = rankAttempts.count { it.result == Attempt.Result.Success }
+        val difficultPassed = averageResTime <= RankEstimationConfig.DIFFICULT_TIME.inWholeMilliseconds
+            && successRate >= RankEstimationConfig.SUCCESS_THRESHOLD
+
         val isMaxRank = Rank.entries.indexOf(tsumego.rank) == Rank.entries.lastIndex
 
-        if (!evaluation.difficultPassed || isMaxRank) {
+        if (!difficultPassed || isMaxRank) {
             val level = computeFinalLevelDelegate(attempts)
             userRepository.upsert(user.copy(level = level))
             attemptRepository.deleteRankEstimationAttempts()

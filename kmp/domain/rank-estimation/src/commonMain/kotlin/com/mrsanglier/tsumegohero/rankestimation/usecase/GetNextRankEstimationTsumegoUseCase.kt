@@ -26,8 +26,8 @@ class GetNextRankEstimationTsumegoUseCase(
 
     private fun currentRank(attempts: List<Pair<Rank, Attempt>>): Rank? {
         val ranksAttempted = attempts.map { it.first }
-        val maxRank = ranksAttempted.maxByOrNull { Rank.entries.indexOf(it) }
-            ?: return Rank.entries.first()
+        val maxRank = ranksAttempted.maxWithOrNull(Rank.comparator)
+            ?: Rank.entries.first()
 
         val countAtMaxRank = ranksAttempted.count { it == maxRank }
         return if (countAtMaxRank >= RankEstimationConfig.BLOCK_SIZE) {

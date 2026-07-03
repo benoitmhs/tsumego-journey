@@ -4,28 +4,38 @@ import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.data.model.user.Level
 import com.mrsanglier.tsumegohero.rankestimation.RankEstimationConfig
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
-class ComputeFinalLevelDelegate(
-    private val evaluateRankBlockDelegate: EvaluateRankBlockDelegate,
-) {
-    operator fun invoke(attempts: List<Pair<Rank, Attempt>>): Level? {
-        val attemptsByRank = attempts.groupBy({ it.first }, { it.second })
+class ComputeFinalLevelDelegate {
+    operator fun invoke(attempts: List<Pair<Rank, Attempt>>): Level {
+        val attempsResults = attempts
+            .groupBy({ it.first }, { it.second })
+            .map { (rank, attemptsByRank) ->
+                val averageResTime = attemptsByRank.map { it.resolutionTimeMs }.average()
+                val successRate = attemptsByRank.count { it.result == Attempt.Result.Success } / attemptsByRank.size.toFloat()
+                Triple(rank, averageResTime, successRate)
+            }
+        attempsResults.forEach {
+            println("${it.first}  ${it.second.milliseconds.inWholeSeconds}  ${it.third}")
+        }
 
-        val validatedBlocks = Rank.entries.asSequence()
-            .map { rank -> rank to attemptsByRank[rank] }
-            .takeWhile { (_, rankAttempts) -> (rankAttempts?.size ?: 0) >= RankEstimationConfig.BLOCK_SIZE }
-            .map { (rank, rankAttempts) -> rank to evaluateRankBlockDelegate(rankAttempts.orEmpty()) }
-            .takeWhile { (_, evaluation) -> evaluation.difficultPassed }
-            .toList()
-
-        val difficultRank = validatedBlocks.lastOrNull()?.first ?: return null
-        val classicalRank = validatedBlocks.lastOrNull { (_, evaluation) -> evaluation.classicalPassed }?.first
-        val flashRank = validatedBlocks.lastOrNull { (_, evaluation) -> evaluation.flashPassed }?.first
+        val flashRank = attempsResults.getMaxRankValidate(RankEstimationConfig.FLASH_TIME)
+        val classicalRank = attempsResults.getMaxRankValidate(RankEstimationConfig.CLASSICAL_TIME)
+        val difficultRank = attempsResults.getMaxRankValidate(RankEstimationConfig.DIFFICULT_TIME)
 
         return Level(
             flashRank = flashRank ?: Rank.entries.first(),
             classicalRank = classicalRank ?: Rank.entries.first(),
-            difficultRank = difficultRank,
+            difficultRank = difficultRank ?: Rank.entries.first(),
         )
     }
+
+    private fun List<Triple<Rank, Double, Float>>.getMaxRankValidate(timeRequirest: Duration): Rank? =
+        this
+            .filter { (_, averageResTime, successRate) ->
+                averageResTime <= timeRequirest.inWholeMilliseconds
+                    && successRate >= RankEstimationConfig.SUCCESS_THRESHOLD
+            }
+            .maxOfWithOrNull(Rank.comparator) { it.first }
 }
