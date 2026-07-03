@@ -12,8 +12,8 @@ internal fun CropBoard?.getScaleFactor(boardSize: BoardSize): Float {
     if (this == null) return 1f
     val originSize = boardSize.size
 
-    val frameMaxLenght = maxOf(boardSection.xMax - boardSection.xMin, boardSection.yMax - boardSection.yMin)
-    val scaledSize = (frameMaxLenght + 2).coerceAtMost(originSize)
+    val frameMaxLength = maxOf(boardSection.xMax - boardSection.xMin, boardSection.yMax - boardSection.yMin)
+    val scaledSize = (frameMaxLength + 2).coerceAtMost(originSize)
 
     if (scaledSize == originSize) return 1f
 
