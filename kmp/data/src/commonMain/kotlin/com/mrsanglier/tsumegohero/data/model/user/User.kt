@@ -7,7 +7,7 @@ data class User(
     val username: String,
     val rank: Rank?,
     val dailyStreak: Int,
-    val stepSuccessStreak: Int,
+    val problemStreak: Int,
     val nbRankStepCompleted: Int,
     val bestDailyStreak: Int,
     val nbTsumegoSolved: Int,

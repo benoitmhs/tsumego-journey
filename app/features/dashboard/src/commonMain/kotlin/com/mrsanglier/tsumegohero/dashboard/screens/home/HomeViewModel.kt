@@ -14,10 +14,12 @@ import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveProgressDataUseCa
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveUserUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.UpdateUserRankUseCase
 import com.mrsanglier.tsumegohero.data.model.game.Rank
+import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.ImportTsumegoUseCase
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.nameWithoutExtension
 import io.github.vinceglb.filekit.readString
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -31,12 +33,13 @@ class HomeViewModel(
     private val loadingManager: LoadingManager,
     private val snackbarManager: SnackbarManager,
     private val updateUserRankUseCase: UpdateUserRankUseCase,
+    private val getNextTsumegoIdUseCase: GetNextTsumegoIdUseCase,
     observeUserUseCase: ObserveUserUseCase,
     observeProgressDataUseCase: ObserveProgressDataUseCase,
     observeDailyStreakUseCase: ObserveDailyStreakUseCase,
 ) : ViewModel() {
 
-    val uiState: StateFlow<HomeViewModelState> = combine(
+    internal val uiState: StateFlow<HomeViewModelState> = combine(
         observeProgressDataUseCase(),
         observeDailyStreakUseCase(),
         observeUserUseCase().map { it?.rank == null }.distinctUntilChanged(),
@@ -53,6 +56,8 @@ class HomeViewModel(
         HomeViewModelState(),
     )
 
+    internal val navEvent = MutableStateFlow<NavEvent?>(null)
+
     internal fun openRankBottomSheet() {
         viewModelScope.launch {
             updateUserRankUseCase(Rank.`5K`).handleResult(
@@ -63,10 +68,21 @@ class HomeViewModel(
     }
 
     internal fun startTsumego() {
-
+        viewModelScope.launch {
+            getNextTsumegoIdUseCase().handleResult(
+                onSuccess = { tsumegoId ->
+                    navEvent.value = NavEvent.Game(tsumegoId)
+                },
+                onError = snackbarManager::showError,
+            )
+        }
     }
 
-    fun displayCountByRank() {
+    internal fun consumeNavigation() {
+        navEvent.value = null
+    }
+
+    internal fun displayCountByRank() {
         viewModelScope.launch {
             importTsumegoUseCase.countRank().forEach { (rank, count) ->
                 println("$rank: $count")
@@ -74,7 +90,7 @@ class HomeViewModel(
         }
     }
 
-    fun saveTsumegoFiles(files: List<PlatformFile>) {
+    internal fun saveTsumegoFiles(files: List<PlatformFile>) {
         viewModelScope.launch {
             loadingManager.withLoading {
                 val filesMap = files.associate {
@@ -107,4 +123,9 @@ class HomeViewModel(
             }
         }
     }
+
+    internal sealed interface NavEvent {
+        data class Game(val tsumegoId: String) : NavEvent
+    }
+
 }

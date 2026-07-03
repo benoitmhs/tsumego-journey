@@ -20,6 +20,7 @@ import com.mrsanglier.tsumegohero.coreui.extension.toIconSpec
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.resources.THDrawable
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
+import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.game.model.Cell
 import com.mrsanglier.tsumegohero.game.model.Game
 import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
@@ -31,6 +32,7 @@ import com.mrsanglier.tsumegohero.game.usecase.PlayOpponentMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayPlayerMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayReviewMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.RestartGameUseCase
+import com.mrsanglier.tsumegohero.game.usecase.SendGameResultUseCase
 import com.mrsanglier.tsumegohero.game.usecase.StartGameUseCase
 import com.mrsanglier.tsumegohero.game.usecase.StartReviewUseCase
 import kotlinx.coroutines.delay
@@ -50,6 +52,7 @@ class GameViewModel(
     private val playPlayerMoveUseCase: PlayPlayerMoveUseCase,
     private val playOpponentMoveUseCase: PlayOpponentMoveUseCase,
     private val playReviewMoveUseCase: PlayReviewMoveUseCase,
+    private val sendGameResultUseCase: SendGameResultUseCase,
     private val startGameUseCase: StartGameUseCase,
     private val startReviewUseCase: StartReviewUseCase,
     private val restartGameUseCase: RestartGameUseCase,
@@ -76,6 +79,16 @@ class GameViewModel(
                 lockTouch.emit(data?.isOpponentTurn == true)
                 if (data?.isOpponentTurn == true) {
                     playOpponentTurn(data)
+                }
+
+                data?.let {
+                    val outcome = data.lastMove?.outcome ?: SgfNodeOutcome.NONE
+                    if (outcome != SgfNodeOutcome.NONE) {
+                        sendGameResult(
+                            isSuccess = outcome == SgfNodeOutcome.SUCCESS,
+                            tsumegoId = data.sgf.id
+                        )
+                    }
                 }
             }
         }
@@ -184,7 +197,7 @@ class GameViewModel(
         }
     }
 
-    private fun navigateReview(isBack: Boolean) {
+    internal fun navigateReview(isBack: Boolean) {
         gameFlow.value?.let { game ->
             navigateReviewUseCase(
                 game = game,
@@ -201,7 +214,7 @@ class GameViewModel(
         }
     }
 
-    private fun next() {
+    internal fun next() {
         loadNextTsumego(isPrevious = false)
     }
 
@@ -209,13 +222,10 @@ class GameViewModel(
         loadNextTsumego(isPrevious = true)
     }
 
-    private fun loadNextTsumego(isPrevious: Boolean) {
+    private fun loadNextTsumego(isPrevious: Boolean) { // TODO handle previous
         gameFlow.value?.sgf?.id?.let { tsumegoId ->
             viewModelScope.launch {
-                getNextTsumegoIdUseCase(
-                    currentTsumegoId = tsumegoId,
-                    isPrevious = isPrevious,
-                ).handleResult(
+                getNextTsumegoIdUseCase().handleResult(
                     onSuccess = { tsumegoId ->
                         loadTsumego(tsumegoId)
                     },
@@ -225,13 +235,13 @@ class GameViewModel(
         }
     }
 
-    private fun reset() {
+    internal fun reset() {
         gameFlow.value?.let { game ->
             gameFlow.value = restartGameUseCase(game)
         }
     }
 
-    private fun startReview() {
+    internal fun startReview() {
         gameFlow.value?.let { game ->
             gameFlow.value = startReviewUseCase(game = game)
         }
@@ -266,49 +276,18 @@ class GameViewModel(
         }
     }
 
-    private val defaultRestartButton: THButtonState
-        get() = THButtonState(
-            text = "Restart".toTextSpec(), // TODO: loco
-            style = ButtonStyle.Secondary,
-            onClick = ::reset,
+    private suspend fun sendGameResult(
+        isSuccess: Boolean,
+        tsumegoId: String,
+    ) {
+        sendGameResultUseCase(
+            isSuccess = isSuccess,
+            tsumegoId = tsumegoId,
+            mode = Attempt.Mode.Standard, // TODO: handle game mode
+        ).handleResult(
+            onSuccess = {},
+            onError = snackbarManager::showError,
         )
+    }
 
-    private val defaultNextButton: THButtonState
-        get() = THButtonState(
-            text = null,
-            trailingIcon = THDrawable.ic_arrow_forward.toIconSpec(),
-            style = ButtonStyle.Secondary,
-            onClick = ::next,
-        )
-
-    private val defaultReviewButton: THButtonState
-        get() = THButtonState(
-            text = "📖 Review".toTextSpec(), // TODO: loco
-            style = ButtonStyle.Secondary,
-            onClick = ::startReview,
-        )
-
-    private val defaultReviewPreviousButton: THButtonState
-        get() = THButtonState(
-            text = null,
-            style = ButtonStyle.Text,
-            onClick = { navigateReview(true) },
-            icon = THDrawable.ic_previous.toIconSpec(),
-        )
-
-    private val defaultReviewNextButton: THButtonState
-        get() = THButtonState(
-            text = null,
-            style = ButtonStyle.Text,
-            onClick = { navigateReview(false) },
-            icon = THDrawable.ic_next.toIconSpec(),
-        )
-
-    private val defaultReviewResetButton: THButtonState
-        get() = THButtonState(
-            text = null,
-            style = ButtonStyle.Text,
-            onClick = ::startReview,
-            icon = THDrawable.ic_refresh.toIconSpec(),
-        )
 }

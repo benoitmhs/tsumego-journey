@@ -3,7 +3,6 @@ package com.mrsanglier.tsumegohero.localdatasources.datasource
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.localdatasources.room.dao.TsumegoDao
 import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
-import com.mrsanglier.tsumegohero.localdatasources.room.model.RankCount
 import com.mrsanglier.tsumegohero.localdatasources.room.model.RoomTsumego
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,8 +22,14 @@ class LocalTsumegoDatasource(
     fun observeGame(id: String): Flow<RawTsumego> =
         dao.observeGame(id).map { roomModel -> roomModel.toAppModel() }
 
-    suspend fun getNextTsumego(rank: Rank): RawTsumego? =
-        dao.getNextTsumego(rank.rawValue)?.toAppModel()
+    suspend fun getNextNeverAttempted(rank: Rank): RawTsumego? =
+        dao.getNextNeverAttempted(rank.rawValue)?.toAppModel()
+
+    suspend fun getNextNeverSucceeded(rank: Rank): RawTsumego? =
+        dao.getNextNeverSucceeded(rank.rawValue)?.toAppModel()
+
+    suspend fun getOldestAttempted(rank: Rank): RawTsumego? =
+        dao.getOldestAttempted(rank.rawValue)?.toAppModel()
 
     suspend fun countRanks(): Map<String, Int> =
         dao.countRanks()

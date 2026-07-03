@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.unit.Dp
@@ -30,6 +31,7 @@ fun DailyStreakCell(
             .padding(horizontal = THTheme.spacing.small)
             .alpha(alpha),
         horizontalArrangement = Arrangement.spacedBy(THTheme.spacing.tiny),
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
             painter = painterResource(imageRes),

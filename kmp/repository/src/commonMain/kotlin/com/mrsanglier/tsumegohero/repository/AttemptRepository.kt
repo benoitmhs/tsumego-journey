@@ -13,4 +13,7 @@ class AttemptRepository(
 
     fun observeLastSucceedAttempt(): Flow<Attempt?> =
         localAttemptDataSource.observeLastSucceedAttempt()
+
+    suspend fun getTsumegoSolvedCount(): Int =
+        localAttemptDataSource.getTsumegoSolvedCount()
 }

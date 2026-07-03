@@ -56,6 +56,7 @@ kotlin {
             implementation(projects.kmp.domain.authentication)
             implementation(projects.kmp.domain.dashboardGame)
             implementation(projects.kmp.domain.game)
+            implementation(projects.kmp.domain.common)
         }
     }
 }

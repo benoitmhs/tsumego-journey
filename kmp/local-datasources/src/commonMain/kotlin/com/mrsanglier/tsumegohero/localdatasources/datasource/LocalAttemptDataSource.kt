@@ -15,4 +15,11 @@ class LocalAttemptDataSource(
 
     fun observeLastSucceedAttempt(): Flow<Attempt?> =
         dao.observeLastSucceedAttempt().map { it?.toAppModel() }
+
+    suspend fun getTsumegoSolvedCount(): Int =
+        dao.getTsumegoSolvedCount()
+
+    suspend fun clean() {
+        dao.clean()
+    }
 }

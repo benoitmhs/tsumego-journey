@@ -9,10 +9,10 @@ import com.mrsanglier.tsumegohero.coreui.componants.button.THButtonState
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.resources.THDrawable
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DailyStreakCellData
-import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.ProblemStreakData
+import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.ProblemStreakProgressBarData
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.RankProgressBarData
-import com.mrsanglier.tsumegohero.dashboardgame.model.ProgressData
 import com.mrsanglier.tsumegohero.data.model.user.DailyStreak
+import com.mrsanglier.tsumegohero.domain.common.model.ProgressData
 
 internal fun DailyStreak.toCellData(): DailyStreakCellData {
     val imageRes = when (status) {
@@ -40,8 +40,8 @@ internal fun ProgressData.getRankProgressBarData(): RankProgressBarData =
             .fastCoerceAtLeast(0.005f),
     )
 
-internal fun ProgressData.getProblemStreakData(): ProblemStreakData =
-    ProblemStreakData(
+internal fun ProgressData.getProblemStreakData(): ProblemStreakProgressBarData =
+    ProblemStreakProgressBarData(
         streak = problemStreak,
         total = problemStreakRequired,
     )
@@ -61,13 +61,13 @@ internal fun HomeViewModel.getMainAction(rankIsNull: Boolean) =
         )
     }
 
-object PlaceHolder {
+internal object PlaceHolder {
     val DailyStreak: DailyStreakCellData
         get() = DailyStreakCellData(imageRes = THDrawable.fire_grey, text = "-".toTextSpec(), alpha = 0.5f)
 
     val RankProgressBar: RankProgressBarData
         get() = RankProgressBarData(label = "-".toTextSpec(), progress = 0f)
 
-    val ProblemStreak: ProblemStreakData
-        get() = ProblemStreakData(streak = 0, total = 10)
+    val ProblemStreak: ProblemStreakProgressBarData
+        get() = ProblemStreakProgressBarData(streak = 0, total = 10)
 }

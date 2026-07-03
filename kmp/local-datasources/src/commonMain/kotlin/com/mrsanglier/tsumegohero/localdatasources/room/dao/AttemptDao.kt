@@ -14,6 +14,9 @@ interface AttemptDao {
     @Query("SELECT * FROM attempt WHERE success = 1 ORDER BY date DESC LIMIT 1")
     fun observeLastSucceedAttempt(): Flow<RoomAttempt?>
 
+    @Query("SELECT COUNT(DISTINCT tsumegoId) FROM attempt WHERE success = 1")
+    suspend fun getTsumegoSolvedCount(): Int
+
     @Query("DELETE FROM attempt")
     suspend fun clean()
 }

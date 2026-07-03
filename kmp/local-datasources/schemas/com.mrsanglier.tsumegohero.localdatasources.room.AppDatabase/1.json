@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1ceaa9169661e98e0a70c15a1b22ec8a",
+    "identityHash": "4a36c42344b1c9ebafc469c31a2d46e2",
     "entities": [
       {
         "tableName": "attempt",
@@ -96,7 +96,7 @@
       },
       {
         "tableName": "user",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `username` TEXT NOT NULL, `rank` TEXT, `dailyStreak` INTEGER NOT NULL, `stepSuccessStreak` INTEGER NOT NULL, `nbRankStepCompleted` INTEGER NOT NULL, `bestDailyStreak` INTEGER NOT NULL, `nbTsumegoSolved` INTEGER NOT NULL, PRIMARY KEY(`userId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `username` TEXT NOT NULL, `rank` TEXT, `dailyStreak` INTEGER NOT NULL, `problemStreak` INTEGER NOT NULL, `nbRankStepCompleted` INTEGER NOT NULL, `bestDailyStreak` INTEGER NOT NULL, `nbTsumegoSolved` INTEGER NOT NULL, PRIMARY KEY(`userId`))",
         "fields": [
           {
             "fieldPath": "userId",
@@ -122,8 +122,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "stepSuccessStreak",
-            "columnName": "stepSuccessStreak",
+            "fieldPath": "problemStreak",
+            "columnName": "problemStreak",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -156,7 +156,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1ceaa9169661e98e0a70c15a1b22ec8a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4a36c42344b1c9ebafc469c31a2d46e2')"
     ]
   }
 }

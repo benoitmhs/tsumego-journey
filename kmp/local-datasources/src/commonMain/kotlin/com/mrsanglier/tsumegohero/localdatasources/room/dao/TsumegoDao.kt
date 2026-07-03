@@ -26,7 +26,28 @@ interface TsumegoDao {
         LIMIT 1
     """
     )
-    suspend fun getNextTsumego(rank: String): RoomTsumego?
+    suspend fun getNextNeverAttempted(rank: String): RoomTsumego?
+
+    @Query(
+        """
+        SELECT * FROM tsumego 
+        WHERE rank = :rank 
+        AND id NOT IN (SELECT tsumegoId FROM attempt WHERE success = 1) 
+        LIMIT 1
+    """
+    )
+    suspend fun getNextNeverSucceeded(rank: String): RoomTsumego?
+
+    @Query(
+        """
+        SELECT t.* FROM tsumego t
+        INNER JOIN attempt a ON t.id = a.tsumegoId
+        WHERE t.rank = :rank
+        ORDER BY a.date ASC
+        LIMIT 1
+    """
+    )
+    suspend fun getOldestAttempted(rank: String): RoomTsumego?
 
     @Query(
         """

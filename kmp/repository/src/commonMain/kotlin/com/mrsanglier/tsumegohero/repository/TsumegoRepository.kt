@@ -18,8 +18,14 @@ class TsumegoRepository(
     fun observeGame(id: String): Flow<RawTsumego> =
         localTsumegoDatasource.observeGame(id)
 
-    suspend fun getNextTsumego(rank: Rank): RawTsumego? =
-        localTsumegoDatasource.getNextTsumego(rank)
+    suspend fun getNextNeverAttempted(rank: Rank): RawTsumego? =
+        localTsumegoDatasource.getNextNeverAttempted(rank)
+
+    suspend fun getNextNeverSucceeded(rank: Rank): RawTsumego? =
+        localTsumegoDatasource.getNextNeverSucceeded(rank)
+
+    suspend fun getOldestAttempted(rank: Rank): RawTsumego? =
+        localTsumegoDatasource.getOldestAttempted(rank)
 
     suspend fun countRanks(): Map<String, Int> =
         localTsumegoDatasource.countRanks()

@@ -5,7 +5,7 @@ class THAppError(
     override val message: String? = null,
     override val cause: Throwable? = null,
     override val code: THAppError.Code,
-) : THError(message, cause, code) {
+) : THError("${title.orEmpty()} ${message.orEmpty()}", cause, code) {
     enum class Code : THErrorCode {
         ObjectNotFound,
         InvalidEmailFormat,

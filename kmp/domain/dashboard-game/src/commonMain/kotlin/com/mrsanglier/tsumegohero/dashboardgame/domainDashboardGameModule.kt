@@ -9,6 +9,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val domainDashboardGameModule: Module = module {
+
     singleOf(::ObserveDailyStreakUseCase)
     singleOf(::ObserveProgressDataUseCase)
     singleOf(::ObserveUserUseCase)

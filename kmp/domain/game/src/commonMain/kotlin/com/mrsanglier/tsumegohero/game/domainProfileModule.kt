@@ -13,6 +13,7 @@ import com.mrsanglier.tsumegohero.game.usecase.PlayOpponentMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayPlayerMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayReviewMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.RestartGameUseCase
+import com.mrsanglier.tsumegohero.game.usecase.SendGameResultUseCase
 import com.mrsanglier.tsumegohero.game.usecase.StartGameUseCase
 import com.mrsanglier.tsumegohero.game.usecase.StartReviewUseCase
 import org.koin.core.module.Module
@@ -29,6 +30,7 @@ val domainGameModule: Module = module {
     singleOf(::PlayReviewMoveUseCase)
     singleOf(::PlayOpponentMoveUseCase)
     singleOf(::RestartGameUseCase)
+    singleOf(::SendGameResultUseCase)
     singleOf(::StartGameUseCase)
     singleOf(::StartReviewUseCase)
 

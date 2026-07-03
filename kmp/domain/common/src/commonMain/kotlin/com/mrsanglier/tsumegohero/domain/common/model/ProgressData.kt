@@ -1,4 +1,4 @@
-package com.mrsanglier.tsumegohero.dashboardgame.model
+package com.mrsanglier.tsumegohero.domain.common.model
 
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 

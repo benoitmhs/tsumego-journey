@@ -21,7 +21,7 @@ class InitUserUseCase(
             username = "",
             rank = null,
             dailyStreak = 0,
-            stepSuccessStreak = 0,
+            problemStreak = 0,
             nbRankStepCompleted = 0,
             bestDailyStreak = 0,
             nbTsumegoSolved = 0,
