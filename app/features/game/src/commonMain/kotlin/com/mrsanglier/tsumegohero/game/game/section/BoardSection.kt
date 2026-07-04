@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.mrsanglier.tsumegohero.coreui.componants.spacer.THSpacerWeight
 import com.mrsanglier.tsumegohero.coreui.componants.spacer.THVerticalSpacer
 import com.mrsanglier.tsumegohero.coreui.componants.text.THText
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
@@ -45,5 +46,7 @@ fun BoardSection(
             boardUiState = boardState,
             onClickCell = onClickCell,
         )
+
+        THSpacerWeight()
     }
 }

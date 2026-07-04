@@ -11,6 +11,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.mrsanglier.tsumegohero.coreui.componants.button.THButtonState
+import com.mrsanglier.tsumegohero.coreui.componants.spacer.THVerticalSpacer
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 
 @Composable
@@ -27,7 +28,7 @@ fun GameActionsSection(
     ) {
         gameActionState.actionButton?.Content(
             modifier = Modifier.fillMaxWidth(),
-        )
+        ) ?: THTheme.spacing.xhuge.THVerticalSpacer()
 
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -38,6 +39,7 @@ fun GameActionsSection(
                     .weight(1f)
                     .animateContentSize(),
             )
+
             gameActionState.validateButton.Content(
                 modifier = Modifier
                     .weight(1f)

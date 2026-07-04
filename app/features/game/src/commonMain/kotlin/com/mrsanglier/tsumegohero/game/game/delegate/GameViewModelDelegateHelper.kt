@@ -2,6 +2,7 @@ package com.mrsanglier.tsumegohero.game.game.delegate
 
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_arrow_forward
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_refresh
+import com.mrsanglier.tsumegohero.app.coreui.resources.ic_send
 import com.mrsanglier.tsumegohero.coreui.componants.button.ButtonStyle
 import com.mrsanglier.tsumegohero.coreui.componants.button.THButtonState
 import com.mrsanglier.tsumegohero.coreui.extension.toIconSpec
@@ -16,7 +17,7 @@ internal fun defaultRestartButton(onClick: () -> Unit): THButtonState = THButton
 )
 
 internal fun defaultNextButton(onClick: () -> Unit): THButtonState = THButtonState(
-    text = null,
+    text = "Next".toTextSpec(),
     trailingIcon = THDrawable.ic_arrow_forward.toIconSpec(),
     style = ButtonStyle.Secondary,
     onClick = onClick,

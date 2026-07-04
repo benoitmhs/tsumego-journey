@@ -2,12 +2,10 @@ package com.mrsanglier.tsumegohero.game.game.delegate
 
 import com.mrsanglier.tsumegohero.core.error.THGameError
 import com.mrsanglier.tsumegohero.core.extension.handleResult
-import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameMode
-import com.mrsanglier.tsumegohero.game.game.section.BoardUiState
 import com.mrsanglier.tsumegohero.game.game.section.GameActionState
 import com.mrsanglier.tsumegohero.game.model.Cell
 import com.mrsanglier.tsumegohero.game.model.Game
@@ -20,7 +18,6 @@ import com.mrsanglier.tsumegohero.game.usecase.RestartGameUseCase
 import com.mrsanglier.tsumegohero.game.usecase.SubmitGhostSequenceUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlin.time.Clock
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -92,8 +89,6 @@ class GameViewModelDelegateImpl(
         skipButton = null,
         actionButton = null,
     )
-
-    override fun Game.mapBoardUiState(): BoardUiState = mapBoardUiState()
 
     override fun onClickCell(cell: Cell) {
         val game = gameFlow.value ?: return
