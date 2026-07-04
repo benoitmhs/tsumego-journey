@@ -20,6 +20,9 @@ import com.mrsanglier.tsumegohero.coreui.animation.slideVerticalExitTransition
 import com.mrsanglier.tsumegohero.coreui.animation.slideVerticalPopEnterTransition
 import com.mrsanglier.tsumegohero.coreui.animation.slideVerticalPopExitTransition
 import com.mrsanglier.tsumegohero.dashboard.navigation.DashboardDestination
+import com.mrsanglier.tsumegohero.game.rankestimation.RankEstimationDestination
+import com.mrsanglier.tsumegohero.game.review.ReviewDestination
+import com.mrsanglier.tsumegohero.game.training.TrainingDestination
 import kotlin.jvm.JvmSuppressWildcards
 
 enum class Transition(
@@ -62,11 +65,14 @@ enum class Transition(
 private val fadingDestinations: Set<String> = setOfNotNull(
     ConnectionDestination::class.simpleName,
     DashboardDestination::class.simpleName,
+    ReviewDestination::class.simpleName,
 )
 
 private val horizontalDestinations: Set<String> = setOfNotNull(
     ChoosePasswordDestination::class.simpleName,
     ChoosePseudoDestination::class.simpleName,
+    TrainingDestination::class.simpleName,
+    RankEstimationDestination::class.simpleName,
 )
 
 private val verticalDestinations: Set<String> = setOfNotNull(
