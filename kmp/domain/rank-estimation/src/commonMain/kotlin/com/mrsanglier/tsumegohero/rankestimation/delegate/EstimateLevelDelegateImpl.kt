@@ -7,8 +7,12 @@ import com.mrsanglier.tsumegohero.rankestimation.RankEstimationConfig
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
-class ComputeFinalLevelDelegate {
-    operator fun invoke(attempts: List<Pair<Rank, Attempt>>): Level {
+interface EstimateLevelDelegate {
+    fun estimateLevel(attempts: List<Pair<Rank, Attempt>>): Level
+}
+
+class EstimateLevelDelegateImpl : EstimateLevelDelegate {
+    override fun estimateLevel(attempts: List<Pair<Rank, Attempt>>): Level {
         val attempsResults = attempts
             .groupBy({ it.first }, { it.second })
             .map { (rank, attemptsByRank) ->

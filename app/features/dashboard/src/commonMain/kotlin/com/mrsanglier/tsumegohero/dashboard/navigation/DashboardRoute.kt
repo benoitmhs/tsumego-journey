@@ -59,7 +59,8 @@ fun DashboardRoute(
                 HomeDestination.composable(
                     navGraphBuilder = this,
                     navScope = HomeNavScope(
-                        navigateToGame = navScope.navigateToGame,
+                        navigateToTraining = navScope.navigateToTraining,
+                        navigateToRankEstimation = navScope.navigateToRankEstimation,
                     )
                 )
                 ProfileDestination.composable(this)

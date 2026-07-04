@@ -12,6 +12,7 @@ kotlin {
 
             implementation(projects.kmp.core)
             implementation(projects.kmp.data)
+            implementation(projects.kmp.domain.common)
             implementation(projects.kmp.repository)
         }
         commonTest.dependencies {

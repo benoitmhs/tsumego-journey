@@ -9,6 +9,7 @@ kotlin {
             // Log
             implementation(libs.kermit)
 
+            implementation(projects.kmp.repository)
             implementation(projects.kmp.core)
             implementation(projects.kmp.data)
         }

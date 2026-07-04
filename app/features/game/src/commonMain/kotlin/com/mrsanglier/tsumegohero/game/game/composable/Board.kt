@@ -5,6 +5,7 @@ import androidx.compose.animation.core.snap
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,12 +15,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.toSize
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
-import com.mrsanglier.tsumegohero.game.game.GHOST_STONE_FADE_DURATION
+import com.mrsanglier.tsumegohero.game.game.delegate.GHOST_STONE_FADE_DURATION
+import com.mrsanglier.tsumegohero.game.game.section.BoardUiState
 import com.mrsanglier.tsumegohero.game.game.uimodel.BoardStyle
 import com.mrsanglier.tsumegohero.game.model.BoardSize
 import com.mrsanglier.tsumegohero.game.model.Cell
@@ -33,6 +36,34 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 internal fun Board(
+    boardUiState: BoardUiState,
+    onClickCell: (Cell) -> Unit,
+    modifier: Modifier = Modifier,
+    boardSize: BoardSize = BoardSize.X19,
+    style: BoardStyle = BoardStyle.Default,
+    isReview: Boolean = false,
+    goodMoves: Set<Cell>? = null,
+    badMoves: Set<Cell>? = null,
+) {
+    Board(
+        boardSize = boardSize,
+        modifier = modifier,
+        style = style,
+        cropBoard = boardUiState.cropBoard,
+        blackStones = boardUiState.blackStones,
+        whiteStones = boardUiState.whiteStones,
+        goodMoves = goodMoves,
+        badMoves = badMoves,
+        lastMove = boardUiState.lastMove,
+        isGhostMode = boardUiState.isGhostMode,
+        isReview = isReview,
+        borderColor = boardUiState.borderColor(),
+        onClickCell = onClickCell,
+    )
+}
+
+@Composable
+private fun Board(
     boardSize: BoardSize = BoardSize.X19,
     modifier: Modifier = Modifier,
     style: BoardStyle = BoardStyle.Default,
@@ -44,6 +75,7 @@ internal fun Board(
     lastMove: Move? = null,
     isGhostMode: Boolean = false,
     isReview: Boolean = false,
+    borderColor: Color,
     onClickCell: (Cell) -> Unit = {},
 ) {
     val blackStoneImageBitmap = imageResource(style.blackStoneRes)
@@ -69,6 +101,11 @@ internal fun Board(
     Box(
         modifier = modifier
             .aspectRatio(1f)
+            .border(
+                width = THTheme.stroke.regular,
+                color = borderColor,
+                shape = THTheme.shape.roundSmall,
+            )
             .clip(THTheme.shape.roundSmall),
     ) {
         Image(

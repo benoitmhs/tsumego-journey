@@ -26,49 +26,53 @@ private fun block(rank: Rank, timeMs: Long, successCount: Int = 5): List<Pair<Ra
         List(5 - successCount) { rank to attempt(timeMs, Attempt.Result.Failure) }
 
 class ComputeFinalLevelDelegateTest : FunSpec({
-    val compute = ComputeFinalLevelDelegate(EvaluateRankBlockDelegate())
+    val delegate = EstimateLevelDelegateImpl()
 
-    test("first rank failing the difficult threshold yields no level") {
-        val attempts = block(Rank.`15K`, timeMs = 400_000, successCount = 3)
-
-        compute(attempts) shouldBe null
-    }
-
-    test("tiers advance independently and stop at the last validated rank") {
-        val attempts =
-            block(Rank.`15K`, timeMs = 10_000) + // flash+classical+difficult
-                block(Rank.`15Kplus`, timeMs = 90_000) + // classical+difficult only
-                block(Rank.`14K`, timeMs = 400_000, successCount = 3) // fails difficult, stops here
-
-        compute(attempts) shouldBe Level(
-            flashRank = Rank.`15K`,
-            classicalRank = Rank.`15Kplus`,
-            difficultRank = Rank.`15Kplus`,
-        )
-    }
-
-    test("tiers never validated fall back to the weakest rank") {
-        val attempts =
-            block(Rank.`15K`, timeMs = 400_000) + // difficult only
-                block(Rank.`15Kplus`, timeMs = 400_000) + // difficult only
-                block(Rank.`14K`, timeMs = 400_000, successCount = 3) // fails difficult, stops here
-
-        compute(attempts) shouldBe Level(
+    test("no attempts falls back to the weakest rank on every tier") {
+        delegate.estimateLevel(emptyList()) shouldBe Level(
             flashRank = Rank.entries.first(),
             classicalRank = Rank.entries.first(),
-            difficultRank = Rank.`15Kplus`,
+            difficultRank = Rank.entries.first(),
         )
     }
 
-    test("an incomplete current block is ignored") {
-        val attempts =
-            block(Rank.`15K`, timeMs = 10_000) +
-                List(3) { Rank.`15Kplus` to attempt(10_000, Attempt.Result.Success) }
+    test("fast and successful attempts validate all three tiers for that rank") {
+        val attempts = block(Rank.`15K`, timeMs = 10_000)
 
-        compute(attempts) shouldBe Level(
+        delegate.estimateLevel(attempts) shouldBe Level(
             flashRank = Rank.`15K`,
             classicalRank = Rank.`15K`,
             difficultRank = Rank.`15K`,
+        )
+    }
+
+    test("slow but successful attempts only validate the difficult tier") {
+        val attempts = block(Rank.`15K`, timeMs = 400_000)
+
+        delegate.estimateLevel(attempts) shouldBe Level(
+            flashRank = Rank.entries.first(),
+            classicalRank = Rank.entries.first(),
+            difficultRank = Rank.`15K`,
+        )
+    }
+
+    test("a rank below the success threshold does not validate any tier") {
+        val attempts = block(Rank.`15K`, timeMs = 10_000, successCount = 3)
+
+        delegate.estimateLevel(attempts) shouldBe Level(
+            flashRank = Rank.entries.first(),
+            classicalRank = Rank.entries.first(),
+            difficultRank = Rank.entries.first(),
+        )
+    }
+
+    test("among several qualifying ranks the strongest one wins per tier") {
+        val attempts = block(Rank.`15K`, timeMs = 10_000) + block(Rank.`10K`, timeMs = 10_000)
+
+        delegate.estimateLevel(attempts) shouldBe Level(
+            flashRank = Rank.`10K`,
+            classicalRank = Rank.`10K`,
+            difficultRank = Rank.`10K`,
         )
     }
 })

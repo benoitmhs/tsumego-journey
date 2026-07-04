@@ -4,8 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeNavScope
-import com.mrsanglier.tsumegohero.game.game.GameDestination
-import com.mrsanglier.tsumegohero.game.game.GameNavScope
+import com.mrsanglier.tsumegohero.game.rankestimation.RankEstimationDestination
+import com.mrsanglier.tsumegohero.game.rankestimation.RankEstimationNavScope
+import com.mrsanglier.tsumegohero.game.review.ReviewDestination
+import com.mrsanglier.tsumegohero.game.review.ReviewNavScope
+import com.mrsanglier.tsumegohero.game.training.TrainingDestination
+import com.mrsanglier.tsumegohero.game.training.TrainingNavScope
 import com.mrsanglier.tsumegohero.navigation.animation.THNavHost
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -22,20 +26,38 @@ fun MainNavigation(
         HomeDestination.composable(
             this,
             HomeNavScope(
-                navigateToGame = { tsumegoId, gameContext ->
-                    navController.navigate(
-                        GameDestination(
-                            tsumegoId = tsumegoId,
-                            context = gameContext,
-                        )
-                    )
+                navigateToTraining = { tsumegoId ->
+                    navController.navigate(TrainingDestination(tsumegoId = tsumegoId))
+                },
+                navigateToRankEstimation = { tsumegoId ->
+                    navController.navigate(RankEstimationDestination(tsumegoId = tsumegoId))
                 },
             ),
         )
 
-        GameDestination.composable(
+        TrainingDestination.composable(
             navGraphBuilder = this,
-            navScope = GameNavScope(
+            navScope = TrainingNavScope(
+                navigateBack = navController::popBackStack,
+                navigateToReview = { tsumegoId ->
+                    navController.navigate(ReviewDestination(tsumegoId = tsumegoId))
+                },
+            )
+        )
+
+        RankEstimationDestination.composable(
+            navGraphBuilder = this,
+            navScope = RankEstimationNavScope(
+                navigateBack = navController::popBackStack,
+                navigateToReview = { tsumegoId ->
+                    navController.navigate(ReviewDestination(tsumegoId = tsumegoId))
+                },
+            )
+        )
+
+        ReviewDestination.composable(
+            navGraphBuilder = this,
+            navScope = ReviewNavScope(
                 navigateBack = navController::popBackStack,
             )
         )

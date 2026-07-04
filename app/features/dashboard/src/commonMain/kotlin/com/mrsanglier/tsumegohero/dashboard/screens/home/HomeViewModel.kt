@@ -12,7 +12,6 @@ import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveDailyStreakUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveProgressDataUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveUserUseCase
-import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.ImportTsumegoUseCase
@@ -64,10 +63,7 @@ class HomeViewModel(
             getNextRankEstimationTsumegoUseCase().handleResult(
                 onSuccess = { tsumegoId ->
                     if (tsumegoId != null) {
-                        navEvent.value = NavEvent.Game(
-                            tsumegoId = tsumegoId,
-                            gameContext = GameContext.RankEstimation,
-                        )
+                        navEvent.value = NavEvent.RankEstimation(tsumegoId)
                     }
                 },
                 onError = snackbarManager::showError,
@@ -79,10 +75,7 @@ class HomeViewModel(
         viewModelScope.launch {
             getNextTsumegoIdUseCase().handleResult(
                 onSuccess = { tsumegoId ->
-                    navEvent.value = NavEvent.Game(
-                        tsumegoId = tsumegoId,
-                        gameContext = GameContext.Training,
-                    )
+                    navEvent.value = NavEvent.Training(tsumegoId)
                 },
                 onError = snackbarManager::showError,
             )
@@ -136,10 +129,8 @@ class HomeViewModel(
     }
 
     internal sealed interface NavEvent {
-        data class Game(
-            val tsumegoId: String,
-            val gameContext: GameContext,
-        ) : NavEvent
+        data class Training(val tsumegoId: String) : NavEvent
+        data class RankEstimation(val tsumegoId: String) : NavEvent
     }
 
 }
