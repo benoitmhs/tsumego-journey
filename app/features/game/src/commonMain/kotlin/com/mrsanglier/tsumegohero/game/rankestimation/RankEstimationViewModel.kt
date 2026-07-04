@@ -68,7 +68,7 @@ class RankEstimationViewModel(
 
         if (args.gameMode == GameMode.Standard) {
             viewModelScope.launch {
-                initClassicGame { tsumegoId, result ->
+                initObserveGame { tsumegoId, result ->
                     submitRankEstimationAnswerUseCase(
                         result = result,
                         tsumegoId = tsumegoId,

@@ -15,7 +15,6 @@ import com.mrsanglier.tsumegohero.game.usecase.PlayGhostMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayOpponentMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayPlayerMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.RestartGameUseCase
-import com.mrsanglier.tsumegohero.game.usecase.SubmitGhostSequenceUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.Clock
@@ -38,7 +37,7 @@ interface GameViewModelDelegate {
     fun onClickCell(cell: Cell)
     suspend fun startTsumego(tsumegoId: String, gameMode: GameMode)
     fun getElapsedTime(): Long
-    suspend fun initClassicGame(submitResult: suspend (String, Attempt.Result) -> Unit)
+    suspend fun initObserveGame(submitResult: suspend (String, Attempt.Result) -> Unit)
 
 }
 
@@ -49,7 +48,6 @@ class GameViewModelDelegateImpl(
     private val playGhostMoveUseCase: PlayGhostMoveUseCase,
     private val playOpponentMoveUseCase: PlayOpponentMoveUseCase,
     private val restartGameUseCase: RestartGameUseCase,
-    private val submitGhostSequenceUseCase: SubmitGhostSequenceUseCase,
     private val snackbarManager: SnackbarManager,
 ) : GameViewModelDelegate,
     BoardViewModelDelegate by boardDelegate {
@@ -137,7 +135,9 @@ class GameViewModelDelegateImpl(
     }
 
     internal fun submitGhostSequence() {
-        gameFlow.value?.let { updateGame(submitGhostSequenceUseCase(it)) }
+        gameFlow.value?.let { game ->
+            updateGame(game.copy(isGhostSubmitted = true))
+        }
     }
 
     override suspend fun startTsumego(tsumegoId: String, gameMode: GameMode) {
@@ -147,7 +147,7 @@ class GameViewModelDelegateImpl(
         )
     }
 
-    override suspend fun initClassicGame(
+    override suspend fun initObserveGame(
         submitResult: suspend (tsumegoId: String, Attempt.Result) -> Unit,
     ) {
         gameFlow.collect { game ->
@@ -155,7 +155,12 @@ class GameViewModelDelegateImpl(
             lockTouch.value = game.isOpponentTurn
             if (game.isOpponentTurn) playOpponentTurn(game)
 
-            if (game.outcome != SgfNodeOutcome.NONE) {
+            val resultShouldBeSubmit = when (game.mode) {
+                GameMode.Ghost -> game.isGhostSubmitted
+                GameMode.Standard -> game.outcome != SgfNodeOutcome.NONE
+            }
+
+            if (resultShouldBeSubmit) {
                 submitResult(
                     game.sgf.id,
                     if (game.outcome == SgfNodeOutcome.SUCCESS) Attempt.Result.Success else Attempt.Result.Failure,

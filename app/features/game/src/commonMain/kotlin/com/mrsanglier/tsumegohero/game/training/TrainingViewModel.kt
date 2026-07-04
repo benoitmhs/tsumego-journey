@@ -10,7 +10,6 @@ import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
-import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
@@ -65,20 +64,18 @@ class TrainingViewModel(
             )
         }
 
-        if (args.gameMode == GameMode.Standard) {
-            viewModelScope.launch {
-                initClassicGame { tsumegoId, result ->
-                    sendGameResultUseCase(
-                        result = result,
-                        tsumegoId = tsumegoId,
-                        mode = args.gameMode,
-                        resolutionTimeMs = getElapsedTime(),
-                        gameContext = GameContext.Training,
-                    ).handleResult(
-                        onSuccess = {},
-                        onError = snackbarManager::showError,
-                    )
-                }
+        viewModelScope.launch {
+            initObserveGame { tsumegoId, result ->
+                sendGameResultUseCase(
+                    result = result,
+                    tsumegoId = tsumegoId,
+                    mode = args.gameMode,
+                    resolutionTimeMs = getElapsedTime(),
+                    gameContext = GameContext.Training,
+                ).handleResult(
+                    onSuccess = {},
+                    onError = snackbarManager::showError,
+                )
             }
         }
     }

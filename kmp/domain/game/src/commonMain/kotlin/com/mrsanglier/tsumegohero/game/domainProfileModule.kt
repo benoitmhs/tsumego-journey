@@ -17,7 +17,6 @@ import com.mrsanglier.tsumegohero.game.usecase.RestartGameUseCase
 import com.mrsanglier.tsumegohero.game.usecase.SendGameResultUseCase
 import com.mrsanglier.tsumegohero.game.usecase.StartGameUseCase
 import com.mrsanglier.tsumegohero.game.usecase.StartReviewUseCase
-import com.mrsanglier.tsumegohero.game.usecase.SubmitGhostSequenceUseCase
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -36,7 +35,6 @@ val domainGameModule: Module = module {
     singleOf(::SendGameResultUseCase)
     singleOf(::StartGameUseCase)
     singleOf(::StartReviewUseCase)
-    singleOf(::SubmitGhostSequenceUseCase)
 
     // Delegate
     singleOf(::DeriveTsumegoDelegateImpl)
