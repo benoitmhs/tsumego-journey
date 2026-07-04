@@ -28,7 +28,7 @@ fun TrainingRoute(
 
     safeNavigation(viewModel.navEvent, viewModel::consumeNavigation) { event ->
         when (event) {
-            is TrainingNavEvent.Review -> navScope.navigateToReview(event.tsumegoId)
+            is TrainingNavEvent.Review -> navScope.navigateToReview(event.tsumegoId, event.boardConfig)
         }
     }
     TrainingScreen(

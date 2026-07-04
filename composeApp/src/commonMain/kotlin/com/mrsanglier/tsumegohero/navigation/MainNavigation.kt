@@ -39,8 +39,14 @@ fun MainNavigation(
             navGraphBuilder = this,
             navScope = TrainingNavScope(
                 navigateBack = navController::popBackStack,
-                navigateToReview = { tsumegoId ->
-                    navController.navigate(ReviewDestination(tsumegoId = tsumegoId))
+                navigateToReview = { tsumegoId, boardConfig ->
+                    navController.navigate(
+                        ReviewDestination(
+                            tsumegoId = tsumegoId,
+                            rotation = boardConfig.rotation,
+                            changeColor = boardConfig.changeColor,
+                        )
+                    )
                 },
             )
         )
@@ -49,8 +55,14 @@ fun MainNavigation(
             navGraphBuilder = this,
             navScope = RankEstimationNavScope(
                 navigateBack = navController::popBackStack,
-                navigateToReview = { tsumegoId ->
-                    navController.navigate(ReviewDestination(tsumegoId = tsumegoId))
+                navigateToReview = { tsumegoId, boardConfig ->
+                    navController.navigate(
+                        ReviewDestination(
+                            tsumegoId = tsumegoId,
+                            rotation = boardConfig.rotation,
+                            changeColor = boardConfig.changeColor,
+                        )
+                    )
                 },
             )
         )

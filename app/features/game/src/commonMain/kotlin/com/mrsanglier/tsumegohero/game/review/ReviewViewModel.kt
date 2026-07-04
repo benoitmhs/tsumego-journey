@@ -10,6 +10,7 @@ import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegateImpl
+import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.model.Cell
 import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
 import com.mrsanglier.tsumegohero.game.usecase.NavigateReviewUseCase
@@ -35,7 +36,16 @@ class ReviewViewModel(
 
     init {
         viewModelScope.launch {
-            loadTsumego(args.tsumegoId, GameMode.Standard).handleResult(
+            val boardConfig = if (args.changeColor != null && args.rotation != null) {
+                BoardConfig(args.rotation, args.changeColor)
+            } else null
+
+
+            loadTsumego(
+                tsumegoId = args.tsumegoId,
+                boardConfig = boardConfig,
+                mode = GameMode.Standard,
+            ).handleResult(
                 onSuccess = { game -> updateGame(startReviewUseCase(game)) },
                 onError = snackbarManager::showError,
             )

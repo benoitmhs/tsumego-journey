@@ -13,6 +13,7 @@ import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
+import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.SendGameResultUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -41,7 +42,9 @@ class TrainingViewModel(
         TrainingViewModelState(
             boardState = game.mapBoardUiState(),
             gameActionState = game.mapGameActionState(
-                onClickReview = { _navEvent.value = TrainingNavEvent.Review(game.sgf.id) },
+                onClickReview = {
+                    _navEvent.value = TrainingNavEvent.Review(game.sgf.id, game.boardConfig)
+                },
                 onClickNext = ::next,
                 onSkipClick = ::skip,
             ),
@@ -130,5 +133,5 @@ class TrainingViewModel(
 }
 
 internal sealed interface TrainingNavEvent {
-    data class Review(val tsumegoId: String) : TrainingNavEvent
+    data class Review(val tsumegoId: String, val boardConfig: BoardConfig) : TrainingNavEvent
 }

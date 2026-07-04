@@ -7,6 +7,7 @@ import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.game.game.section.BoardUiState
+import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.model.Game
 import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
 import com.mrsanglier.tsumegohero.game.model.Stone
@@ -23,7 +24,11 @@ import kotlinx.coroutines.flow.asStateFlow
 interface BoardViewModelDelegate {
     val gameFlow: StateFlow<Game?>
 
-    suspend fun loadTsumego(tsumegoId: String, mode: GameMode): THResult<Game>
+    suspend fun loadTsumego(
+        tsumegoId: String,
+        mode: GameMode,
+        boardConfig: BoardConfig? = null,
+    ): THResult<Game>
 
     fun updateGame(game: Game)
     fun Game.mapBoardUiState(): BoardUiState
@@ -37,8 +42,12 @@ class BoardViewModelDelegateImpl(
     private val _gameFlow = MutableStateFlow<Game?>(null)
     override val gameFlow: StateFlow<Game?> = _gameFlow.asStateFlow()
 
-    override suspend fun loadTsumego(tsumegoId: String, mode: GameMode): THResult<Game> {
-        val result = startGameUseCase(tsumegoId, mode)
+    override suspend fun loadTsumego(
+        tsumegoId: String,
+        mode: GameMode,
+        boardConfig: BoardConfig?,
+    ): THResult<Game> {
+        val result = startGameUseCase(tsumegoId, mode, boardConfig)
         if (result is THResult.Success) {
             updateGame(result.successData)
         }

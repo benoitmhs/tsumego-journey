@@ -1,12 +1,12 @@
 package com.mrsanglier.tsumegohero.game.model
 
-import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 
 data class Game(
     val sgf: RawTsumego,
     val board: Board,
+    val boardConfig: BoardConfig,
     val moveStack: List<MoveNode> = emptyList(),
     val tsumego: Tsumego,
     val cropBoard: CropBoard,

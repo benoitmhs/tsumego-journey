@@ -28,7 +28,7 @@ fun RankEstimationRoute(
 
     safeNavigation(viewModel.navEvent, viewModel::consumeNavigation) { event ->
         when (event) {
-            is RankEstimationNavEvent.Review -> navScope.navigateToReview(event.tsumegoId)
+            is RankEstimationNavEvent.Review -> navScope.navigateToReview(event.tsumegoId, event.boardConfig)
             is RankEstimationNavEvent.Back -> navScope.navigateBack()
         }
     }

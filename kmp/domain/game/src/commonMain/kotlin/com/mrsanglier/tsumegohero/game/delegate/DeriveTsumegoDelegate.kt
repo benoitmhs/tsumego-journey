@@ -1,31 +1,36 @@
 package com.mrsanglier.tsumegohero.game.delegate
 
 import com.mrsanglier.tsumegohero.game.model.Board
+import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.model.BoardSize
 import com.mrsanglier.tsumegohero.game.model.Cell
 import com.mrsanglier.tsumegohero.game.model.Grid
 import com.mrsanglier.tsumegohero.game.model.Move
 import com.mrsanglier.tsumegohero.game.model.MoveNode
 import com.mrsanglier.tsumegohero.game.model.RootNode
+import com.mrsanglier.tsumegohero.game.model.Rotation
 import com.mrsanglier.tsumegohero.game.model.Stone
 import com.mrsanglier.tsumegohero.game.model.Stone.Companion.getOpponent
 import com.mrsanglier.tsumegohero.game.model.Tsumego
 
 interface DeriveTsumegoDelegate {
-    fun deriveTsumego(tsumego: Tsumego): Tsumego
+    fun applyBoardConfig(
+        tsumego: Tsumego,
+        boardConfig: BoardConfig,
+    ): Tsumego
 }
 
 class DeriveTsumegoDelegateImpl : DeriveTsumegoDelegate {
-    override fun deriveTsumego(tsumego: Tsumego): Tsumego {
-        val rotation = Rotation.entries.random()
-        val changeColor = setOf(true, false).random()
-
-        val newGrid = tsumego.initialBoard.grid.rotate(rotation = rotation, swapColor = changeColor)
+    override fun applyBoardConfig(
+        tsumego: Tsumego,
+        boardConfig: BoardConfig,
+    ): Tsumego {
+        val newGrid = tsumego.initialBoard.grid.rotate(rotation = boardConfig.rotation, swapColor = boardConfig.changeColor)
         val newRoot = tsumego.root.children.map { node ->
             node.derive(
-                rotation = rotation,
+                rotation = boardConfig.rotation,
                 boardSize = tsumego.initialBoard.boardSize,
-                swapColor = changeColor,
+                swapColor = boardConfig.changeColor,
             )
         }.toMutableList()
 
@@ -37,10 +42,6 @@ class DeriveTsumegoDelegateImpl : DeriveTsumegoDelegate {
             root = RootNode(newRoot),
             rank = tsumego.rank,
         )
-    }
-
-    private enum class Rotation {
-        `90`, `180`, `-90`, None;
     }
 
     private fun Cell.rotate(rotation: Rotation, boardSize: BoardSize): Cell {

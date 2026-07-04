@@ -15,6 +15,7 @@ import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
+import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.rankestimation.usecase.GetNextRankEstimationTsumegoUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.SubmitRankEstimationAnswerUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -43,7 +44,9 @@ class RankEstimationViewModel(
         RankEstimationViewModelState(
             boardState = game.mapBoardUiState(),
             gameActionState = game.mapGameActionState(
-                onClickReview = { _navEvent.value = RankEstimationNavEvent.Review(game.sgf.id) },
+                onClickReview = {
+                    _navEvent.value = RankEstimationNavEvent.Review(game.sgf.id, game.boardConfig)
+                },
                 onClickNext = ::next,
                 onSkipClick = ::skip,
             ),
@@ -137,6 +140,6 @@ class RankEstimationViewModel(
 }
 
 internal sealed interface RankEstimationNavEvent {
-    data class Review(val tsumegoId: String) : RankEstimationNavEvent
+    data class Review(val tsumegoId: String, val boardConfig: BoardConfig) : RankEstimationNavEvent
     data object Back : RankEstimationNavEvent
 }
