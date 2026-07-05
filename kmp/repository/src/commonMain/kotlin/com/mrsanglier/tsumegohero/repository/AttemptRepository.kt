@@ -20,6 +20,9 @@ class AttemptRepository(
     suspend fun getRankEstimationAttempts(): List<Attempt> =
         localAttemptDataSource.getRankEstimationAttempts()
 
+    fun observeRankEstimationAttempts(): Flow<List<Attempt>> =
+        localAttemptDataSource.observeRankEstimationAttempts()
+
     suspend fun deleteRankEstimationAttempts() {
         localAttemptDataSource.deleteRankEstimationAttempts()
     }

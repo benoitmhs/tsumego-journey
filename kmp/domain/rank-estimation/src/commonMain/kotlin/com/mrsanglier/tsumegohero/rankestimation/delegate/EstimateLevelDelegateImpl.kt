@@ -1,45 +1,41 @@
 package com.mrsanglier.tsumegohero.rankestimation.delegate
 
-import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.data.model.user.Level
 import com.mrsanglier.tsumegohero.rankestimation.RankEstimationConfig
-import kotlin.time.Duration
-import kotlin.time.Duration.Companion.milliseconds
+import com.mrsanglier.tsumegohero.rankestimation.model.RankEstimationSearchState
+import com.mrsanglier.tsumegohero.rankestimation.model.RankEstimationSearchState.Tier
+import kotlin.math.max
+import kotlin.math.min
 
 interface EstimateLevelDelegate {
-    fun estimateLevel(attempts: List<Attempt>): Level
+    fun estimateLevel(searchState: RankEstimationSearchState): Level
 }
 
 class EstimateLevelDelegateImpl : EstimateLevelDelegate {
-    override fun estimateLevel(attempts: List<Attempt>): Level {
-        val attempsResults = attempts
-            .groupBy { it.rank }
-            .map { (rank, attemptsByRank) ->
-                val averageResTime = attemptsByRank.map { it.resolutionTimeMs }.average()
-                val successRate = attemptsByRank.count { it.result == Attempt.Result.Success } / attemptsByRank.size.toFloat()
-                Triple(rank, averageResTime, successRate)
-            }
-        attempsResults.forEach {
-            println("${it.first}  ${it.second.milliseconds.inWholeSeconds}  ${it.third}")
-        }
 
-        val flashRank = attempsResults.getMaxRankValidate(RankEstimationConfig.FLASH_TIME)
-        val classicalRank = attempsResults.getMaxRankValidate(RankEstimationConfig.CLASSICAL_TIME)
-        val difficultRank = attempsResults.getMaxRankValidate(RankEstimationConfig.DIFFICULT_TIME)
+    // flash is at least 1 kyu below classical, difficult at least 1 kyu above
+    override fun estimateLevel(searchState: RankEstimationSearchState): Level {
+        val classicalIndex = searchState.validatedRankIndex(Tier.Classical)
+        val flashIndex = min(
+            searchState.validatedRankIndex(Tier.Flash),
+            classicalIndex - RankEstimationConfig.TIER_MIN_GAP,
+        )
+        val difficultIndex = max(
+            searchState.validatedRankIndex(Tier.Difficult),
+            classicalIndex + RankEstimationConfig.TIER_MIN_GAP,
+        )
 
         return Level(
-            flashRank = flashRank ?: Rank.entries.first(),
-            classicalRank = classicalRank ?: Rank.entries.first(),
-            difficultRank = difficultRank ?: Rank.entries.first(),
+            flashRank = rankAt(flashIndex),
+            classicalRank = rankAt(classicalIndex),
+            difficultRank = rankAt(difficultIndex),
         )
     }
 
-    private fun List<Triple<Rank, Double, Float>>.getMaxRankValidate(timeRequirest: Duration): Rank? =
-        this
-            .filter { (_, averageResTime, successRate) ->
-                averageResTime <= timeRequirest.inWholeMilliseconds
-                    && successRate >= RankEstimationConfig.SUCCESS_THRESHOLD
-            }
-            .maxOfWithOrNull(Rank.comparator) { it.first }
+    private fun RankEstimationSearchState.validatedRankIndex(tier: Tier): Int =
+        brackets[tier]?.lastValidated?.let { Rank.entries.indexOf(it) } ?: 0
+
+    private fun rankAt(index: Int): Rank =
+        Rank.entries[index.coerceIn(0, Rank.entries.lastIndex)]
 }

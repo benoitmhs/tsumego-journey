@@ -1,6 +1,7 @@
 package com.mrsanglier.tsumegohero.game.rankestimation
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
@@ -13,6 +14,7 @@ import com.mrsanglier.tsumegohero.coreui.componants.topbar.THTopBar
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.TopBarAction
 import com.mrsanglier.tsumegohero.coreui.extension.rememberTopBarElevation
 import com.mrsanglier.tsumegohero.coreui.navigation.safeNavigation
+import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import com.mrsanglier.tsumegohero.game.game.section.BoardSection
 import com.mrsanglier.tsumegohero.game.game.section.GameActionsSection
 import com.mrsanglier.tsumegohero.game.model.Cell
@@ -62,6 +64,12 @@ private fun RankEstimationScreen(
         Column(
             modifier = Modifier.padding(innerPadding),
         ) {
+            uiState.rankProgressBar?.Composable(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = THTheme.spacing.large),
+            )
+
             BoardSection(
                 boardState = uiState.boardState,
                 onClickCell = onClickCell,

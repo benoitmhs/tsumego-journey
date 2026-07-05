@@ -21,6 +21,9 @@ class TsumegoRepository(
     suspend fun getNextNeverAttempted(rank: Rank): RawTsumego? =
         localTsumegoDatasource.getNextNeverAttempted(rank)
 
+    suspend fun getRandomNeverAttempted(rank: Rank): RawTsumego? =
+        localTsumegoDatasource.getRandomNeverAttempted(rank)
+
     suspend fun getNextNeverSucceeded(rank: Rank): RawTsumego? =
         localTsumegoDatasource.getNextNeverSucceeded(rank)
 

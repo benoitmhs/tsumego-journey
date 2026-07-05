@@ -16,13 +16,16 @@ import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
 import com.mrsanglier.tsumegohero.game.model.BoardConfig
+import com.mrsanglier.tsumegohero.game.rankestimation.composable.RankProgressBarState
+import com.mrsanglier.tsumegohero.rankestimation.model.RankEstimationProgress
 import com.mrsanglier.tsumegohero.rankestimation.usecase.GetNextRankEstimationTsumegoUseCase
+import com.mrsanglier.tsumegohero.rankestimation.usecase.ObserveRankEstimationProgressUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.SubmitRankEstimationAnswerUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -31,6 +34,7 @@ class RankEstimationViewModel(
     private val snackbarManager: SnackbarManager,
     private val submitRankEstimationAnswerUseCase: SubmitRankEstimationAnswerUseCase,
     private val getNextRankEstimationTsumegoUseCase: GetNextRankEstimationTsumegoUseCase,
+    private val observeRankEstimationProgressUseCase: ObserveRankEstimationProgressUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(),
     BoardViewModelDelegate by gameViewModelDelegateImpl,
@@ -38,10 +42,14 @@ class RankEstimationViewModel(
 
     private val args: RankEstimationDestination = savedStateHandle.toRoute()
 
-    internal val uiState: StateFlow<RankEstimationViewModelState> = gameFlow.map { game ->
-        if (game == null) return@map initialState()
+    internal val uiState: StateFlow<RankEstimationViewModelState> = combine(
+        gameFlow,
+        observeRankEstimationProgressUseCase(),
+    ) { game, progress ->
+        if (game == null) return@combine initialState()
 
         RankEstimationViewModelState(
+            rankProgressBar = progress.toRankProgressBarState(),
             boardState = game.mapBoardUiState(),
             gameActionState = game.mapGameActionState(
                 onClickReview = {
@@ -69,27 +77,33 @@ class RankEstimationViewModel(
             )
         }
 
-        if (args.gameMode == GameMode.Standard) {
-            viewModelScope.launch {
-                initObserveGame { rawTsumego, result ->
-                    submitRankEstimationAnswerUseCase(
-                        result = result,
-                        tsumego = rawTsumego,
-                        gameMode = args.gameMode,
-                        resolutionTimeMs = getElapsedTime(),
-                    ).handleResult(
-                        onSuccess = {},
-                        onError = snackbarManager::showError,
-                    )
-                }
+        viewModelScope.launch {
+            initObserveGame { rawTsumego, result ->
+                submitRankEstimationAnswerUseCase(
+                    result = result,
+                    tsumego = rawTsumego,
+                    gameMode = args.gameMode,
+                    resolutionTimeMs = getElapsedTime(),
+                ).handleResult(
+                    onSuccess = {},
+                    onError = snackbarManager::showError,
+                )
             }
         }
     }
 
     private fun initialState(): RankEstimationViewModelState = RankEstimationViewModelState(
+        rankProgressBar = null,
         gameActionState = initialGameActionState(),
         boardState = initialBoardUiState(),
     )
+
+    private fun RankEstimationProgress.toRankProgressBarState(): RankProgressBarState =
+        RankProgressBarState(
+            rankText = currentRank.rawValue.lowercase().toTextSpec(),
+            progress = problemsDone,
+            total = problemsExpected,
+        )
 
     private fun skip() {
         val game = gameFlow.value ?: return

@@ -1,12 +1,14 @@
 package com.mrsanglier.tsumegohero.rankestimation.model
 
+import com.mrsanglier.tsumegohero.data.model.game.Rank
+
 /**
- * @property currentRank: current rank of Tsumego testing
- * @property rankProblemsDone: number of problems done for the current rank
- * @property rankProblemTotal: total number of problems for the current rank
+ * @property currentRank: rank of the Tsumego currently tested
+ * @property problemsDone: number of problems done since the beginning of the estimation
+ * @property problemsExpected: estimated total number of problems for the whole estimation
  */
 data class RankEstimationProgress(
-    val currentRank: Int,
-    val rankProblemsDone: Int,
-    val rankProblemTotal: Int,
+    val currentRank: Rank,
+    val problemsDone: Int,
+    val problemsExpected: Int,
 )

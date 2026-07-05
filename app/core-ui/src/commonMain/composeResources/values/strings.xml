@@ -61,5 +61,7 @@
     <string name="dashboard_navigationBarItem_play">Play</string>
     <string name="firstName_textField_title">First name</string>
     <string name="profile_logoutButton_label">Logout</string>
+    <string name="rankEstimation_declareRank_title">What is your approximate level?</string>
+    <string name="rankEstimation_declareRank_unknown">I don\'t know</string>
     <string name="snackbar_disconnected">Disconnected</string>
 </resources>

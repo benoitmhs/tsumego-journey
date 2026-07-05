@@ -6,10 +6,11 @@ import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.data.model.game.GameMode
-import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 import com.mrsanglier.tsumegohero.data.model.user.Level
 import com.mrsanglier.tsumegohero.rankestimation.RankEstimationConfig
+import com.mrsanglier.tsumegohero.rankestimation.delegate.ComputeSearchStateDelegate
+import com.mrsanglier.tsumegohero.rankestimation.delegate.ComputeSearchStateDelegateImpl
 import com.mrsanglier.tsumegohero.rankestimation.delegate.EstimateLevelDelegate
 import com.mrsanglier.tsumegohero.rankestimation.delegate.EstimateLevelDelegateImpl
 import com.mrsanglier.tsumegohero.repository.AttemptRepository
@@ -21,9 +22,11 @@ import kotlin.uuid.Uuid
 
 class SubmitRankEstimationAnswerUseCase(
     estimateLevelDelegateImpl: EstimateLevelDelegateImpl,
+    computeSearchStateDelegateImpl: ComputeSearchStateDelegateImpl,
     private val userRepository: UserRepository,
     private val attemptRepository: AttemptRepository,
-) : EstimateLevelDelegate by estimateLevelDelegateImpl {
+) : EstimateLevelDelegate by estimateLevelDelegateImpl,
+    ComputeSearchStateDelegate by computeSearchStateDelegateImpl {
 
     @OptIn(ExperimentalUuidApi::class)
     suspend operator fun invoke(
@@ -50,24 +53,14 @@ class SubmitRankEstimationAnswerUseCase(
         )
 
         val attempts = attemptRepository.getRankEstimationAttempts()
+        val seedRank = attempts.firstOrNull()?.rank ?: RankEstimationConfig.DEFAULT_SEED_RANK
+        val searchState = computeSearchState(attempts, seedRank)
 
-        val rankAttempts = attempts.filter { it.rank == tsumego.rank }
+        if (!searchState.isFinished) return@catchResult null
 
-        if (rankAttempts.size < RankEstimationConfig.BLOCK_SIZE) return@catchResult null
-
-        val averageResTime = rankAttempts.map { it.resolutionTimeMs }.average()
-        val successRate = rankAttempts.count { it.result == Attempt.Result.Success }
-        val difficultPassed = averageResTime <= RankEstimationConfig.DIFFICULT_TIME.inWholeMilliseconds
-            && successRate >= RankEstimationConfig.SUCCESS_THRESHOLD
-
-        val isMaxRank = Rank.entries.indexOf(tsumego.rank) == Rank.entries.lastIndex
-
-        if (!difficultPassed || isMaxRank) {
-            val level = estimateLevel(attempts)
-            userRepository.upsert(user.copy(level = level))
-            attemptRepository.deleteRankEstimationAttempts()
-            return@catchResult level
-        }
-        null
+        val level = estimateLevel(searchState)
+        userRepository.upsert(user.copy(level = level))
+        attemptRepository.deleteRankEstimationAttempts()
+        level
     }
 }

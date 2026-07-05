@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.mrsanglier.tsumegohero.core.extension.handleResult
 import com.mrsanglier.tsumegohero.coreui.componants.loading.LoadingManager
+import com.mrsanglier.tsumegohero.coreui.componants.modalbottomsheet.THModalBottomSheetState
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.THSnackbarState
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showDone
@@ -12,6 +13,7 @@ import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveDailyStreakUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveProgressDataUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveUserUseCase
+import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DeclareRankBottomSheet
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.ImportTsumegoUseCase
@@ -22,6 +24,7 @@ import io.github.vinceglb.filekit.readString
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -58,9 +61,20 @@ class HomeViewModel(
 
     internal val navEvent = MutableStateFlow<NavEvent?>(null)
 
+    private val _bottomSheet = MutableStateFlow<THModalBottomSheetState?>(null)
+    internal val bottomSheet: StateFlow<THModalBottomSheetState?> = _bottomSheet.asStateFlow()
+
     internal fun openRankBottomSheet() {
+        _bottomSheet.value = DeclareRankBottomSheet(
+            onRankSelected = ::startRankEstimation,
+            onDismiss = { _bottomSheet.value = null },
+        )
+    }
+
+    private fun startRankEstimation(declaredRank: Rank?) {
+        _bottomSheet.value = null
         viewModelScope.launch {
-            getNextRankEstimationTsumegoUseCase().handleResult(
+            getNextRankEstimationTsumegoUseCase(declaredRank).handleResult(
                 onSuccess = { tsumegoId ->
                     if (tsumegoId != null) {
                         navEvent.value = NavEvent.RankEstimation(tsumegoId)

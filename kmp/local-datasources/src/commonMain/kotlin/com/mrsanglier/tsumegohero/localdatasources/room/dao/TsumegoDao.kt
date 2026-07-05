@@ -30,6 +30,17 @@ interface TsumegoDao {
 
     @Query(
         """
+        SELECT * FROM tsumego
+        WHERE rank = :rank
+        AND id NOT IN (SELECT tsumegoId FROM attempt)
+        ORDER BY RANDOM()
+        LIMIT 1
+    """
+    )
+    suspend fun getRandomNeverAttempted(rank: String): RoomTsumego?
+
+    @Query(
+        """
         SELECT * FROM tsumego 
         WHERE rank = :rank 
         AND id NOT IN (SELECT tsumegoId FROM attempt WHERE result = 'Success')

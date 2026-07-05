@@ -3,7 +3,6 @@ package com.mrsanglier.tsumegohero.localdatasources.room.dao
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.localdatasources.room.model.RoomAttempt
 import kotlinx.coroutines.flow.Flow
@@ -19,8 +18,11 @@ interface AttemptDao {
     @Query("SELECT COUNT(DISTINCT tsumegoId) FROM attempt WHERE result = 'Success'")
     suspend fun getTsumegoSolvedCount(): Int
 
-    @Query("SELECT * FROM attempt WHERE context = :gameContext")
+    @Query("SELECT * FROM attempt WHERE context = :gameContext ORDER BY date ASC")
     suspend fun getRankEstimationAttempts(gameContext: GameContext): List<RoomAttempt>
+
+    @Query("SELECT * FROM attempt WHERE context = :gameContext ORDER BY date ASC")
+    fun observeRankEstimationAttempts(gameContext: GameContext): Flow<List<RoomAttempt>>
 
     @Query("DELETE FROM attempt WHERE context = :gameContext")
     suspend fun deleteByContext(gameContext: GameContext)

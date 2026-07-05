@@ -23,6 +23,10 @@ class LocalAttemptDataSource(
     suspend fun getRankEstimationAttempts(): List<Attempt> =
         dao.getRankEstimationAttempts(GameContext.RankEstimation).map { it.toAppModel() }
 
+    fun observeRankEstimationAttempts(): Flow<List<Attempt>> =
+        dao.observeRankEstimationAttempts(GameContext.RankEstimation)
+            .map { attempts -> attempts.map { it.toAppModel() } }
+
     suspend fun deleteRankEstimationAttempts() {
         dao.deleteByContext(GameContext.RankEstimation)
     }

@@ -25,6 +25,9 @@ class LocalTsumegoDatasource(
     suspend fun getNextNeverAttempted(rank: Rank): RawTsumego? =
         dao.getNextNeverAttempted(rank.rawValue)?.toAppModel()
 
+    suspend fun getRandomNeverAttempted(rank: Rank): RawTsumego? =
+        dao.getRandomNeverAttempted(rank.rawValue)?.toAppModel()
+
     suspend fun getNextNeverSucceeded(rank: Rank): RawTsumego? =
         dao.getNextNeverSucceeded(rank.rawValue)?.toAppModel()
 

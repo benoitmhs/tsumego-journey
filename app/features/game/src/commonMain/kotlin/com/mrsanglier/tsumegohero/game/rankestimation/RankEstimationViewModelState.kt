@@ -7,7 +7,7 @@ import com.mrsanglier.tsumegohero.game.rankestimation.composable.RankProgressBar
 
 @Immutable
 internal data class RankEstimationViewModelState(
-    val rankProgressBar: RankProgressBarState,
+    val rankProgressBar: RankProgressBarState?,
     val boardState: BoardUiState,
     val gameActionState: GameActionState,
 )

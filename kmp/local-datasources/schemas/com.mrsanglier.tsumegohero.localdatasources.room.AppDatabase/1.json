@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "0b37c736bae763a6fb770c794c780fbc",
+    "identityHash": "62cec19c294841739860a02cea526537",
     "entities": [
       {
         "tableName": "attempt",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `userId` TEXT NOT NULL, `tsumegoId` TEXT NOT NULL, `result` TEXT NOT NULL, `mode` TEXT NOT NULL, `context` TEXT NOT NULL, `date` INTEGER NOT NULL, `resolutionTimeMs` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `userId` TEXT NOT NULL, `tsumegoId` TEXT NOT NULL, `rank` TEXT NOT NULL, `result` TEXT NOT NULL, `mode` TEXT NOT NULL, `context` TEXT NOT NULL, `date` INTEGER NOT NULL, `resolutionTimeMs` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -23,6 +23,12 @@
           {
             "fieldPath": "tsumegoId",
             "columnName": "tsumegoId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "rank",
+            "columnName": "rank",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -178,7 +184,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0b37c736bae763a6fb770c794c780fbc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '62cec19c294841739860a02cea526537')"
     ]
   }
 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrsanglier.tsumegohero.coreui.componants.bottombar.THBottomBar
+import com.mrsanglier.tsumegohero.coreui.componants.modalbottomsheet.Composable
 import com.mrsanglier.tsumegohero.coreui.componants.screen.LocalPiScreenPadding
 import com.mrsanglier.tsumegohero.coreui.componants.screen.THScreen
 import com.mrsanglier.tsumegohero.coreui.componants.text.THText
@@ -36,6 +37,7 @@ fun HomeRoute(
     viewModel: HomeViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val bottomSheet by viewModel.bottomSheet.collectAsStateWithLifecycle()
 
     safeNavigation(viewModel.navEvent, viewModel::consumeNavigation) { event ->
         when (event) {
@@ -47,6 +49,8 @@ fun HomeRoute(
     HomeScreen(
         uiState = uiState,
     )
+
+    bottomSheet?.Composable()
 }
 
 @Composable
