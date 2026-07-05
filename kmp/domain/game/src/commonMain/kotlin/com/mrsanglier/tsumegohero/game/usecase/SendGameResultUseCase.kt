@@ -6,7 +6,6 @@ import com.mrsanglier.tsumegohero.core.extension.daysUntil
 import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
-import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 import com.mrsanglier.tsumegohero.data.model.user.User
 import com.mrsanglier.tsumegohero.repository.AttemptRepository
@@ -27,7 +26,6 @@ class SendGameResultUseCase(
     suspend operator fun invoke(
         result: Attempt.Result,
         tsumego: RawTsumego,
-        mode: GameMode,
         gameContext: GameContext,
         resolutionTimeMs: Long,
     ): THResult<User> = THResult.catchResult {
@@ -41,7 +39,6 @@ class SendGameResultUseCase(
             tsumegoId = tsumego.id,
             rank = tsumego.rank,
             result = result,
-            mode = mode,
             date = Clock.System.now(),
             resolutionTimeMs = resolutionTimeMs,
             context = gameContext,

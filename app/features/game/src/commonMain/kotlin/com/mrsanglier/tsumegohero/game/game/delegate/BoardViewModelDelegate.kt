@@ -5,10 +5,10 @@ import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.coreui.extension.composed
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
-import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.game.game.section.BoardUiState
 import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.model.Game
+import com.mrsanglier.tsumegohero.game.model.GameOption
 import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
 import com.mrsanglier.tsumegohero.game.model.Stone
 import com.mrsanglier.tsumegohero.game.usecase.StartGameUseCase
@@ -26,7 +26,7 @@ interface BoardViewModelDelegate {
 
     suspend fun loadTsumego(
         tsumegoId: String,
-        mode: GameMode,
+        option: GameOption,
         boardConfig: BoardConfig? = null,
     ): THResult<Game>
 
@@ -44,10 +44,10 @@ class BoardViewModelDelegateImpl(
 
     override suspend fun loadTsumego(
         tsumegoId: String,
-        mode: GameMode,
+        option: GameOption,
         boardConfig: BoardConfig?,
     ): THResult<Game> {
-        val result = startGameUseCase(tsumegoId, mode, boardConfig)
+        val result = startGameUseCase(tsumegoId, option, boardConfig)
         if (result is THResult.Success) {
             updateGame(result.successData)
         }
@@ -59,15 +59,15 @@ class BoardViewModelDelegateImpl(
     }
 
     override fun Game.mapBoardUiState(): BoardUiState {
-        val isGhostRevealed = !isGhostMode || isGhostSubmitted
+        val isRevealed = !option.ghost || outcome != SgfNodeOutcome.NONE
 
         return BoardUiState(
             title = sgf.name.toTextSpec(),
-            whiteStones = if (isGhostRevealed) board.whiteStones else tsumego.initialBoard.whiteStones,
-            blackStones = if (isGhostRevealed) board.blackStones else tsumego.initialBoard.blackStones,
+            whiteStones = if (isRevealed) board.whiteStones else tsumego.initialBoard.whiteStones,
+            blackStones = if (isRevealed) board.blackStones else tsumego.initialBoard.blackStones,
             cropBoard = cropBoard,
             lastMove = lastMove?.move,
-            isGhostMode = isGhostMode,
+            isGhostMode = option.ghost,
             playerStone = when (playerStone) {
                 Stone.BLACK -> "Black to play".toTextSpec() // TODO: loco
                 Stone.WHITE -> "White to play".toTextSpec() // TODO: loco

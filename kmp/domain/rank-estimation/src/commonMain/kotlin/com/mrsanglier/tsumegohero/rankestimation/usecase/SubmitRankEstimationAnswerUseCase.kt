@@ -5,7 +5,6 @@ import com.mrsanglier.tsumegohero.core.error.toError
 import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
-import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 import com.mrsanglier.tsumegohero.data.model.user.Level
 import com.mrsanglier.tsumegohero.rankestimation.RankEstimationConfig
@@ -32,7 +31,6 @@ class SubmitRankEstimationAnswerUseCase(
     suspend operator fun invoke(
         tsumego: RawTsumego,
         resolutionTimeMs: Long,
-        gameMode: GameMode,
         result: Attempt.Result,
     ): THResult<Level?> = THResult.catchResult {
         val user = userRepository.observeUser().first()
@@ -45,7 +43,6 @@ class SubmitRankEstimationAnswerUseCase(
                 tsumegoId = tsumego.id,
                 rank = tsumego.rank,
                 result = result,
-                mode = gameMode,
                 date = Clock.System.now(),
                 context = GameContext.RankEstimation,
                 resolutionTimeMs = resolutionTimeMs,

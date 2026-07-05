@@ -5,14 +5,14 @@ import com.mrsanglier.tsumegohero.core.extension.handleResult
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
-import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 import com.mrsanglier.tsumegohero.game.game.section.GameActionState
 import com.mrsanglier.tsumegohero.game.model.Cell
 import com.mrsanglier.tsumegohero.game.model.Game
+import com.mrsanglier.tsumegohero.game.model.GameOption
 import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
+import com.mrsanglier.tsumegohero.game.usecase.PlayBothColorsMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayFreeMoveUseCase
-import com.mrsanglier.tsumegohero.game.usecase.PlayGhostMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayOpponentMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayPlayerMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.RestartGameUseCase
@@ -23,7 +23,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Instant
 
-internal val OPPONENT_TURN_DELAY: Duration = 300.milliseconds
+internal val OPPONENT_TURN_DELAY: Duration = 500.milliseconds
 internal val GHOST_STONE_FADE_DURATION: Duration = 1000.milliseconds
 
 interface GameViewModelDelegate {
@@ -36,7 +36,7 @@ interface GameViewModelDelegate {
     fun initialGameActionState(): GameActionState
 
     fun onClickCell(cell: Cell)
-    suspend fun startTsumego(tsumegoId: String, gameMode: GameMode)
+    suspend fun startTsumego(tsumegoId: String, gameOption: GameOption)
     fun getElapsedTime(): Long
     suspend fun initObserveGame(submitResult: suspend (RawTsumego, Attempt.Result) -> Unit)
 
@@ -46,7 +46,7 @@ class GameViewModelDelegateImpl(
     boardDelegate: BoardViewModelDelegateImpl,
     private val playFreeMoveUseCase: PlayFreeMoveUseCase,
     private val playPlayerMoveUseCase: PlayPlayerMoveUseCase,
-    private val playGhostMoveUseCase: PlayGhostMoveUseCase,
+    private val playBothColorsMoveUseCase: PlayBothColorsMoveUseCase,
     private val playOpponentMoveUseCase: PlayOpponentMoveUseCase,
     private val restartGameUseCase: RestartGameUseCase,
     private val snackbarManager: SnackbarManager,
@@ -61,23 +61,23 @@ class GameViewModelDelegateImpl(
         onClickNext: () -> Unit,
         onSkipClick: () -> Unit,
     ): GameActionState {
-        val ghostMovePending = isGhostMode && !isGhostSubmitted
+        val submitPending = !option.autoPlay && !isSequenceSubmitted
         return GameActionState(
             validateButton = when {
-                ghostMovePending && lastMove != null -> defaultSubmitButton(::submitGhostSequence)
-                ghostMovePending -> defaultSubmitButton(::submitGhostSequence).copy(enabled = false)
-                !isGhostMode && outcome == SgfNodeOutcome.NONE -> defaultNextButton(onClickNext).copy(enabled = false)
+                submitPending && lastMove != null -> defaultSubmitButton(::submitSequence)
+                submitPending -> defaultSubmitButton(::submitSequence).copy(enabled = false)
+                option.autoPlay && outcome == SgfNodeOutcome.NONE -> defaultNextButton(onClickNext).copy(enabled = false)
                 else -> defaultNextButton(onClickNext).copy(enabled = true)
 
             },
             skipButton = when {
-                isGhostMode && !isGhostSubmitted || !isGhostMode && outcome == SgfNodeOutcome.NONE -> defaultSkipButton(onSkipClick)
+                submitPending || option.autoPlay && outcome == SgfNodeOutcome.NONE -> defaultSkipButton(onSkipClick)
                 else -> null
             },
             actionButton = when {
-                ghostMovePending && lastMove != null -> defaultRestartButton(::reset)
-                !isGhostMode && outcome == SgfNodeOutcome.NONE && lastMove != null -> defaultRestartButton(::reset)
-                outcome != SgfNodeOutcome.NONE || isGhostSubmitted -> defaultReviewButton(onClickReview)
+                submitPending && lastMove != null -> defaultRestartButton(::reset)
+                option.autoPlay && outcome == SgfNodeOutcome.NONE && lastMove != null -> defaultRestartButton(::reset)
+                outcome != SgfNodeOutcome.NONE -> defaultReviewButton(onClickReview)
                 else -> null
             },
         )
@@ -93,14 +93,14 @@ class GameViewModelDelegateImpl(
         val game = gameFlow.value ?: return
 
         when {
-            game.isGhostMode && !game.isGhostSubmitted -> playGhostMove(cell, game)
-            game.outcome == SgfNodeOutcome.NONE -> playPlayerMove(cell, game)
-            else -> playFreeMove(cell, game)
+            game.outcome != SgfNodeOutcome.NONE -> playFreeMove(cell, game)
+            game.option.autoPlay -> playPlayerMove(cell, game)
+            else -> playBothColorsMove(cell, game)
         }
     }
 
-    private fun playGhostMove(cell: Cell, game: Game) {
-        playGhostMoveUseCase(game, cell).handleResult(
+    private fun playBothColorsMove(cell: Cell, game: Game) {
+        playBothColorsMoveUseCase(game, cell).handleResult(
             onSuccess = ::updateGame,
             onError = { error ->
                 when (error?.code) {
@@ -135,17 +135,17 @@ class GameViewModelDelegateImpl(
         gameFlow.value?.let { updateGame(restartGameUseCase(it)) }
     }
 
-    internal fun submitGhostSequence() {
+    internal fun submitSequence() {
         gameFlow.value?.let { game ->
-            updateGame(game.copy(isGhostSubmitted = true))
+            updateGame(game.copy(isSequenceSubmitted = true))
         }
     }
 
     override suspend fun startTsumego(
         tsumegoId: String,
-        gameMode: GameMode,
+        gameOption: GameOption,
     ) {
-        loadTsumego(tsumegoId, gameMode).handleResult(
+        loadTsumego(tsumegoId, gameOption).handleResult(
             onSuccess = { problemStartedAt = Clock.System.now() },
             onError = snackbarManager::showError,
         )
@@ -159,10 +159,8 @@ class GameViewModelDelegateImpl(
             lockTouch.value = game.isOpponentTurn
             if (game.isOpponentTurn) playOpponentTurn(game)
 
-            val resultShouldBeSubmit = when (game.mode) {
-                GameMode.Ghost -> game.isGhostSubmitted
-                GameMode.Standard -> game.outcome != SgfNodeOutcome.NONE
-            }
+            // In manual submission (!autoPlay), outcome != NONE if and only if the sequence was submitted
+            val resultShouldBeSubmit = game.outcome != SgfNodeOutcome.NONE
 
             if (resultShouldBeSubmit) {
                 submitResult(

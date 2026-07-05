@@ -4,7 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
-import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import kotlin.time.Instant
 
@@ -15,7 +14,6 @@ class RoomAttempt(
     val tsumegoId: String,
     val rank: String,
     val result: Attempt.Result,
-    val mode: GameMode,
     val context: GameContext,
     val date: Instant,
     val resolutionTimeMs: Long,
@@ -26,7 +24,6 @@ class RoomAttempt(
         tsumegoId = tsumegoId,
         rank = Rank.safeValueOf(rank)!!,
         result = result,
-        mode = mode,
         date = date,
         context = context,
         resolutionTimeMs = resolutionTimeMs,
@@ -40,7 +37,6 @@ class RoomAttempt(
             rank = appModel.rank.rawValue,
             result = appModel.result,
             date = appModel.date,
-            mode = appModel.mode,
             context = appModel.context,
             resolutionTimeMs = appModel.resolutionTimeMs,
         )

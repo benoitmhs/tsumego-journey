@@ -7,11 +7,11 @@ import androidx.navigation.toRoute
 import com.mrsanglier.tsumegohero.core.extension.handleResult
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
-import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegateImpl
 import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.model.Cell
+import com.mrsanglier.tsumegohero.game.model.GameOption
 import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
 import com.mrsanglier.tsumegohero.game.usecase.NavigateReviewUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayReviewMoveUseCase
@@ -44,7 +44,7 @@ class ReviewViewModel(
             loadTsumego(
                 tsumegoId = args.tsumegoId,
                 boardConfig = boardConfig,
-                mode = GameMode.Standard,
+                option = GameOption(autoPlay = false, ghost = false),
             ).handleResult(
                 onSuccess = { game -> updateGame(startReviewUseCase(game)) },
                 onError = snackbarManager::showError,

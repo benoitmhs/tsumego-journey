@@ -8,7 +8,6 @@ class Attempt(
     val tsumegoId: String,
     val rank: Rank,
     val result: Result,
-    val mode: GameMode,
     val date: Instant,
     val context: GameContext,
     val resolutionTimeMs: Long,

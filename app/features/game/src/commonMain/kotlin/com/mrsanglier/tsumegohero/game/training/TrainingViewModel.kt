@@ -14,6 +14,7 @@ import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
 import com.mrsanglier.tsumegohero.game.model.BoardConfig
+import com.mrsanglier.tsumegohero.game.model.GameOption
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.SendGameResultUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +36,7 @@ class TrainingViewModel(
     ViewModel() {
 
     private val args: TrainingDestination = savedStateHandle.toRoute()
+    private val gameOption = GameOption(autoPlay = args.autoPlay, ghost = args.ghost)
 
     val uiState: StateFlow<TrainingViewModelState> = gameFlow.map { game ->
         if (game == null) return@map initialState()
@@ -63,7 +65,7 @@ class TrainingViewModel(
         viewModelScope.launch {
             startTsumego(
                 tsumegoId = args.tsumegoId,
-                gameMode = args.gameMode,
+                gameOption = gameOption,
             )
         }
 
@@ -72,7 +74,6 @@ class TrainingViewModel(
                 sendGameResultUseCase(
                     result = result,
                     tsumego = rawTsumego,
-                    mode = args.gameMode,
                     resolutionTimeMs = getElapsedTime(),
                     gameContext = GameContext.Training,
                 ).handleResult(
@@ -94,7 +95,6 @@ class TrainingViewModel(
             val submitResult = sendGameResultUseCase(
                 result = Attempt.Result.Skip,
                 tsumego = game.sgf,
-                mode = args.gameMode,
                 resolutionTimeMs = getElapsedTime(),
                 gameContext = GameContext.Training,
             )
@@ -118,7 +118,7 @@ class TrainingViewModel(
             onSuccess = { data ->
                 startTsumego(
                     tsumegoId = data,
-                    gameMode = args.gameMode,
+                    gameOption = gameOption,
                 )
             },
             onError = {

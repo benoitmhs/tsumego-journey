@@ -11,11 +11,11 @@ import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showDone
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
-import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
 import com.mrsanglier.tsumegohero.game.model.BoardConfig
+import com.mrsanglier.tsumegohero.game.model.GameOption
 import com.mrsanglier.tsumegohero.game.rankestimation.composable.RankProgressBarState
 import com.mrsanglier.tsumegohero.rankestimation.usecase.GetNextRankEstimationTsumegoUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.ObserveRankEstimationProgressUseCase
@@ -28,12 +28,13 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+private val GAME_OPTION: GameOption = GameOption(autoPlay = true, ghost = true)
 class RankEstimationViewModel(
     gameViewModelDelegateImpl: GameViewModelDelegateImpl,
     private val snackbarManager: SnackbarManager,
     private val submitRankEstimationAnswerUseCase: SubmitRankEstimationAnswerUseCase,
     private val getNextRankEstimationTsumegoUseCase: GetNextRankEstimationTsumegoUseCase,
-    private val observeRankEstimationProgressUseCase: ObserveRankEstimationProgressUseCase,
+    observeRankEstimationProgressUseCase: ObserveRankEstimationProgressUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel(),
     BoardViewModelDelegate by gameViewModelDelegateImpl,
@@ -72,7 +73,7 @@ class RankEstimationViewModel(
         viewModelScope.launch {
             startTsumego(
                 tsumegoId = args.tsumegoId,
-                gameMode = args.gameMode,
+                gameOption = GAME_OPTION,
             )
         }
 
@@ -81,7 +82,6 @@ class RankEstimationViewModel(
                 submitRankEstimationAnswerUseCase(
                     result = result,
                     tsumego = rawTsumego,
-                    gameMode = args.gameMode,
                     resolutionTimeMs = getElapsedTime(),
                 ).handleResult(
                     onSuccess = {},
@@ -103,7 +103,6 @@ class RankEstimationViewModel(
             val submitResult = submitRankEstimationAnswerUseCase(
                 result = Attempt.Result.Skip,
                 tsumego = game.sgf,
-                gameMode = args.gameMode,
                 resolutionTimeMs = getElapsedTime(),
             )
             if (submitResult is THResult.Failure) {
@@ -127,7 +126,7 @@ class RankEstimationViewModel(
                 if (tsumegoId != null) {
                     startTsumego(
                         tsumegoId = tsumegoId,
-                        gameMode = args.gameMode,
+                        gameOption = GAME_OPTION,
                     )
                 } else {
                     snackbarManager.showDone("Estimation terminé".toTextSpec()) // TODO: loco

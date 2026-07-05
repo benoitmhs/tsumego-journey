@@ -8,8 +8,8 @@ import com.mrsanglier.tsumegohero.game.delegate.PlayMoveDelegateImpl
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.ImportTsumegoUseCase
 import com.mrsanglier.tsumegohero.game.usecase.NavigateReviewUseCase
+import com.mrsanglier.tsumegohero.game.usecase.PlayBothColorsMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayFreeMoveUseCase
-import com.mrsanglier.tsumegohero.game.usecase.PlayGhostMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayOpponentMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayPlayerMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayReviewMoveUseCase
@@ -26,8 +26,8 @@ val domainGameModule: Module = module {
     singleOf(::GetNextTsumegoIdUseCase)
     singleOf(::ImportTsumegoUseCase)
     singleOf(::NavigateReviewUseCase)
+    singleOf(::PlayBothColorsMoveUseCase)
     singleOf(::PlayFreeMoveUseCase)
-    singleOf(::PlayGhostMoveUseCase)
     singleOf(::PlayPlayerMoveUseCase)
     singleOf(::PlayReviewMoveUseCase)
     singleOf(::PlayOpponentMoveUseCase)

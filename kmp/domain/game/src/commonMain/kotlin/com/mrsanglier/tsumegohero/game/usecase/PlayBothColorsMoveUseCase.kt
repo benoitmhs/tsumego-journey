@@ -13,11 +13,11 @@ import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
 import com.mrsanglier.tsumegohero.game.model.Stone.Companion.getOpponent
 
 /**
- * Plays a move for either color in ghost mode: the player controls both sides, alternating
- * colors, while the move is still matched against the solution tree so [SubmitGhostSequenceUseCase]
- * can later determine success.
+ * Plays a move for either color when autoPlay is disabled: the player controls both sides,
+ * alternating colors, while the move is still matched against the solution tree so the outcome
+ * can be determined once the sequence is submitted.
  */
-class PlayGhostMoveUseCase(
+class PlayBothColorsMoveUseCase(
     playMoveDelegateImpl: PlayMoveDelegateImpl,
 ) : PlayMoveDelegate by playMoveDelegateImpl {
 

@@ -10,7 +10,7 @@ class RestartGameUseCase {
             board = game.tsumego.initialBoard,
             moveStack = emptyList(),
             reviewRoot = null,
-            isGhostSubmitted = false,
+            isSequenceSubmitted = false,
         )
     }
 }

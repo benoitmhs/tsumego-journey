@@ -2,7 +2,6 @@ package com.mrsanglier.tsumegohero.rankestimation.delegate
 
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
-import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.data.model.user.Level
 import com.mrsanglier.tsumegohero.rankestimation.model.RankEstimationSearchState
@@ -19,7 +18,6 @@ private fun attempt(rank: Rank, result: Attempt.Result, timeMs: Long, index: Int
         tsumegoId = "tsumego$index",
         rank = rank,
         result = result,
-        mode = GameMode.Standard,
         date = Instant.fromEpochMilliseconds(index.toLong()),
         context = GameContext.RankEstimation,
         resolutionTimeMs = timeMs,
