@@ -70,7 +70,6 @@ private fun HomeScreen(
                 hazeState = bottomBarHazeState,
                 elevation = bottomBarElevation,
                 primaryButton = uiState.mainAction,
-                streakProgressBar = uiState.problemStreakData,
             )
         }
     ) { innerPadding ->

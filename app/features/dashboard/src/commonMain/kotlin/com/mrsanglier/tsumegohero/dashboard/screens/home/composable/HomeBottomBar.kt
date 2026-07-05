@@ -19,7 +19,6 @@ import dev.chrisbanes.haze.HazeState
 
 @Composable
 internal fun HomeBottomBar(
-    streakProgressBar: ProblemStreakProgressBarData,
     hazeState: HazeState,
     elevation: Dp,
     primaryButton: THButtonState?,
@@ -38,7 +37,6 @@ internal fun HomeBottomBar(
             .zIndex(1f),
         verticalArrangement = Arrangement.spacedBy(THTheme.spacing.small),
     ) {
-        streakProgressBar.Composable()
         primaryButton?.Content(modifier = Modifier.fillMaxWidth())
     }
 }

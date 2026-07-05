@@ -57,7 +57,6 @@ class SubmitRankEstimationAnswerUseCase(
 
         val level = estimateLevel(searchState)
         userRepository.upsert(user.copy(level = level))
-        attemptRepository.deleteRankEstimationAttempts()
         level
     }
 }

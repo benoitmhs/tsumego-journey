@@ -53,7 +53,6 @@ class HomeViewModel(
         HomeViewModelState(
             dailyStreakData = dailyStreak.data?.toCellData() ?: PlaceHolder.DailyStreak,
             rankProgressBarData = progressData?.getRankProgressBarData() ?: PlaceHolder.RankProgressBar,
-            problemStreakData = progressData?.getProblemStreakData() ?: PlaceHolder.ProblemStreak,
             mainAction = getMainAction(
                 rankIsNull = levelIsNull,
                 estimationInProgress = estimationInProgress,
