@@ -1,18 +1,24 @@
 package com.mrsanglier.tsumegohero.game.rankestimation
 
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrsanglier.tsumegohero.coreui.componants.screen.THScreen
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.THTopBar
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.TopBarAction
 import com.mrsanglier.tsumegohero.coreui.extension.rememberTopBarElevation
+import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.navigation.safeNavigation
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import com.mrsanglier.tsumegohero.game.game.section.BoardSection
@@ -51,10 +57,12 @@ private fun RankEstimationScreen(
     val topBarHazeState = remember { HazeState() }
     val topBarElevation by rememberTopBarElevation(scrollState)
 
+    val animatedProgress by animateFloatAsState(uiState.progress)
+
     THScreen(
         topBar = {
             THTopBar(
-                title = uiState.boardState.title,
+                title = "Estimation du niveau".toTextSpec(),
                 hazeState = topBarHazeState,
                 navAction = TopBarAction.back(navigateBack),
                 elevation = topBarElevation,
@@ -64,11 +72,19 @@ private fun RankEstimationScreen(
         Column(
             modifier = Modifier.padding(innerPadding),
         ) {
-            uiState.rankProgressBar?.Composable(
+            LinearProgressIndicator(
+                color = THTheme.colors.contentTint,
+                trackColor = THTheme.colors.surface2,
+                strokeCap = StrokeCap.Round,
+                progress = { animatedProgress },
+                gapSize = 0.dp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = THTheme.spacing.large),
+                    .padding(horizontal = THTheme.spacing.large)
+                    .height(THTheme.spacing.small),
+                drawStopIndicator = {},
             )
+
 
             BoardSection(
                 boardState = uiState.boardState,

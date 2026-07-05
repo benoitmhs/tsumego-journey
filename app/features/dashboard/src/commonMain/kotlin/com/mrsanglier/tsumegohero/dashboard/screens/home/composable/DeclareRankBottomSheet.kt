@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.mrsanglier.tsumegohero.app.coreui.resources.rankEstimation_declareRank_title
 import com.mrsanglier.tsumegohero.app.coreui.resources.rankEstimation_declareRank_unknown
@@ -46,17 +47,19 @@ internal class DeclareRankBottomSheet(
                     .heightIn(max = RankListMaxHeight)
                     .padding(vertical = THTheme.spacing.medium),
             ) {
-                items(fullRanks) { rank ->
+                items(
+                    key = { it.rawValue },
+                    items = fullRanks,
+                    contentType = { "rank.item" },
+                ) { rank ->
                     THText(
                         text = rank.rawValue.lowercase().toTextSpec(),
-                        style = THTheme.typography.content100,
+                        style = THTheme.typography.label200,
+                        textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth()
                             .thClickable(onClick = { onRankSelected(rank) })
-                            .padding(
-                                vertical = THTheme.spacing.small,
-                                horizontal = THTheme.spacing.small,
-                            ),
+                            .padding(THTheme.spacing.medium),
                     )
                 }
             }

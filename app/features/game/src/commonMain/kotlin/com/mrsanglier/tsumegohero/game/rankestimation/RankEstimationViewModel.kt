@@ -17,7 +17,6 @@ import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
 import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.rankestimation.composable.RankProgressBarState
-import com.mrsanglier.tsumegohero.rankestimation.model.RankEstimationProgress
 import com.mrsanglier.tsumegohero.rankestimation.usecase.GetNextRankEstimationTsumegoUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.ObserveRankEstimationProgressUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.SubmitRankEstimationAnswerUseCase
@@ -49,7 +48,7 @@ class RankEstimationViewModel(
         if (game == null) return@combine initialState()
 
         RankEstimationViewModelState(
-            rankProgressBar = progress.toRankProgressBarState(),
+            progress = progress,
             boardState = game.mapBoardUiState(),
             gameActionState = game.mapGameActionState(
                 onClickReview = {
@@ -93,17 +92,10 @@ class RankEstimationViewModel(
     }
 
     private fun initialState(): RankEstimationViewModelState = RankEstimationViewModelState(
-        rankProgressBar = null,
+        progress = 0f,
         gameActionState = initialGameActionState(),
         boardState = initialBoardUiState(),
     )
-
-    private fun RankEstimationProgress.toRankProgressBarState(): RankProgressBarState =
-        RankProgressBarState(
-            rankText = currentRank.rawValue.lowercase().toTextSpec(),
-            progress = problemsDone,
-            total = problemsExpected,
-        )
 
     private fun skip() {
         val game = gameFlow.value ?: return
