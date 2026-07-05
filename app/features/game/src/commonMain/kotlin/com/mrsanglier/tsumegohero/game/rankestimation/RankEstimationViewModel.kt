@@ -38,7 +38,7 @@ class RankEstimationViewModel(
 
     private val args: RankEstimationDestination = savedStateHandle.toRoute()
 
-    val uiState: StateFlow<RankEstimationViewModelState> = gameFlow.map { game ->
+    internal val uiState: StateFlow<RankEstimationViewModelState> = gameFlow.map { game ->
         if (game == null) return@map initialState()
 
         RankEstimationViewModelState(
