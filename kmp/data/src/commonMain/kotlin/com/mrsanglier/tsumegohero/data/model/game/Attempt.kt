@@ -6,6 +6,7 @@ class Attempt(
     val id: String,
     val userId: String,
     val tsumegoId: String,
+    val rank: Rank,
     val result: Result,
     val mode: GameMode,
     val date: Instant,

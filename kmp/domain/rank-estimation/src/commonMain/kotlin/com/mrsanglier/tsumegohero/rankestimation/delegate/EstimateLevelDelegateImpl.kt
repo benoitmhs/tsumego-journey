@@ -8,13 +8,13 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 interface EstimateLevelDelegate {
-    fun estimateLevel(attempts: List<Pair<Rank, Attempt>>): Level
+    fun estimateLevel(attempts: List<Attempt>): Level
 }
 
 class EstimateLevelDelegateImpl : EstimateLevelDelegate {
-    override fun estimateLevel(attempts: List<Pair<Rank, Attempt>>): Level {
+    override fun estimateLevel(attempts: List<Attempt>): Level {
         val attempsResults = attempts
-            .groupBy({ it.first }, { it.second })
+            .groupBy { it.rank }
             .map { (rank, attemptsByRank) ->
                 val averageResTime = attemptsByRank.map { it.resolutionTimeMs }.average()
                 val successRate = attemptsByRank.count { it.result == Attempt.Result.Success } / attemptsByRank.size.toFloat()

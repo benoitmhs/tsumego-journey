@@ -71,10 +71,10 @@ class RankEstimationViewModel(
 
         if (args.gameMode == GameMode.Standard) {
             viewModelScope.launch {
-                initObserveGame { tsumegoId, result ->
+                initObserveGame { rawTsumego, result ->
                     submitRankEstimationAnswerUseCase(
                         result = result,
-                        tsumegoId = tsumegoId,
+                        tsumego = rawTsumego,
                         gameMode = args.gameMode,
                         resolutionTimeMs = getElapsedTime(),
                     ).handleResult(
@@ -96,7 +96,7 @@ class RankEstimationViewModel(
         viewModelScope.launch {
             val submitResult = submitRankEstimationAnswerUseCase(
                 result = Attempt.Result.Skip,
-                tsumegoId = game.sgf.id,
+                tsumego = game.sgf,
                 gameMode = args.gameMode,
                 resolutionTimeMs = getElapsedTime(),
             )

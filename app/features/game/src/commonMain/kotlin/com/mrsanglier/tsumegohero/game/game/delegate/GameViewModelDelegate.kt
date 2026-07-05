@@ -6,6 +6,7 @@ import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameMode
+import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 import com.mrsanglier.tsumegohero.game.game.section.GameActionState
 import com.mrsanglier.tsumegohero.game.model.Cell
 import com.mrsanglier.tsumegohero.game.model.Game
@@ -37,7 +38,7 @@ interface GameViewModelDelegate {
     fun onClickCell(cell: Cell)
     suspend fun startTsumego(tsumegoId: String, gameMode: GameMode)
     fun getElapsedTime(): Long
-    suspend fun initObserveGame(submitResult: suspend (String, Attempt.Result) -> Unit)
+    suspend fun initObserveGame(submitResult: suspend (RawTsumego, Attempt.Result) -> Unit)
 
 }
 
@@ -140,7 +141,10 @@ class GameViewModelDelegateImpl(
         }
     }
 
-    override suspend fun startTsumego(tsumegoId: String, gameMode: GameMode) {
+    override suspend fun startTsumego(
+        tsumegoId: String,
+        gameMode: GameMode,
+    ) {
         loadTsumego(tsumegoId, gameMode).handleResult(
             onSuccess = { problemStartedAt = Clock.System.now() },
             onError = snackbarManager::showError,
@@ -148,7 +152,7 @@ class GameViewModelDelegateImpl(
     }
 
     override suspend fun initObserveGame(
-        submitResult: suspend (tsumegoId: String, Attempt.Result) -> Unit,
+        submitResult: suspend (rawTsumego: RawTsumego, Attempt.Result) -> Unit,
     ) {
         gameFlow.collect { game ->
             if (game == null) return@collect
@@ -162,7 +166,7 @@ class GameViewModelDelegateImpl(
 
             if (resultShouldBeSubmit) {
                 submitResult(
-                    game.sgf.id,
+                    game.sgf,
                     if (game.outcome == SgfNodeOutcome.SUCCESS) Attempt.Result.Success else Attempt.Result.Failure,
                 )
             }

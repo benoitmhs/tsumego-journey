@@ -29,8 +29,8 @@ class GetNextRankEstimationTsumegoUseCase(
             ?: throw THAppError.Code.ObjectNotFound.toError(message = "No tsumego found")
     }
 
-    private fun currentRank(attempts: List<Pair<Rank, Attempt>>): Rank? {
-        val ranksAttempted = attempts.map { it.first }
+    private fun currentRank(attempts: List<Attempt>): Rank? {
+        val ranksAttempted = attempts.map { it.rank }
         val maxRank = ranksAttempted.maxWithOrNull(Rank.comparator)
             ?: Rank.entries.first()
 

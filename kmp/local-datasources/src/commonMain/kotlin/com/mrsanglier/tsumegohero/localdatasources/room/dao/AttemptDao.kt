@@ -6,7 +6,6 @@ import androidx.room.Upsert
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.localdatasources.room.model.RoomAttempt
-import com.mrsanglier.tsumegohero.localdatasources.room.model.RoomRankEstimationAttemptRow
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,15 +19,8 @@ interface AttemptDao {
     @Query("SELECT COUNT(DISTINCT tsumegoId) FROM attempt WHERE result = 'Success'")
     suspend fun getTsumegoSolvedCount(): Int
 
-    @Query(
-        """
-        SELECT a.*, t.rank AS `rank`
-        FROM attempt a
-        INNER JOIN tsumego t ON a.tsumegoId = t.id
-        WHERE a.context = :gameContext
-    """
-    )
-    suspend fun getRankEstimationAttempts(gameContext: GameContext): List<RoomRankEstimationAttemptRow>
+    @Query("SELECT * FROM attempt WHERE context = :gameContext")
+    suspend fun getRankEstimationAttempts(gameContext: GameContext): List<RoomAttempt>
 
     @Query("DELETE FROM attempt WHERE context = :gameContext")
     suspend fun deleteByContext(gameContext: GameContext)

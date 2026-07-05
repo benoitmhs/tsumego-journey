@@ -7,12 +7,12 @@ import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.data.model.game.GameMode
 import com.mrsanglier.tsumegohero.data.model.game.Rank
+import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 import com.mrsanglier.tsumegohero.data.model.user.Level
 import com.mrsanglier.tsumegohero.rankestimation.RankEstimationConfig
 import com.mrsanglier.tsumegohero.rankestimation.delegate.EstimateLevelDelegate
 import com.mrsanglier.tsumegohero.rankestimation.delegate.EstimateLevelDelegateImpl
 import com.mrsanglier.tsumegohero.repository.AttemptRepository
-import com.mrsanglier.tsumegohero.repository.TsumegoRepository
 import com.mrsanglier.tsumegohero.repository.UserRepository
 import kotlinx.coroutines.flow.first
 import kotlin.time.Clock
@@ -23,25 +23,24 @@ class SubmitRankEstimationAnswerUseCase(
     estimateLevelDelegateImpl: EstimateLevelDelegateImpl,
     private val userRepository: UserRepository,
     private val attemptRepository: AttemptRepository,
-    private val tsumegoRepository: TsumegoRepository,
 ) : EstimateLevelDelegate by estimateLevelDelegateImpl {
 
     @OptIn(ExperimentalUuidApi::class)
     suspend operator fun invoke(
-        tsumegoId: String,
+        tsumego: RawTsumego,
         resolutionTimeMs: Long,
         gameMode: GameMode,
         result: Attempt.Result,
     ): THResult<Level?> = THResult.catchResult {
         val user = userRepository.observeUser().first()
             ?: throw THAppError.Code.ObjectNotFound.toError("User not found")
-        val tsumego = tsumegoRepository.observeGame(tsumegoId).first()
 
         attemptRepository.upsert(
             Attempt(
                 id = Uuid.random().toString(),
                 userId = user.userId,
-                tsumegoId = tsumegoId,
+                tsumegoId = tsumego.id,
+                rank = tsumego.rank,
                 result = result,
                 mode = gameMode,
                 date = Clock.System.now(),
@@ -52,7 +51,7 @@ class SubmitRankEstimationAnswerUseCase(
 
         val attempts = attemptRepository.getRankEstimationAttempts()
 
-        val rankAttempts = attempts.filter { it.first == tsumego.rank }.map { it.second }
+        val rankAttempts = attempts.filter { it.rank == tsumego.rank }
 
         if (rankAttempts.size < RankEstimationConfig.BLOCK_SIZE) return@catchResult null
 

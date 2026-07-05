@@ -68,10 +68,10 @@ class TrainingViewModel(
         }
 
         viewModelScope.launch {
-            initObserveGame { tsumegoId, result ->
+            initObserveGame { rawTsumego, result ->
                 sendGameResultUseCase(
                     result = result,
-                    tsumegoId = tsumegoId,
+                    tsumego = rawTsumego,
                     mode = args.gameMode,
                     resolutionTimeMs = getElapsedTime(),
                     gameContext = GameContext.Training,
@@ -93,7 +93,7 @@ class TrainingViewModel(
         viewModelScope.launch {
             val submitResult = sendGameResultUseCase(
                 result = Attempt.Result.Skip,
-                tsumegoId = game.sgf.id,
+                tsumego = game.sgf,
                 mode = args.gameMode,
                 resolutionTimeMs = getElapsedTime(),
                 gameContext = GameContext.Training,

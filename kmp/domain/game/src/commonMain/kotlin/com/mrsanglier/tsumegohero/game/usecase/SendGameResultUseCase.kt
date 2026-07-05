@@ -7,6 +7,7 @@ import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.data.model.game.GameMode
+import com.mrsanglier.tsumegohero.data.model.game.RawTsumego
 import com.mrsanglier.tsumegohero.data.model.user.User
 import com.mrsanglier.tsumegohero.repository.AttemptRepository
 import com.mrsanglier.tsumegohero.repository.UserRepository
@@ -25,7 +26,7 @@ class SendGameResultUseCase(
     @OptIn(ExperimentalUuidApi::class)
     suspend operator fun invoke(
         result: Attempt.Result,
-        tsumegoId: String,
+        tsumego: RawTsumego,
         mode: GameMode,
         gameContext: GameContext,
         resolutionTimeMs: Long,
@@ -37,7 +38,8 @@ class SendGameResultUseCase(
         val newAttempt = Attempt(
             id = Uuid.random().toString(),
             userId = user.userId,
-            tsumegoId = tsumegoId,
+            tsumegoId = tsumego.id,
+            rank = tsumego.rank,
             result = result,
             mode = mode,
             date = Clock.System.now(),
