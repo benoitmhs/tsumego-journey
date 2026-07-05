@@ -46,20 +46,28 @@ internal fun ProgressData.getProblemStreakData(): ProblemStreakProgressBarData =
         total = problemStreakRequired,
     )
 
-internal fun HomeViewModel.getMainAction(rankIsNull: Boolean) =
-    if (rankIsNull) {
-        THButtonState(
-            text = "Choose my Rank".toTextSpec(), // TODO: loco
-            onClick = ::openRankBottomSheet,
-            style = ButtonStyle.Primary,
-        )
-    } else {
-        THButtonState(
-            text = "Solve Tsumego".toTextSpec(), // TODO: loco
-            onClick = ::startTsumego,
-            style = ButtonStyle.Primary,
-        )
-    }
+internal fun HomeViewModel.getMainAction(
+    rankIsNull: Boolean,
+    estimationInProgress: Boolean,
+) = when {
+    !rankIsNull -> THButtonState(
+        text = "Solve Tsumego".toTextSpec(), // TODO: loco
+        onClick = ::startTsumego,
+        style = ButtonStyle.Primary,
+    )
+
+    estimationInProgress -> THButtonState(
+        text = "Continue the test".toTextSpec(), // TODO: loco
+        onClick = ::continueRankEstimation,
+        style = ButtonStyle.Primary,
+    )
+
+    else -> THButtonState(
+        text = "Choose my Rank".toTextSpec(), // TODO: loco
+        onClick = ::openRankBottomSheet,
+        style = ButtonStyle.Primary,
+    )
+}
 
 internal object PlaceHolder {
     val DailyStreak: DailyStreakCellData

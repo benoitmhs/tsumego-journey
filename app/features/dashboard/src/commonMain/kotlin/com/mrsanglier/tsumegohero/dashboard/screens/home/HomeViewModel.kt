@@ -18,6 +18,7 @@ import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.ImportTsumegoUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.GetNextRankEstimationTsumegoUseCase
+import com.mrsanglier.tsumegohero.rankestimation.usecase.ObserveRankEstimationInProgressUseCase
 import io.github.vinceglb.filekit.PlatformFile
 import io.github.vinceglb.filekit.nameWithoutExtension
 import io.github.vinceglb.filekit.readString
@@ -40,18 +41,23 @@ class HomeViewModel(
     observeUserUseCase: ObserveUserUseCase,
     observeProgressDataUseCase: ObserveProgressDataUseCase,
     observeDailyStreakUseCase: ObserveDailyStreakUseCase,
+    observeRankEstimationInProgressUseCase: ObserveRankEstimationInProgressUseCase,
 ) : ViewModel() {
 
     internal val uiState: StateFlow<HomeViewModelState> = combine(
         observeProgressDataUseCase(),
         observeDailyStreakUseCase(),
         observeUserUseCase().map { it?.level == null }.distinctUntilChanged(),
-    ) { progressData, dailyStreak, levelIsNull ->
+        observeRankEstimationInProgressUseCase(),
+    ) { progressData, dailyStreak, levelIsNull, estimationInProgress ->
         HomeViewModelState(
             dailyStreakData = dailyStreak.data?.toCellData() ?: PlaceHolder.DailyStreak,
             rankProgressBarData = progressData?.getRankProgressBarData() ?: PlaceHolder.RankProgressBar,
             problemStreakData = progressData?.getProblemStreakData() ?: PlaceHolder.ProblemStreak,
-            mainAction = getMainAction(levelIsNull),
+            mainAction = getMainAction(
+                rankIsNull = levelIsNull,
+                estimationInProgress = estimationInProgress,
+            ),
         )
     }.stateIn(
         viewModelScope,
@@ -69,6 +75,10 @@ class HomeViewModel(
             onRankSelected = ::startRankEstimation,
             onDismiss = { _bottomSheet.value = null },
         )
+    }
+
+    internal fun continueRankEstimation() {
+        startRankEstimation(declaredRank = null)
     }
 
     private fun startRankEstimation(declaredRank: Rank?) {

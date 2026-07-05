@@ -4,6 +4,7 @@ import com.mrsanglier.tsumegohero.domain.common.delegate.GetNextTsumegoFromRankD
 import com.mrsanglier.tsumegohero.rankestimation.delegate.ComputeSearchStateDelegateImpl
 import com.mrsanglier.tsumegohero.rankestimation.delegate.EstimateLevelDelegateImpl
 import com.mrsanglier.tsumegohero.rankestimation.usecase.GetNextRankEstimationTsumegoUseCase
+import com.mrsanglier.tsumegohero.rankestimation.usecase.ObserveRankEstimationInProgressUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.ObserveRankEstimationProgressUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.SubmitRankEstimationAnswerUseCase
 import org.koin.core.module.Module
@@ -13,6 +14,7 @@ import org.koin.dsl.module
 val domainRankEstimationModule: Module = module {
     // UseCase
     singleOf(::GetNextRankEstimationTsumegoUseCase)
+    singleOf(::ObserveRankEstimationInProgressUseCase)
     singleOf(::ObserveRankEstimationProgressUseCase)
     singleOf(::SubmitRankEstimationAnswerUseCase)
 

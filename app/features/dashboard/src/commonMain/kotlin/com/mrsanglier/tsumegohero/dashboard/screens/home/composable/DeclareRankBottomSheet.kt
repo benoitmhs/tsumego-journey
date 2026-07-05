@@ -67,7 +67,7 @@ internal class DeclareRankBottomSheet(
             THButton(
                 text = THString.rankEstimation_declareRank_unknown.toTextSpec(),
                 onClick = { onRankSelected(null) },
-                style = ButtonStyle.Outlined,
+                style = ButtonStyle.Secondary,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = THTheme.spacing.large),
