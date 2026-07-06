@@ -63,5 +63,7 @@
     <string name="profile_logoutButton_label">Logout</string>
     <string name="rankEstimation_declareRank_title">What is your approximate level?</string>
     <string name="rankEstimation_declareRank_unknown">I don\'t know</string>
+    <string name="rankEstimation_result_congrats">Estimate Complete!\\nHere your level:</string>
+    <string name="rankEstimation_result_button">Super</string>
     <string name="snackbar_disconnected">Disconnected</string>
 </resources>

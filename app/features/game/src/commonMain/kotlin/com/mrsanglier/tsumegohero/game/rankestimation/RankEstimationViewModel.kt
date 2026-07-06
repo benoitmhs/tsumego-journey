@@ -7,10 +7,10 @@ import androidx.navigation.toRoute
 import com.mrsanglier.tsumegohero.core.extension.handleResult
 import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
-import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showDone
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
+import com.mrsanglier.tsumegohero.data.model.user.Level
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
@@ -41,6 +41,8 @@ class RankEstimationViewModel(
     GameViewModelDelegate by gameViewModelDelegateImpl {
 
     private val args: RankEstimationDestination = savedStateHandle.toRoute()
+
+    private var estimatedLevel: Level? = null
 
     internal val uiState: StateFlow<RankEstimationViewModelState> = combine(
         gameFlow,
@@ -84,7 +86,7 @@ class RankEstimationViewModel(
                     tsumego = rawTsumego,
                     resolutionTimeMs = getElapsedTime(),
                 ).handleResult(
-                    onSuccess = {},
+                    onSuccess = { level -> level?.let { estimatedLevel = it } },
                     onError = snackbarManager::showError,
                 )
             }
@@ -105,9 +107,13 @@ class RankEstimationViewModel(
                 tsumego = game.sgf,
                 resolutionTimeMs = getElapsedTime(),
             )
-            if (submitResult is THResult.Failure) {
-                snackbarManager.showError(submitResult.error)
-                return@launch
+            when (submitResult) {
+                is THResult.Failure -> {
+                    snackbarManager.showError(submitResult.error)
+                    return@launch
+                }
+
+                is THResult.Success -> submitResult.successData?.let { estimatedLevel = it }
             }
 
             loadNextTsumego()
@@ -129,8 +135,10 @@ class RankEstimationViewModel(
                         gameOption = GAME_OPTION,
                     )
                 } else {
-                    snackbarManager.showDone("Estimation terminé".toTextSpec()) // TODO: loco
-                    _navEvent.value = RankEstimationNavEvent.Back
+                    _navEvent.value = estimatedLevel
+                        ?.let { RankEstimationNavEvent.Result(it) }
+                        ?: RankEstimationNavEvent.Back
+                    println("flash: ${estimatedLevel?.flashRank} | classical: ${estimatedLevel?.classicalRank} | difficile: ${estimatedLevel?.difficultRank}")
                 }
             },
             onError = {
@@ -146,5 +154,6 @@ class RankEstimationViewModel(
 
 internal sealed interface RankEstimationNavEvent {
     data class Review(val tsumegoId: String, val boardConfig: BoardConfig) : RankEstimationNavEvent
+    data class Result(val level: Level) : RankEstimationNavEvent
     data object Back : RankEstimationNavEvent
 }

@@ -6,6 +6,8 @@ import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeNavScope
 import com.mrsanglier.tsumegohero.game.rankestimation.RankEstimationDestination
 import com.mrsanglier.tsumegohero.game.rankestimation.RankEstimationNavScope
+import com.mrsanglier.tsumegohero.game.rankestimation.result.RankEstimationResultDestination
+import com.mrsanglier.tsumegohero.game.rankestimation.result.RankEstimationResultNavScope
 import com.mrsanglier.tsumegohero.game.review.ReviewDestination
 import com.mrsanglier.tsumegohero.game.review.ReviewNavScope
 import com.mrsanglier.tsumegohero.game.training.TrainingDestination
@@ -64,6 +66,21 @@ fun MainNavigation(
                         )
                     )
                 },
+                navigateToResult = { level ->
+                    navController.navigate(
+                        RankEstimationResultDestination(rank = level.classicalRank.rawValue)
+                    ) {
+                        // The estimation is over: close, "Super" or a back gesture all lead back home
+                        popUpTo<RankEstimationDestination> { inclusive = true }
+                    }
+                },
+            )
+        )
+
+        RankEstimationResultDestination.composable(
+            navGraphBuilder = this,
+            navScope = RankEstimationResultNavScope(
+                close = navController::popBackStack,
             )
         )
 

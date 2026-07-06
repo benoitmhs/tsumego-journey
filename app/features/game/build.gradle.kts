@@ -20,6 +20,10 @@ kotlin {
             implementation(libs.compose.components.resources)
             implementation(libs.compose.preview)
 
+            // Animation
+            implementation(libs.compottie)
+            implementation(libs.compottie.dot)
+
             // Constraint layout
             implementation(libs.constraintlayout)
 
