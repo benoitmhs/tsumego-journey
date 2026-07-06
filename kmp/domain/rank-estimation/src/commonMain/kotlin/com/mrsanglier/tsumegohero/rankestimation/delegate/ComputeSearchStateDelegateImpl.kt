@@ -26,31 +26,35 @@ class ComputeSearchStateDelegateImpl : ComputeSearchStateDelegate {
 
         while (true) {
             val targetTier = searchPriority.firstOrNull { !brackets.getValue(it).isConverged }
-            if (targetTier == null || consumed >= RankEstimationConfig.PROBLEM_CAP) {
+            if (targetTier == null) {
                 nextRankIndex = null
                 break
             }
 
-            val blockSize = brackets.getValue(targetTier).blockSize
             if (consumed >= attempts.size) {
-                nextRankIndex = brackets.getValue(targetTier).nextRankIndex(seedRank)
+                nextRankIndex = nextRankToServe(attempts) { brackets.getValue(targetTier).nextRankIndex(seedRank) }
                 break
             }
 
             val blockRankIndex = attempts[consumed].rank.index
-            val block = attempts
-                .subList(consumed, min(consumed + blockSize, attempts.size))
-                .takeWhile { it.rank.index == blockRankIndex }
+            val run = attempts.drop(consumed).takeWhile { it.rank.index == blockRankIndex }
+            val blockSize = decidedBlockSize(run)
 
-            val isTrailingIncompleteBlock = block.size < blockSize
-                && consumed + block.size == attempts.size
-            if (isTrailingIncompleteBlock) {
-                nextRankIndex = blockRankIndex
-                break
+            if (blockSize == null) {
+                val isTrailingRun = consumed + run.size == attempts.size
+                if (isTrailingRun) {
+                    // undecided 1-1 (or single attempt): keep serving the same rank as tie-breaker
+                    nextRankIndex = nextRankToServe(attempts) { blockRankIndex }
+                    break
+                }
+                // undecided run in the middle of the history (legacy data): ignore it
+                consumed += run.size
+                continue
             }
 
+            val block = run.take(blockSize)
             brackets.values.forEach { bracket -> bracket.update(blockRankIndex, block) }
-            consumed += block.size
+            consumed += blockSize
         }
 
         return RankEstimationSearchState(
@@ -61,9 +65,37 @@ class ComputeSearchStateDelegateImpl : ComputeSearchStateDelegate {
         )
     }
 
+    private fun nextRankToServe(attempts: List<Attempt>, rankIndex: () -> Int): Int? =
+        if (attempts.size >= RankEstimationConfig.PROBLEM_CAP) null else rankIndex()
+
+    // number of attempts needed to decide the block on raw results, null if still undecided
+    private fun decidedBlockSize(run: List<Attempt>): Int? {
+        var successes = 0
+        var failures = 0
+        run.take(RankEstimationConfig.BLOCK_MAX_SIZE).forEachIndexed { index, attempt ->
+            if (attempt.result == Attempt.Result.Success) successes++ else failures++
+            if (successes >= RankEstimationConfig.BLOCK_DECISION_COUNT ||
+                failures >= RankEstimationConfig.BLOCK_DECISION_COUNT
+            ) {
+                return index + 1
+            }
+        }
+        return null
+    }
+
+    // the tier time threshold applies to the average resolution time of the solved problems
     private fun MutableBracket.update(rankIndex: Int, block: List<Attempt>) {
-        val validated = block.count { it.isSuccessFor(tier) } >= RankEstimationConfig.BLOCK_SUCCESS_QUORUM
-        if (validated) validate(rankIndex) else fail(rankIndex)
+        val solved = block.filter { it.result == Attempt.Result.Success }
+        if (solved.size < RankEstimationConfig.BLOCK_DECISION_COUNT) {
+            fail(rankIndex)
+            return
+        }
+        val averageTimeMs = solved.map { it.resolutionTimeMs }.average()
+        if (averageTimeMs <= tier.timeLimit.inWholeMilliseconds) {
+            validate(rankIndex)
+        } else {
+            fail(rankIndex)
+        }
     }
 
     private fun expectedProblems(done: Int, brackets: Collection<MutableBracket>): Int {
@@ -73,8 +105,7 @@ class ComputeSearchStateDelegateImpl : ComputeSearchStateDelegate {
             val width = if (isCadrage) RankEstimationConfig.CADRAGE_STEP else bracket.hi - bracket.lo
             val dichotomyBlocks = ceil(log2(width.toDouble())).toInt().coerceAtLeast(0)
             val cadrageBlocks = if (isCadrage) 2 else 0
-            dichotomyBlocks * RankEstimationConfig.DICHOTOMY_BLOCK_SIZE +
-                cadrageBlocks * RankEstimationConfig.CADRAGE_BLOCK_SIZE
+            (dichotomyBlocks + cadrageBlocks) * RankEstimationConfig.BLOCK_DECISION_COUNT
         }
         return min(done + remaining, RankEstimationConfig.PROBLEM_CAP).coerceAtLeast(done)
     }
@@ -91,14 +122,6 @@ private class MutableBracket(val tier: Tier) {
     private val validationCounts = mutableMapOf<Int, Int>()
 
     val isConverged: Boolean get() = hi - lo <= 1
-
-    // cadrage while a bound is still unknown, then dichotomy
-    val blockSize: Int
-        get() = if (lo == NO_LO || hi == NO_HI) {
-            RankEstimationConfig.CADRAGE_BLOCK_SIZE
-        } else {
-            RankEstimationConfig.DICHOTOMY_BLOCK_SIZE
-        }
 
     fun nextRankIndex(seedRank: Rank): Int = when {
         lo == NO_LO && hi == NO_HI -> seedRank.index
@@ -126,9 +149,6 @@ private class MutableBracket(val tier: Tier) {
         firstFailed = Rank.entries.getOrNull(hi),
     )
 }
-
-private fun Attempt.isSuccessFor(tier: Tier): Boolean =
-    result == Attempt.Result.Success && resolutionTimeMs <= tier.timeLimit.inWholeMilliseconds
 
 private val Tier.timeLimit: Duration
     get() = when (this) {

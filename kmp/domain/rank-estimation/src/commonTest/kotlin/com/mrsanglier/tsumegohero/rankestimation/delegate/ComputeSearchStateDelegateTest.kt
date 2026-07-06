@@ -138,9 +138,9 @@ class ComputeSearchStateDelegateTest : FunSpec({
         state.isFinished.shouldBeTrue()
     }
 
-    test("a skip counts as a failure for the three tiers") {
+    test("two skips fail the block for the three tiers") {
         val attempts = listOf(
-            attempt(Rank.`10K`, Attempt.Result.Success, timeMs = 10_000L, index = 0),
+            attempt(Rank.`10K`, Attempt.Result.Skip, timeMs = 10_000L, index = 0),
             attempt(Rank.`10K`, Attempt.Result.Skip, timeMs = 10_000L, index = 1),
         )
 
@@ -149,6 +149,37 @@ class ComputeSearchStateDelegateTest : FunSpec({
         RankEstimationSearchState.Tier.entries.forEach { tier ->
             state.brackets.getValue(tier).firstFailed shouldBe Rank.`10K`
         }
+    }
+
+    test("a single failure does not decide the block, a 3rd problem breaks the tie") {
+        val undecided = listOf(
+            attempt(Rank.`10K`, Attempt.Result.Success, timeMs = 60_000L, index = 0),
+            attempt(Rank.`10K`, Attempt.Result.Skip, timeMs = 60_000L, index = 1),
+        )
+
+        val undecidedState = delegate.computeSearchState(undecided, seedRank = Rank.`10K`)
+        undecidedState.nextRank shouldBe Rank.`10K`
+
+        val decided = undecided + attempt(Rank.`10K`, Attempt.Result.Success, timeMs = 60_000L, index = 2)
+
+        val decidedState = delegate.computeSearchState(decided, seedRank = Rank.`10K`)
+        decidedState.brackets
+            .getValue(RankEstimationSearchState.Tier.Classical)
+            .lastValidated shouldBe Rank.`10K`
+    }
+
+    test("tier thresholds apply to the average time of the solved problems of the block") {
+        val attempts = listOf(
+            attempt(Rank.`10K`, Attempt.Result.Success, timeMs = 15_000L, index = 0),
+            attempt(Rank.`10K`, Attempt.Result.Success, timeMs = 22_000L, index = 1),
+        )
+
+        val state = delegate.computeSearchState(attempts, seedRank = Rank.`10K`)
+
+        // one problem exceeds 20s but the block average (18.5s) validates the flash tier
+        state.brackets
+            .getValue(RankEstimationSearchState.Tier.Flash)
+            .lastValidated shouldBe Rank.`10K`
     }
 
     test("an incomplete block keeps serving the same rank") {

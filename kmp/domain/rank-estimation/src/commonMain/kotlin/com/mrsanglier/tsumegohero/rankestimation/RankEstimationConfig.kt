@@ -9,9 +9,12 @@ internal object RankEstimationConfig {
     val CLASSICAL_TIME = 2.minutes
     val DIFFICULT_TIME = 7.minutes
     const val CADRAGE_STEP = 8
-    const val CADRAGE_BLOCK_SIZE = 2
-    const val DICHOTOMY_BLOCK_SIZE = 3
-    const val BLOCK_SUCCESS_QUORUM = 2
+
+    // A block is decided on raw results: 2 successes validate it, 2 failures fail it,
+    // a 3rd problem breaks a 1-1 tie. Tier time thresholds then apply to the average
+    // resolution time of the block's solved problems.
+    const val BLOCK_DECISION_COUNT = 2
+    const val BLOCK_MAX_SIZE = 2 * BLOCK_DECISION_COUNT - 1
     const val PROBLEM_CAP = 25
 
     // 1 kyu = 2 rank entries (each kyu/dan has a "+" half rank)
