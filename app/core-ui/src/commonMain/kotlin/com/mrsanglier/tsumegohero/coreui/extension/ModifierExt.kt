@@ -114,13 +114,11 @@ fun Modifier.thClickable(
     )
 
 @Composable
-fun Modifier.foCard(
+fun Modifier.thCard(
     backgroundColor: Color = THTheme.colors.surface1,
 ): Modifier =
     this.surface(
         shape = THTheme.shape.roundLarge,
-        borderColor = THTheme.colors.strokeCard,
-        borderWidth = THTheme.stroke.xthin,
         elevation = THTheme.elevation.medium,
         background = backgroundColor,
     )

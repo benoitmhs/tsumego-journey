@@ -10,11 +10,14 @@ import com.mrsanglier.tsumegohero.coreui.componants.snackbar.THSnackbarState
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showDone
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
+import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DailyObjectiveCard
+import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DailyObjectiveCardState
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveDailyStreakUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveProgressDataUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveUserUseCase
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DeclareRankBottomSheet
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.TrainingModeBottomSheet
+import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveDailyObjectiveUseCase
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.data.model.game.TrainingMode
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
@@ -44,6 +47,7 @@ class HomeViewModel(
     observeProgressDataUseCase: ObserveProgressDataUseCase,
     observeDailyStreakUseCase: ObserveDailyStreakUseCase,
     observeRankEstimationInProgressUseCase: ObserveRankEstimationInProgressUseCase,
+    observeDailyObjectiveUseCase: ObserveDailyObjectiveUseCase,
 ) : ViewModel() {
 
     internal val uiState: StateFlow<HomeViewModelState> = combine(
@@ -51,13 +55,32 @@ class HomeViewModel(
         observeDailyStreakUseCase(),
         observeUserUseCase().map { it?.level == null }.distinctUntilChanged(),
         observeRankEstimationInProgressUseCase(),
-    ) { progressData, dailyStreak, levelIsNull, estimationInProgress ->
+        observeDailyObjectiveUseCase(),
+    ) { progressData, dailyStreak, levelIsNull, estimationInProgress, dailyObjectives ->
         HomeViewModelState(
             dailyStreakData = dailyStreak.data?.toCellData() ?: PlaceHolder.DailyStreak,
             rankProgressBarData = progressData?.getRankProgressBarData() ?: PlaceHolder.RankProgressBar,
             mainAction = getMainAction(
                 rankIsNull = levelIsNull,
                 estimationInProgress = estimationInProgress,
+            ),
+            dailyObjectiveCards = listOf(
+                DailyObjectiveCardState(
+                    attempts = dailyObjectives.flashProblemResults,
+                    trainingMode = TrainingMode.Flash,
+                    onClick = { startTraining(TrainingMode.Flash) }
+                ),
+                DailyObjectiveCardState(
+                    attempts = dailyObjectives.classicalProblemResults,
+                    trainingMode = TrainingMode.Classical,
+                    onClick = { startTraining(TrainingMode.Classical) }
+
+                ),
+                DailyObjectiveCardState(
+                    attempts = dailyObjectives.difficultProblemResults,
+                    trainingMode = TrainingMode.Difficult,
+                    onClick = { startTraining(TrainingMode.Difficult) }
+                ),
             ),
         )
     }.stateIn(

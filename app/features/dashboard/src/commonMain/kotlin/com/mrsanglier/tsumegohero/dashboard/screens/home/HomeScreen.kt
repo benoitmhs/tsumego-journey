@@ -23,6 +23,7 @@ import com.mrsanglier.tsumegohero.coreui.extension.rememberBottomBarElevation
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.navigation.safeNavigation
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
+import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DailyObjectiveCardState
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DailyStreakCellData
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.Header
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.HomeBottomBar
@@ -86,6 +87,9 @@ private fun HomeScreen(
             // Rank & progress
             ProgressSection(uiState.rankProgressBarData)
 
+            // Daily objectives
+            DailyObjectivesSection(uiState.dailyObjectiveCards)
+
             // Statistics
             StatsSection()
 
@@ -119,6 +123,22 @@ private fun TopHeader(dailyStreakData: DailyStreakCellData) {
 private fun ColumnScope.ProgressSection(rankProgressBarData: RankProgressBarData) {
     Header(text = "Progress".toTextSpec()) // TODO: loco
     rankProgressBarData.Composable(modifier = Modifier.align(Alignment.CenterHorizontally))
+}
+
+@Composable
+private fun ColumnScope.DailyObjectivesSection(dailyObjectiveCards: List<DailyObjectiveCardState>?) {
+    dailyObjectiveCards?.let { cards ->
+        Header("Daily objectives".toTextSpec()) // TODO: loco"
+        cards.forEach { card ->
+            card.Content(
+                modifier = Modifier
+                    .padding(
+                        horizontal = THTheme.spacing.large,
+                        vertical = THTheme.spacing.small,
+                    )
+            )
+        }
+    }
 }
 
 @Composable

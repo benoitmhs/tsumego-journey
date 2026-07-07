@@ -83,6 +83,10 @@ object THTypography {
             letterSpacing = (-0.33).sp,
         )
 
+    val content50Semibold: TextStyle
+        @Composable
+        get() = content50.copy(fontWeight = FontWeight.SemiBold)
+
     // Label
     val label200: TextStyle
         @Composable

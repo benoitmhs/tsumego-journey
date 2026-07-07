@@ -2,6 +2,7 @@ package com.mrsanglier.tsumegohero.dashboard.screens.home
 
 import androidx.compose.runtime.Immutable
 import com.mrsanglier.tsumegohero.coreui.componants.button.THButtonState
+import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DailyObjectiveCardState
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DailyStreakCellData
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.RankProgressBarData
 
@@ -9,5 +10,6 @@ import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.RankProgress
 internal data class HomeViewModelState(
     val dailyStreakData: DailyStreakCellData = PlaceHolder.DailyStreak,
     val rankProgressBarData: RankProgressBarData = PlaceHolder.RankProgressBar,
+    val dailyObjectiveCards: List<DailyObjectiveCardState>? = null,
     val mainAction: THButtonState? = null,
 )
