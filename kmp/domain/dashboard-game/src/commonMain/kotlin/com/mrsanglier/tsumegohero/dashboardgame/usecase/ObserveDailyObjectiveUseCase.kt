@@ -16,8 +16,11 @@ class ObserveDailyObjectiveUseCase(
     operator fun invoke(): Flow<DailyObjective> =
         attemptRepository.observeTodayTrainingAttempts().map { attempts ->
             val flashs = attempts.filterByTrainingMode(TrainingMode.Flash)
+                .take(Config.DailyObjective.FLASH_TOTAL_OBJECTIVE)
             val classicals = attempts.filterByTrainingMode(TrainingMode.Classical)
+                .take(Config.DailyObjective.CLASSICAL_TOTAL_OBJECTIVE)
             val difficults = attempts.filterByTrainingMode(TrainingMode.Difficult)
+                .take(Config.DailyObjective.DIFFICULT_TOTAL_OBJECTIVE)
 
             val remainingFlash = Config.DailyObjective.FLASH_TOTAL_OBJECTIVE - flashs.count()
             val remainingClassical = Config.DailyObjective.CLASSICAL_TOTAL_OBJECTIVE - classicals.count()
@@ -29,7 +32,11 @@ class ObserveDailyObjectiveUseCase(
                 difficultProblemResults = difficults.map { it.result } + List(remainingDifficult) { null },
             )
         }
-            .distinctUntilChanged()
+            .distinctUntilChanged { old, new ->
+                old.flashProblemResults.filterNotNull().count() == new.flashProblemResults.filterNotNull().count() &&
+                    old.classicalProblemResults.filterNotNull().count() == new.classicalProblemResults.filterNotNull().count() &&
+                    old.difficultProblemResults.filterNotNull().count() == new.difficultProblemResults.filterNotNull().count()
+            }
 
     private fun List<Attempt>.filterByTrainingMode(trainingMode: TrainingMode): List<Attempt> =
         filter { (it.context as? GameContext.Training)?.trainingMode == trainingMode }
