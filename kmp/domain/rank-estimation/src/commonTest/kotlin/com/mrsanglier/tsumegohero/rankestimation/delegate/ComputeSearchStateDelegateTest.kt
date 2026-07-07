@@ -151,16 +151,17 @@ class ComputeSearchStateDelegateTest : FunSpec({
         }
     }
 
-    test("a single failure does not decide the block, a 3rd problem breaks the tie") {
+    test("after a failure the block needs 3 successes to be validated") {
         val undecided = listOf(
             attempt(Rank.`10K`, Attempt.Result.Success, timeMs = 60_000L, index = 0),
             attempt(Rank.`10K`, Attempt.Result.Skip, timeMs = 60_000L, index = 1),
+            attempt(Rank.`10K`, Attempt.Result.Success, timeMs = 60_000L, index = 2),
         )
 
         val undecidedState = delegate.computeSearchState(undecided, seedRank = Rank.`10K`)
         undecidedState.nextRank shouldBe Rank.`10K`
 
-        val decided = undecided + attempt(Rank.`10K`, Attempt.Result.Success, timeMs = 60_000L, index = 2)
+        val decided = undecided + attempt(Rank.`10K`, Attempt.Result.Success, timeMs = 60_000L, index = 3)
 
         val decidedState = delegate.computeSearchState(decided, seedRank = Rank.`10K`)
         decidedState.brackets

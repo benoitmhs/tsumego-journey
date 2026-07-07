@@ -68,17 +68,21 @@ class ComputeSearchStateDelegateImpl : ComputeSearchStateDelegate {
     private fun nextRankToServe(attempts: List<Attempt>, rankIndex: () -> Int): Int? =
         if (attempts.size >= RankEstimationConfig.PROBLEM_CAP) null else rankIndex()
 
-    // number of attempts needed to decide the block on raw results, null if still undecided
+    // number of attempts needed to decide the block on raw results, null if still undecided:
+    // 2 failures fail it, 2 clean successes validate it, 3 successes after a failure validate it
     private fun decidedBlockSize(run: List<Attempt>): Int? {
         var successes = 0
         var failures = 0
         run.take(RankEstimationConfig.BLOCK_MAX_SIZE).forEachIndexed { index, attempt ->
             if (attempt.result == Attempt.Result.Success) successes++ else failures++
-            if (successes >= RankEstimationConfig.BLOCK_DECISION_COUNT ||
-                failures >= RankEstimationConfig.BLOCK_DECISION_COUNT
-            ) {
-                return index + 1
+
+            val isFailed = failures >= RankEstimationConfig.BLOCK_FAILURE_LIMIT
+            val successesToValidate = if (failures == 0) {
+                RankEstimationConfig.BLOCK_CLEAN_SUCCESS_COUNT
+            } else {
+                RankEstimationConfig.BLOCK_RECOVERY_SUCCESS_COUNT
             }
+            if (isFailed || successes >= successesToValidate) return index + 1
         }
         return null
     }
@@ -86,7 +90,8 @@ class ComputeSearchStateDelegateImpl : ComputeSearchStateDelegate {
     // the tier time threshold applies to the average resolution time of the solved problems
     private fun MutableBracket.update(rankIndex: Int, block: List<Attempt>) {
         val solved = block.filter { it.result == Attempt.Result.Success }
-        if (solved.size < RankEstimationConfig.BLOCK_DECISION_COUNT) {
+        val failures = block.size - solved.size
+        if (failures >= RankEstimationConfig.BLOCK_FAILURE_LIMIT) {
             fail(rankIndex)
             return
         }
@@ -105,7 +110,7 @@ class ComputeSearchStateDelegateImpl : ComputeSearchStateDelegate {
             val width = if (isCadrage) RankEstimationConfig.CADRAGE_STEP else bracket.hi - bracket.lo
             val dichotomyBlocks = ceil(log2(width.toDouble())).toInt().coerceAtLeast(0)
             val cadrageBlocks = if (isCadrage) 2 else 0
-            (dichotomyBlocks + cadrageBlocks) * RankEstimationConfig.BLOCK_DECISION_COUNT
+            (dichotomyBlocks + cadrageBlocks) * RankEstimationConfig.BLOCK_CLEAN_SUCCESS_COUNT
         }
         return min(done + remaining, RankEstimationConfig.PROBLEM_CAP).coerceAtLeast(done)
     }
