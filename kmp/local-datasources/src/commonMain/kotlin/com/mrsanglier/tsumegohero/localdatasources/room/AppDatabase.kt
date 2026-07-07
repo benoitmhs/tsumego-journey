@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.RoomDatabaseConstructor
 import androidx.room.TypeConverters
+import com.mrsanglier.tsumegohero.localdatasources.room.converters.GameContextConverter
 import com.mrsanglier.tsumegohero.localdatasources.room.dao.AttemptDao
 import com.mrsanglier.tsumegohero.localdatasources.room.dao.TsumegoDao
 import com.mrsanglier.tsumegohero.localdatasources.room.dao.UserDao
@@ -20,7 +21,11 @@ import com.mrsanglier.tsumegohero.localdatasources.room.model.RoomTsumego
     ],
     version = 1
 )
-@TypeConverters(InstantTypeConverter::class, DateTimeConverter::class)
+@TypeConverters(
+    InstantTypeConverter::class,
+    DateTimeConverter::class,
+    GameContextConverter::class,
+)
 @ConstructedBy(AppDatabaseConstructor::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun attemptDao(): AttemptDao

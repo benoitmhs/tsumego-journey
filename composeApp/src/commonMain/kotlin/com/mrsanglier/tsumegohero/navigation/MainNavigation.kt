@@ -28,8 +28,13 @@ fun MainNavigation(
         HomeDestination.composable(
             this,
             HomeNavScope(
-                navigateToTraining = { tsumegoId ->
-                    navController.navigate(TrainingDestination(tsumegoId = tsumegoId))
+                navigateToTraining = { tsumegoId, trainingMode ->
+                    navController.navigate(
+                        TrainingDestination(
+                            tsumegoId = tsumegoId,
+                            trainingMode = trainingMode,
+                        )
+                    )
                 },
                 navigateToRankEstimation = { tsumegoId ->
                     navController.navigate(RankEstimationDestination(tsumegoId = tsumegoId))

@@ -2,6 +2,7 @@ package com.mrsanglier.tsumegohero.rankestimation.delegate
 
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.Rank
+import com.mrsanglier.tsumegohero.domain.common.Config
 import com.mrsanglier.tsumegohero.rankestimation.RankEstimationConfig
 import com.mrsanglier.tsumegohero.rankestimation.model.RankEstimationSearchState
 import com.mrsanglier.tsumegohero.rankestimation.model.RankEstimationSearchState.Bracket
@@ -157,9 +158,9 @@ private class MutableBracket(val tier: Tier) {
 
 private val Tier.timeLimit: Duration
     get() = when (this) {
-        Tier.Flash -> RankEstimationConfig.FLASH_TIME
-        Tier.Classical -> RankEstimationConfig.CLASSICAL_TIME
-        Tier.Difficult -> RankEstimationConfig.DIFFICULT_TIME
+        Tier.Flash -> Config.Game.FLASH_TIME
+        Tier.Classical -> Config.Game.CLASSICAL_TIME
+        Tier.Difficult -> Config.Game.DIFFICULT_TIME
     }
 
 private val Rank.index: Int get() = Rank.entries.indexOf(this)

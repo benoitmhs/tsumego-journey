@@ -45,4 +45,6 @@ internal object DefaultDarkColorScheme : THColorScheme {
 
     // Other
     override val fadeImage: Color = Purple950.copy(alpha = 0.30f)
+    override val detailBlue: Color = PastelBlue
+    override val detailGreen: Color = PastelGreen
 }

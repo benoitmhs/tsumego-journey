@@ -45,6 +45,8 @@ interface THColorScheme {
 
     // Other
     val fadeImage: Color
+    val detailGreen: Color
+    val detailBlue: Color
 
     @Suppress("CyclomaticComplexMethod")
     fun copy(
@@ -125,5 +127,7 @@ interface THColorScheme {
         override val modal: Color = modal ?: this@THColorScheme.modal
         override val modalSoft: Color = modalSoft ?: this@THColorScheme.modalSoft
         override val fadeImage: Color = this@THColorScheme.fadeImage
+        override val detailBlue: Color = this@THColorScheme.detailBlue
+        override val detailGreen: Color = this@THColorScheme.detailGreen
     }
 }

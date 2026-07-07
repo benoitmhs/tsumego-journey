@@ -14,6 +14,9 @@ internal val IvoryT85 = Color(0xd9fffffb)
 
 internal val Green = Color(0xff12d361)
 val DarkGreen = Color(0xff05873e)
+
+internal val PastelBlue = Color(0xff84CB80)
+internal val PastelGreen = Color(0xff519BE4)
 internal val Pink = Color(0xffe16162)
 internal val PinkT40 = Color(0x66e16162)
 

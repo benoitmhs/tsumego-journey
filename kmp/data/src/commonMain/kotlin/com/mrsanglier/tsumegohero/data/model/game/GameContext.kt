@@ -1,5 +1,6 @@
 package com.mrsanglier.tsumegohero.data.model.game
 
-enum class GameContext {
-    Training, RankEstimation;
+sealed interface GameContext {
+    data object RankEstimation : GameContext
+    data class Training(val trainingMode: TrainingMode) : GameContext
 }

@@ -1,13 +1,8 @@
 package com.mrsanglier.tsumegohero.rankestimation
 
 import com.mrsanglier.tsumegohero.data.model.game.Rank
-import kotlin.time.Duration.Companion.minutes
-import kotlin.time.Duration.Companion.seconds
 
 internal object RankEstimationConfig {
-    val FLASH_TIME = 20.seconds
-    val CLASSICAL_TIME = 2.minutes
-    val DIFFICULT_TIME = 7.minutes
     const val CADRAGE_STEP = 8
 
     // A block fails at 2 failures. It is validated at 2 successes when clean,

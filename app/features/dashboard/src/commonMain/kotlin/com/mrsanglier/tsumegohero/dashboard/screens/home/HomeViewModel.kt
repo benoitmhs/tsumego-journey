@@ -14,7 +14,9 @@ import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveDailyStreakUseCas
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveProgressDataUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveUserUseCase
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DeclareRankBottomSheet
+import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.TrainingModeBottomSheet
 import com.mrsanglier.tsumegohero.data.model.game.Rank
+import com.mrsanglier.tsumegohero.data.model.game.TrainingMode
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.ImportTsumegoUseCase
 import com.mrsanglier.tsumegohero.rankestimation.usecase.GetNextRankEstimationTsumegoUseCase
@@ -95,10 +97,18 @@ class HomeViewModel(
     }
 
     internal fun startTsumego() {
+        _bottomSheet.value = TrainingModeBottomSheet(
+            onModeSelected = ::startTraining,
+            onDismiss = { _bottomSheet.value = null },
+        )
+    }
+
+    private fun startTraining(trainingMode: TrainingMode) {
+        _bottomSheet.value = null
         viewModelScope.launch {
-            getNextTsumegoIdUseCase().handleResult(
+            getNextTsumegoIdUseCase(trainingMode).handleResult(
                 onSuccess = { tsumegoId ->
-                    navEvent.value = NavEvent.Training(tsumegoId)
+                    navEvent.value = NavEvent.Training(tsumegoId, trainingMode)
                 },
                 onError = snackbarManager::showError,
             )
@@ -152,7 +162,7 @@ class HomeViewModel(
     }
 
     internal sealed interface NavEvent {
-        data class Training(val tsumegoId: String) : NavEvent
+        data class Training(val tsumegoId: String, val trainingMode: TrainingMode) : NavEvent
         data class RankEstimation(val tsumegoId: String) : NavEvent
     }
 

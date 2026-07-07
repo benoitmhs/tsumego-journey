@@ -1,5 +1,6 @@
 package com.mrsanglier.tsumegohero.repository
 
+import com.mrsanglier.tsumegohero.core.extension.todayInterval
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.localdatasources.datasource.LocalAttemptDataSource
 import kotlinx.coroutines.flow.Flow
@@ -22,6 +23,14 @@ class AttemptRepository(
 
     fun observeRankEstimationAttempts(): Flow<List<Attempt>> =
         localAttemptDataSource.observeRankEstimationAttempts()
+
+    fun observeTodayTrainingAttempts(): Flow<List<Attempt>> {
+        val today = todayInterval()
+        return localAttemptDataSource.observeTrainingAttempts(
+            startOfDay = today.start,
+            endOfDay = today.endExclusive,
+        )
+    }
 
     suspend fun deleteRankEstimationAttempts() {
         localAttemptDataSource.deleteRankEstimationAttempts()

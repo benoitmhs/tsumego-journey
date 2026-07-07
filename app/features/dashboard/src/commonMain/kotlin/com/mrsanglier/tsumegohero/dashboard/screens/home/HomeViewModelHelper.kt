@@ -12,7 +12,7 @@ import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.DailyStreakC
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.ProblemStreakProgressBarData
 import com.mrsanglier.tsumegohero.dashboard.screens.home.composable.RankProgressBarData
 import com.mrsanglier.tsumegohero.data.model.user.DailyStreak
-import com.mrsanglier.tsumegohero.domain.common.model.ProgressData
+import com.mrsanglier.tsumegohero.data.model.objective.ProgressData
 
 internal fun DailyStreak.toCellData(): DailyStreakCellData {
     val imageRes = when (status) {

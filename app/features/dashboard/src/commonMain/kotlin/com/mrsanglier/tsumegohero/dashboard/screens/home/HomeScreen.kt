@@ -41,7 +41,7 @@ fun HomeRoute(
 
     safeNavigation(viewModel.navEvent, viewModel::consumeNavigation) { event ->
         when (event) {
-            is HomeViewModel.NavEvent.Training -> navScope.navigateToTraining(event.tsumegoId)
+            is HomeViewModel.NavEvent.Training -> navScope.navigateToTraining(event.tsumegoId, event.trainingMode)
             is HomeViewModel.NavEvent.RankEstimation -> navScope.navigateToRankEstimation(event.tsumegoId)
         }
     }

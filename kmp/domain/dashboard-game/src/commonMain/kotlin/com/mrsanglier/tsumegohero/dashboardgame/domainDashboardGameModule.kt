@@ -1,5 +1,6 @@
 package com.mrsanglier.tsumegohero.dashboardgame
 
+import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveDailyObjectiveUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveDailyStreakUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveProgressDataUseCase
 import com.mrsanglier.tsumegohero.dashboardgame.usecase.ObserveUserUseCase
@@ -9,6 +10,7 @@ import org.koin.dsl.module
 
 val domainDashboardGameModule: Module = module {
 
+    singleOf(::ObserveDailyObjectiveUseCase)
     singleOf(::ObserveDailyStreakUseCase)
     singleOf(::ObserveProgressDataUseCase)
     singleOf(::ObserveUserUseCase)

@@ -2,7 +2,7 @@ package com.mrsanglier.tsumegohero.domain.common.delegate
 
 import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.data.model.user.User
-import com.mrsanglier.tsumegohero.domain.common.model.ProgressData
+import com.mrsanglier.tsumegohero.data.model.objective.ProgressData
 
 interface GetProgressDataDelegate {
     fun getProgressData(user: User): ProgressData

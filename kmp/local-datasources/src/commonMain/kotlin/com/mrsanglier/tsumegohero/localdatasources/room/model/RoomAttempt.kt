@@ -5,6 +5,7 @@ import androidx.room.PrimaryKey
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.data.model.game.Rank
+import com.mrsanglier.tsumegohero.data.model.game.TrainingMode
 import kotlin.time.Instant
 
 @Entity(tableName = "attempt")

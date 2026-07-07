@@ -6,6 +6,7 @@ import com.mrsanglier.tsumegohero.localdatasources.room.dao.AttemptDao
 import com.mrsanglier.tsumegohero.localdatasources.room.model.RoomAttempt
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlin.time.Instant
 
 class LocalAttemptDataSource(
     private val dao: AttemptDao,
@@ -25,6 +26,10 @@ class LocalAttemptDataSource(
 
     fun observeRankEstimationAttempts(): Flow<List<Attempt>> =
         dao.observeRankEstimationAttempts(GameContext.RankEstimation)
+            .map { attempts -> attempts.map { it.toAppModel() } }
+
+    fun observeTrainingAttempts(startOfDay: Instant, endOfDay: Instant): Flow<List<Attempt>> =
+        dao.observeTrainingAttempts(startOfDay = startOfDay, endOfDay = endOfDay)
             .map { attempts -> attempts.map { it.toAppModel() } }
 
     suspend fun deleteRankEstimationAttempts() {

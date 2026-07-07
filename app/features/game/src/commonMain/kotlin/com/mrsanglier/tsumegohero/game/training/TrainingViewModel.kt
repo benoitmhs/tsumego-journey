@@ -75,7 +75,7 @@ class TrainingViewModel(
                     result = result,
                     tsumego = rawTsumego,
                     resolutionTimeMs = getElapsedTime(),
-                    gameContext = GameContext.Training,
+                    gameContext = GameContext.Training(args.trainingMode),
                 ).handleResult(
                     onSuccess = {},
                     onError = snackbarManager::showError,
@@ -96,7 +96,7 @@ class TrainingViewModel(
                 result = Attempt.Result.Skip,
                 tsumego = game.sgf,
                 resolutionTimeMs = getElapsedTime(),
-                gameContext = GameContext.Training,
+                gameContext = GameContext.Training(args.trainingMode),
             )
             if (submitResult is THResult.Failure) {
                 snackbarManager.showError(submitResult.error)
@@ -114,7 +114,7 @@ class TrainingViewModel(
     }
 
     private suspend fun loadNextTsumego() {
-        getNextTsumegoIdUseCase().handleResult(
+        getNextTsumegoIdUseCase(trainingMode = args.trainingMode).handleResult(
             onSuccess = { data ->
                 startTsumego(
                     tsumegoId = data,
