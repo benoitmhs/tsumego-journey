@@ -81,7 +81,7 @@ private fun TopBannerCard(
             .fillMaxWidth()
             .surface(
                 shape = THTheme.shape.topBanner,
-                background = THTheme.colors.surface3,
+                background = THTheme.colors.surface2,
             )
             .thClickable(onClick = onClick)
             .statusBarsPadding()

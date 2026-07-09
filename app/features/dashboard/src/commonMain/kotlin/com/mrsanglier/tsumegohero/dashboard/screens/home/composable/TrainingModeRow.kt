@@ -53,7 +53,7 @@ fun TrainingModeRow(
             )
             THText(
                 text = description,
-                style = THTheme.typography.content50,
+                style = THTheme.typography.content100,
             )
         }
 

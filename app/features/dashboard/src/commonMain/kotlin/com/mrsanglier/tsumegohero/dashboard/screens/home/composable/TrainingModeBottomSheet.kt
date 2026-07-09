@@ -31,9 +31,12 @@ internal class TrainingModeBottomSheet(
     @Composable
     override fun Content(hideBottomSheet: () -> Unit) {
         Column(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = THTheme.spacing.large),
         ) {
             THText(
+                modifier = Modifier.padding(horizontal = THTheme.spacing.large),
                 text = THString.training_mode_title.toTextSpec(),
                 style = THTheme.typography.title100,
             )

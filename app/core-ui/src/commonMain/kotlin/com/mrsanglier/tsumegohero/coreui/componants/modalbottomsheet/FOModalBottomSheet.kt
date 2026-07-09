@@ -26,7 +26,7 @@ fun THModalBottomSheetState.Composable() {
         sheetState = sheetState,
         dragHandle = null,
         shape = THTheme.shape.bottomSheet,
-        containerColor = THTheme.colors.background,
+        containerColor = THTheme.colors.surface1,
     ) {
         Content(
             hideBottomSheet = {

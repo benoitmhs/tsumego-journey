@@ -66,7 +66,7 @@
     <string name="rankEstimation_result_congrats">Estimate Complete!\\nHere your level:</string>
     <string name="rankEstimation_result_button">Super</string>
     <string name="snackbar_disconnected">Disconnected</string>
-    <string name="training_mode_title">Choose your training mode</string>
+    <string name="training_mode_title">Choose a problem type</string>
     <string name="training_mode_flash">Flash</string>
     <string name="training_mode_classical">Classical</string>
     <string name="training_mode_difficult">Difficult</string>

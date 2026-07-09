@@ -66,7 +66,7 @@
     <string name="rankEstimation_result_congrats">Éstimation terminée !\\nVoici votre niveau :</string>
     <string name="rankEstimation_result_button">Super</string>
     <string name="snackbar_disconnected">Déconnecté</string>
-    <string name="training_mode_title">Choisis ton mode d'entraînement</string>
+    <string name="training_mode_title">Choisis un type de problème</string>
     <string name="training_mode_flash">Éclair</string>
     <string name="training_mode_classical">Classique</string>
     <string name="training_mode_difficult">Difficile</string>
