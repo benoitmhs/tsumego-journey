@@ -29,6 +29,7 @@ fun TrainingRoute(
     safeNavigation(viewModel.navEvent, viewModel::consumeNavigation) { event ->
         when (event) {
             is TrainingNavEvent.Review -> navScope.navigateToReview(event.tsumegoId, event.boardConfig)
+            is TrainingNavEvent.Promotion -> navScope.navigateToPromotion(event.rank)
         }
     }
     TrainingScreen(

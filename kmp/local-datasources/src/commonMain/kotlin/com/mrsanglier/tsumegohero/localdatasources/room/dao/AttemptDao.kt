@@ -36,6 +36,9 @@ interface AttemptDao {
     )
     fun observeTrainingAttempts(startOfDay: Instant, endOfDay: Instant): Flow<List<RoomAttempt>>
 
+    @Query("SELECT * FROM attempt WHERE context = :gameContext ORDER BY date DESC LIMIT :limit")
+    suspend fun getLastAttempts(gameContext: GameContext, limit: Int): List<RoomAttempt>
+
     @Query("DELETE FROM attempt WHERE context = :gameContext")
     suspend fun deleteByContext(gameContext: GameContext)
 

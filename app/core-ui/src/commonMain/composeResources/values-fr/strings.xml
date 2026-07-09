@@ -70,4 +70,6 @@
     <string name="training_mode_flash">Éclair</string>
     <string name="training_mode_classical">Classique</string>
     <string name="training_mode_difficult">Difficile</string>
+    <string name="training_promotion_congrats">Félicitations, tu as atteint un nouveau niveau !</string>
+    <string name="topBanner_dailyStreak">Série quotidienne : %1$d</string>
 </resources>

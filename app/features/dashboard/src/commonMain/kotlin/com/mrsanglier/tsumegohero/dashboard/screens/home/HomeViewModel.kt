@@ -66,18 +66,18 @@ class HomeViewModel(
             ),
             dailyObjectiveCards = listOf(
                 DailyObjectiveCardState(
-                    attempts = dailyObjectives.flashProblemResults,
+                    attempts = dailyObjectives.flashProblemResults.map { it?.result },
                     trainingMode = TrainingMode.Flash,
                     onClick = { startTraining(TrainingMode.Flash) }
                 ),
                 DailyObjectiveCardState(
-                    attempts = dailyObjectives.classicalProblemResults,
+                    attempts = dailyObjectives.classicalProblemResults.map { it?.result },
                     trainingMode = TrainingMode.Classical,
                     onClick = { startTraining(TrainingMode.Classical) }
 
                 ),
                 DailyObjectiveCardState(
-                    attempts = dailyObjectives.difficultProblemResults,
+                    attempts = dailyObjectives.difficultProblemResults.map { it?.result },
                     trainingMode = TrainingMode.Difficult,
                     onClick = { startTraining(TrainingMode.Difficult) }
                 ),

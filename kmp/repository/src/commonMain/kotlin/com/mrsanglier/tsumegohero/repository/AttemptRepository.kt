@@ -2,6 +2,7 @@ package com.mrsanglier.tsumegohero.repository
 
 import com.mrsanglier.tsumegohero.core.extension.todayInterval
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
+import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.localdatasources.datasource.LocalAttemptDataSource
 import kotlinx.coroutines.flow.Flow
 
@@ -23,6 +24,9 @@ class AttemptRepository(
 
     fun observeRankEstimationAttempts(): Flow<List<Attempt>> =
         localAttemptDataSource.observeRankEstimationAttempts()
+
+    suspend fun getLastAttempts(gameContext: GameContext, limit: Int): List<Attempt> =
+        localAttemptDataSource.getLastAttempts(gameContext = gameContext, limit = limit)
 
     fun observeTodayTrainingAttempts(): Flow<List<Attempt>> {
         val today = todayInterval()

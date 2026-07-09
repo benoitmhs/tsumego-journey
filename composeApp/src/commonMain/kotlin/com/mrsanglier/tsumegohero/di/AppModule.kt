@@ -6,6 +6,8 @@ import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.AlertDialogViewM
 import com.mrsanglier.tsumegohero.coreui.componants.loading.LoadingManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarViewModel
+import com.mrsanglier.tsumegohero.coreui.componants.topbanner.TopBannerManager
+import com.mrsanglier.tsumegohero.coreui.componants.topbanner.TopBannerViewModel
 import com.mrsanglier.tsumegohero.navigation.MainNavigationViewModel
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModelOf
@@ -16,9 +18,11 @@ val appModule = module {
     single<LoadingManager> { LoadingManager() }
     singleOf(::AlertDialogManager)
     singleOf(::SnackbarManager)
+    singleOf(::TopBannerManager)
 
     viewModelOf(::AppViewModel)
     viewModelOf(::MainNavigationViewModel)
     viewModelOf(::SnackbarViewModel)
+    viewModelOf(::TopBannerViewModel)
     viewModelOf(::AlertDialogViewModel)
 }

@@ -8,14 +8,19 @@ import com.mrsanglier.tsumegohero.core.extension.handleResult
 import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
+import com.mrsanglier.tsumegohero.coreui.componants.topbanner.TopBannerManager
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
+import com.mrsanglier.tsumegohero.data.model.game.Rank
 import com.mrsanglier.tsumegohero.game.game.delegate.BoardViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
 import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.model.GameOption
+import com.mrsanglier.tsumegohero.game.training.composable.DailyStreakTopBannerState
+import com.mrsanglier.tsumegohero.game.training.composable.ObjectiveProgressTopBannerState
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
+import com.mrsanglier.tsumegohero.game.usecase.SendGameResultData
 import com.mrsanglier.tsumegohero.game.usecase.SendGameResultUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,6 +35,7 @@ class TrainingViewModel(
     private val snackbarManager: SnackbarManager,
     private val sendGameResultUseCase: SendGameResultUseCase,
     private val getNextTsumegoIdUseCase: GetNextTsumegoIdUseCase,
+    private val topBannerManager: TopBannerManager,
     savedStateHandle: SavedStateHandle,
 ) : GameViewModelDelegate by gameViewModelDelegateImpl,
     BoardViewModelDelegate by gameViewModelDelegateImpl,
@@ -77,7 +83,12 @@ class TrainingViewModel(
                     resolutionTimeMs = getElapsedTime(),
                     gameContext = GameContext.Training(args.trainingMode),
                 ).handleResult(
-                    onSuccess = {},
+                    onSuccess = { data ->
+                        data.classicalPromotion?.let { promotedRank ->
+                            _navEvent.value = TrainingNavEvent.Promotion(promotedRank)
+                        }
+                        showProgressBanners(data)
+                    },
                     onError = snackbarManager::showError,
                 )
             }
@@ -98,9 +109,18 @@ class TrainingViewModel(
                 resolutionTimeMs = getElapsedTime(),
                 gameContext = GameContext.Training(args.trainingMode),
             )
-            if (submitResult is THResult.Failure) {
-                snackbarManager.showError(submitResult.error)
-                return@launch
+            when (submitResult) {
+                is THResult.Failure -> {
+                    snackbarManager.showError(submitResult.error)
+                    return@launch
+                }
+
+                is THResult.Success -> {
+                    submitResult.successData.classicalPromotion?.let { promotedRank ->
+                        _navEvent.value = TrainingNavEvent.Promotion(promotedRank)
+                    }
+                    showProgressBanners(submitResult.successData)
+                }
             }
 
             loadNextTsumego()
@@ -110,6 +130,25 @@ class TrainingViewModel(
     private fun next() {
         viewModelScope.launch {
             loadNextTsumego()
+        }
+    }
+
+    private fun showProgressBanners(data: SendGameResultData) {
+        data.dailyStreakNotif?.let { streakCount ->
+            topBannerManager.show(DailyStreakTopBannerState(streakCount))
+        }
+
+        data.objectiveNotif?.let { (trainingMode, results) ->
+            if (results.contains(null)) {
+                topBannerManager.show(
+                    ObjectiveProgressTopBannerState(
+                        trainingMode = trainingMode,
+                        attempts = results,
+                    )
+                )
+            } else {
+                // TODO handle results complete
+            }
         }
     }
 
@@ -134,4 +173,5 @@ class TrainingViewModel(
 
 internal sealed interface TrainingNavEvent {
     data class Review(val tsumegoId: String, val boardConfig: BoardConfig) : TrainingNavEvent
+    data class Promotion(val rank: Rank) : TrainingNavEvent
 }

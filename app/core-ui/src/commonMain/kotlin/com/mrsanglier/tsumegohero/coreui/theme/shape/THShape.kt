@@ -27,4 +27,11 @@ object THShape {
         bottomStart = THCornerRadius.none,
         bottomEnd = THCornerRadius.none,
     )
+
+    val topBanner: Shape = RoundedCornerShape(
+        topStart = THCornerRadius.none,
+        topEnd = THCornerRadius.none,
+        bottomStart = THCornerRadius.huge,
+        bottomEnd = THCornerRadius.huge,
+    )
 }

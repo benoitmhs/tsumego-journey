@@ -32,6 +32,9 @@ class LocalAttemptDataSource(
         dao.observeTrainingAttempts(startOfDay = startOfDay, endOfDay = endOfDay)
             .map { attempts -> attempts.map { it.toAppModel() } }
 
+    suspend fun getLastAttempts(gameContext: GameContext, limit: Int): List<Attempt> =
+        dao.getLastAttempts(gameContext = gameContext, limit = limit).map { it.toAppModel() }
+
     suspend fun deleteRankEstimationAttempts() {
         dao.deleteByContext(GameContext.RankEstimation)
     }

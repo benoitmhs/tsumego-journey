@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeNavScope
+import com.mrsanglier.tsumegohero.game.promotion.LevelPromotionDestination
+import com.mrsanglier.tsumegohero.game.promotion.LevelPromotionNavScope
 import com.mrsanglier.tsumegohero.game.rankestimation.RankEstimationDestination
 import com.mrsanglier.tsumegohero.game.rankestimation.RankEstimationNavScope
 import com.mrsanglier.tsumegohero.game.rankestimation.result.RankEstimationResultDestination
@@ -55,6 +57,16 @@ fun MainNavigation(
                         )
                     )
                 },
+                navigateToPromotion = { rank ->
+                    navController.navigate(LevelPromotionDestination(rank = rank.rawValue))
+                },
+            )
+        )
+
+        LevelPromotionDestination.composable(
+            navGraphBuilder = this,
+            navScope = LevelPromotionNavScope(
+                close = navController::popBackStack,
             )
         )
 

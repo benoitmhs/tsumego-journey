@@ -14,6 +14,8 @@ import com.mrsanglier.tsumegohero.coreui.componants.loading.LoadingManager
 import com.mrsanglier.tsumegohero.coreui.componants.loading.LoadingView
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarView
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarViewModel
+import com.mrsanglier.tsumegohero.coreui.componants.topbanner.TopBannerView
+import com.mrsanglier.tsumegohero.coreui.componants.topbanner.TopBannerViewModel
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import com.mrsanglier.tsumegohero.maintenance.screen.ForceUpdateScreen
@@ -56,6 +58,11 @@ fun App(
             SnackbarView(
                 viewModel = koinViewModel<SnackbarViewModel>(),
                 modifier = Modifier.align(Alignment.BottomCenter),
+            )
+
+            TopBannerView(
+                viewModel = koinViewModel<TopBannerViewModel>(),
+                modifier = Modifier.align(Alignment.TopCenter),
             )
         }
     }

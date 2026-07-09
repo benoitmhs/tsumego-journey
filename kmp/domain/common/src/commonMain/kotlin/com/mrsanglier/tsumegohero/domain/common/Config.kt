@@ -17,4 +17,11 @@ object Config {
         const val CLASSICAL_TOTAL_OBJECTIVE: Int = 5
         const val DIFFICULT_TOTAL_OBJECTIVE: Int = 2
     }
+
+    object LevelProgression {
+        const val WINDOW_SIZE = 20
+        const val PROMOTION_SUCCESS_RATE = 0.9f
+        const val DEMOTION_FAILURE_RATE = 0.4f
+        const val TIER_MIN_GAP = 2
+    }
 }
