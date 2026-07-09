@@ -69,17 +69,19 @@ class HomeViewModel(
                     attempts = dailyObjectives.flashProblemResults.map { it?.result },
                     trainingMode = TrainingMode.Flash,
                     onClick = { startTraining(TrainingMode.Flash) }
+                        .takeIf { !levelIsNull },
                 ),
                 DailyObjectiveCardState(
                     attempts = dailyObjectives.classicalProblemResults.map { it?.result },
                     trainingMode = TrainingMode.Classical,
                     onClick = { startTraining(TrainingMode.Classical) }
-
+                        .takeIf { !levelIsNull },
                 ),
                 DailyObjectiveCardState(
                     attempts = dailyObjectives.difficultProblemResults.map { it?.result },
                     trainingMode = TrainingMode.Difficult,
                     onClick = { startTraining(TrainingMode.Difficult) }
+                        .takeIf { !levelIsNull }
                 ),
             ),
         )

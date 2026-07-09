@@ -8,8 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_arrow_forward
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_done_star_filled
 import com.mrsanglier.tsumegohero.coreui.componants.cellobjective.CellObjective
@@ -28,13 +26,11 @@ import com.mrsanglier.tsumegohero.coreui.utils.ComposeProvider
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.TrainingMode
 
-private val ProgressHeight: Dp = 3.dp
-
 @Composable
 fun DailyObjectiveCard(
     title: TextSpec,
     icon: IconSpec,
-    trailingIcon: IconSpec,
+    trailingIcon: IconSpec?,
     alpha: Float,
     attempts: ComposeProvider<List<Color>>,
     doneText: TextSpec,
@@ -62,7 +58,7 @@ fun DailyObjectiveCard(
 data class DailyObjectiveCardState(
     val attempts: List<Attempt.Result?>,
     val trainingMode: TrainingMode,
-    val onClick: (() -> Unit),
+    val onClick: (() -> Unit)?,
 ) {
     @Composable
     fun Content(
@@ -75,10 +71,10 @@ data class DailyObjectiveCardState(
         DailyObjectiveCard(
             title = trainingMode.label(),
             icon = trainingMode.icon(),
-            trailingIcon = if (isComplete) {
-                THDrawable.ic_done_star_filled.toIconSpec { THTheme.colors.contentTint }
-            } else {
-                THDrawable.ic_arrow_forward.toIconSpec { THTheme.colors.content }
+            trailingIcon = when {
+                isComplete -> THDrawable.ic_done_star_filled.toIconSpec { THTheme.colors.contentTint }
+                onClick != null -> THDrawable.ic_arrow_forward.toIconSpec { THTheme.colors.content }
+                else -> null
             },
             alpha = if (isComplete) 0.5f else 1f,
             attempts = THTheme.composed {
