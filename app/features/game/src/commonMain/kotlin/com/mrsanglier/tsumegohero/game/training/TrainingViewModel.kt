@@ -4,11 +4,15 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import com.mrsanglier.tsumegohero.app.coreui.resources.training_screen_title
 import com.mrsanglier.tsumegohero.core.extension.handleResult
 import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.coreui.componants.topbanner.TopBannerManager
+import com.mrsanglier.tsumegohero.coreui.extension.model.label
+import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
+import com.mrsanglier.tsumegohero.coreui.resources.THString
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.data.model.game.Rank
@@ -17,21 +21,23 @@ import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegate
 import com.mrsanglier.tsumegohero.game.game.delegate.GameViewModelDelegateImpl
 import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.model.GameOption
+import com.mrsanglier.tsumegohero.game.training.composable.CurrentDailyObjectiveProgressState
 import com.mrsanglier.tsumegohero.game.training.composable.DailyStreakTopBannerState
-import com.mrsanglier.tsumegohero.game.training.composable.ObjectiveProgressTopBannerState
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
+import com.mrsanglier.tsumegohero.game.usecase.ObserveCurrentDailyObjectiveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.SendGameResultData
 import com.mrsanglier.tsumegohero.game.usecase.SendGameResultUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class TrainingViewModel(
     gameViewModelDelegateImpl: GameViewModelDelegateImpl,
+    observeCurrentDailyObjectiveUseCase: ObserveCurrentDailyObjectiveUseCase,
     private val snackbarManager: SnackbarManager,
     private val sendGameResultUseCase: SendGameResultUseCase,
     private val getNextTsumegoIdUseCase: GetNextTsumegoIdUseCase,
@@ -43,11 +49,16 @@ class TrainingViewModel(
 
     private val args: TrainingDestination = savedStateHandle.toRoute()
     private val gameOption = GameOption(autoPlay = args.autoPlay, ghost = args.ghost)
+    private val title = THString.training_screen_title.toTextSpec(args.trainingMode.label())
 
-    val uiState: StateFlow<TrainingViewModelState> = gameFlow.map { game ->
-        if (game == null) return@map initialState()
+    internal val uiState: StateFlow<TrainingViewModelState> = combine(
+        gameFlow,
+        observeCurrentDailyObjectiveUseCase(args.trainingMode),
+    ) { game, objectiveAttempts ->
+        if (game == null) return@combine initialState()
 
         TrainingViewModelState(
+            title = title,
             boardState = game.mapBoardUiState(),
             gameActionState = game.mapGameActionState(
                 onClickReview = {
@@ -56,6 +67,7 @@ class TrainingViewModel(
                 onClickNext = ::next,
                 onSkipClick = ::skip,
             ),
+            currentDailyObectiveProgress = CurrentDailyObjectiveProgressState(objectiveAttempts),
         )
     }
         .stateIn(
@@ -96,8 +108,10 @@ class TrainingViewModel(
     }
 
     private fun initialState(): TrainingViewModelState = TrainingViewModelState(
+        title = title,
         gameActionState = initialGameActionState(),
         boardState = initialBoardUiState(),
+        currentDailyObectiveProgress = CurrentDailyObjectiveProgressState(emptyList()),
     )
 
     private fun skip() {
@@ -139,14 +153,7 @@ class TrainingViewModel(
         }
 
         data.objectiveNotif?.let { (trainingMode, results) ->
-            if (results.contains(null)) {
-                topBannerManager.show(
-                    ObjectiveProgressTopBannerState(
-                        trainingMode = trainingMode,
-                        attempts = results,
-                    )
-                )
-            } else {
+            if (results.all { it != null }) {
                 // TODO handle results complete
             }
         }

@@ -9,6 +9,7 @@ import com.mrsanglier.tsumegohero.game.delegate.UpdateLevelDelegateImpl
 import com.mrsanglier.tsumegohero.game.usecase.GetNextTsumegoIdUseCase
 import com.mrsanglier.tsumegohero.game.usecase.ImportTsumegoUseCase
 import com.mrsanglier.tsumegohero.game.usecase.NavigateReviewUseCase
+import com.mrsanglier.tsumegohero.game.usecase.ObserveCurrentDailyObjectiveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayBothColorsMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayFreeMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayOpponentMoveUseCase
@@ -36,6 +37,7 @@ val domainGameModule: Module = module {
     singleOf(::SendGameResultUseCase)
     singleOf(::StartGameUseCase)
     singleOf(::StartReviewUseCase)
+    singleOf(::ObserveCurrentDailyObjectiveUseCase)
 
     // Delegate
     singleOf(::DeriveTsumegoDelegateImpl)

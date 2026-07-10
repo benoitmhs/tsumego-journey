@@ -13,9 +13,9 @@ import com.mrsanglier.tsumegohero.app.coreui.resources.ic_done_star_filled
 import com.mrsanglier.tsumegohero.coreui.componants.cellobjective.CellObjective
 import com.mrsanglier.tsumegohero.coreui.componants.icon.IconSpec
 import com.mrsanglier.tsumegohero.coreui.componants.text.TextSpec
-import com.mrsanglier.tsumegohero.coreui.extension.composed
 import com.mrsanglier.tsumegohero.coreui.extension.model.icon
 import com.mrsanglier.tsumegohero.coreui.extension.model.label
+import com.mrsanglier.tsumegohero.coreui.extension.model.mapToColor
 import com.mrsanglier.tsumegohero.coreui.extension.thCard
 import com.mrsanglier.tsumegohero.coreui.extension.thClickable
 import com.mrsanglier.tsumegohero.coreui.extension.toIconSpec
@@ -32,7 +32,7 @@ fun DailyObjectiveCard(
     icon: IconSpec,
     trailingIcon: IconSpec?,
     alpha: Float,
-    attempts: ComposeProvider<List<Color>>,
+    attempts: List<ComposeProvider<Color>?>,
     doneText: TextSpec,
     totalText: TextSpec,
     modifier: Modifier = Modifier,
@@ -77,16 +77,7 @@ data class DailyObjectiveCardState(
                 else -> null
             },
             alpha = if (isComplete) 0.5f else 1f,
-            attempts = THTheme.composed {
-                attempts.map { result ->
-                    when (result) {
-                        Attempt.Result.Success -> colors.detailGreen
-                        Attempt.Result.Failure -> colors.contentCritical
-                        Attempt.Result.Skip -> colors.contentSecondary
-                        null -> colors.contentDisable
-                    }
-                }
-            },
+            attempts = attempts.mapToColor(),
             doneText = attempts.count { it != null }.toString().toTextSpec(),
             totalText = "/${attempts.count()}".toTextSpec(),
             modifier = modifier,

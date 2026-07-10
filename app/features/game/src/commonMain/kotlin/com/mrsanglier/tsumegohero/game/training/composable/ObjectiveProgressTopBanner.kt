@@ -9,9 +9,9 @@ import com.mrsanglier.tsumegohero.coreui.componants.cellobjective.CellObjective
 import com.mrsanglier.tsumegohero.coreui.componants.icon.IconSpec
 import com.mrsanglier.tsumegohero.coreui.componants.text.TextSpec
 import com.mrsanglier.tsumegohero.coreui.componants.topbanner.THTopBannerState
-import com.mrsanglier.tsumegohero.coreui.extension.composed
 import com.mrsanglier.tsumegohero.coreui.extension.model.icon
 import com.mrsanglier.tsumegohero.coreui.extension.model.label
+import com.mrsanglier.tsumegohero.coreui.extension.model.mapToColor
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import com.mrsanglier.tsumegohero.coreui.utils.ComposeProvider
@@ -22,7 +22,7 @@ import com.mrsanglier.tsumegohero.data.model.game.TrainingMode
 private fun ObjectiveProgressTopBanner(
     title: TextSpec,
     icon: IconSpec,
-    attempts: ComposeProvider<List<Color>>,
+    attempts: List<ComposeProvider<Color>?>,
     currentAttemptIndex: Int?,
     doneText: TextSpec,
     totalText: TextSpec,
@@ -51,16 +51,7 @@ data class ObjectiveProgressTopBannerState(
         ObjectiveProgressTopBanner(
             title = trainingMode.label(),
             icon = trainingMode.icon(),
-            attempts = THTheme.composed {
-                attempts.map { result ->
-                    when (result) {
-                        Attempt.Result.Success -> colors.detailGreen
-                        Attempt.Result.Failure -> colors.contentCritical
-                        Attempt.Result.Skip -> colors.contentSecondary
-                        null -> colors.contentDisable
-                    }
-                }
-            },
+            attempts = attempts.mapToColor(),
             doneText = attempts.count { it != null }.toString().toTextSpec(),
             totalText = "/${attempts.count()}".toTextSpec(),
             currentAttemptIndex = attempts.indexOfLast { it != null },

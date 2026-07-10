@@ -1,6 +1,7 @@
 package com.mrsanglier.tsumegohero.game.training
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
@@ -13,7 +14,9 @@ import com.mrsanglier.tsumegohero.coreui.componants.topbar.THTopBar
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.TopBarAction
 import com.mrsanglier.tsumegohero.coreui.extension.rememberTopBarElevation
 import com.mrsanglier.tsumegohero.coreui.navigation.safeNavigation
+import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import com.mrsanglier.tsumegohero.game.game.section.BoardSection
+import com.mrsanglier.tsumegohero.game.training.composable.CurrentDailyObectiveProgress
 import com.mrsanglier.tsumegohero.game.game.section.GameActionsSection
 import com.mrsanglier.tsumegohero.game.model.Cell
 import dev.chrisbanes.haze.HazeState
@@ -52,7 +55,7 @@ private fun TrainingScreen(
     THScreen(
         topBar = {
             THTopBar(
-                title = uiState.boardState.title,
+                title = uiState.title,
                 hazeState = topBarHazeState,
                 navAction = TopBarAction.back(navigateBack),
                 elevation = topBarElevation,
@@ -62,6 +65,15 @@ private fun TrainingScreen(
         Column(
             modifier = Modifier.padding(innerPadding),
         ) {
+            if (uiState.currentDailyObectiveProgress.attempts.isNotEmpty()) {
+                uiState.currentDailyObectiveProgress.Content(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = THTheme.spacing.large)
+                        .padding(bottom = THTheme.spacing.xlarge),
+                )
+            }
+
             BoardSection(
                 boardState = uiState.boardState,
                 modifier = Modifier.weight(1f),
