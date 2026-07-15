@@ -71,10 +71,21 @@ kotlin {
     }
 }
 
+// Same flavor property as BuildKonfig (buildkonfig.flavor in gradle.properties, dev by default)
+val buildkonfigFlavor: String = project.findProperty("buildkonfig.flavor") as? String ?: "dev"
+
 android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res")
     sourceSets["main"].resources.srcDirs("src/commonMain/resources")
+
+    defaultConfig {
+        // Distinct applicationId per flavor: dev installs alongside prod. The namespace
+        // (Kotlin packages, generated R) stays the same on purpose.
+        if (buildkonfigFlavor != "prod") {
+            applicationId = "$applicationId.${buildkonfigFlavor}"
+        }
+    }
 
     dependencies {
         debugImplementation(libs.compose.preview)
