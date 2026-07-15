@@ -1,6 +1,6 @@
 package com.mrsanglier.tsumegohero.repository
 
-import com.mrsanglier.tsumegohero.core.extension.todayInterval
+import com.mrsanglier.tsumegohero.core.extension.dayInterval
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
 import com.mrsanglier.tsumegohero.localdatasources.datasource.LocalAttemptDataSource
@@ -28,11 +28,14 @@ class AttemptRepository(
     suspend fun getLastAttempts(gameContext: GameContext, limit: Int): List<Attempt> =
         localAttemptDataSource.getLastAttempts(gameContext = gameContext, limit = limit)
 
-    fun observeTodayTrainingAttempts(): Flow<List<Attempt>> {
-        val today = todayInterval()
+    fun observeTodayTrainingAttempts(): Flow<List<Attempt>> =
+        observeTrainingAttemptsOfDay(daysAgo = 0)
+
+    fun observeTrainingAttemptsOfDay(daysAgo: Int): Flow<List<Attempt>> {
+        val day = dayInterval(daysAgo)
         return localAttemptDataSource.observeTrainingAttempts(
-            startOfDay = today.start,
-            endOfDay = today.endExclusive,
+            startOfDay = day.start,
+            endOfDay = day.endExclusive,
         )
     }
 

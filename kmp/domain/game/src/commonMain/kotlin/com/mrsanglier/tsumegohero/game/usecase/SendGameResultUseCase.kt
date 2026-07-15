@@ -2,7 +2,6 @@ package com.mrsanglier.tsumegohero.game.usecase
 
 import com.mrsanglier.tsumegohero.core.error.THAppError
 import com.mrsanglier.tsumegohero.core.error.toError
-import com.mrsanglier.tsumegohero.core.extension.daysUntil
 import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.data.model.game.Attempt
 import com.mrsanglier.tsumegohero.data.model.game.GameContext
@@ -23,8 +22,6 @@ import kotlinx.coroutines.flow.first
 import kotlin.time.Clock
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
-
-private const val DailyStreakThreshold: Int = 2
 
 data class SendGameResultData(
     val classicalPromotion: Rank?,
@@ -49,7 +46,6 @@ class SendGameResultUseCase(
     ): THResult<SendGameResultData> = THResult.catchResult {
         val user = userRepository.observeUser().first()
             ?: throw THAppError.Code.ObjectNotFound.toError("User not found")
-        val lastAttempt = attemptRepository.observeLastSucceedAttempt().first()
 
         val newAttempt = Attempt(
             id = Uuid.random().toString(),
@@ -63,11 +59,10 @@ class SendGameResultUseCase(
         )
         attemptRepository.upsert(newAttempt)
 
+        val dailyObjective = observeDailyObjective().first()
+
         val updatedUser = if (result == Attempt.Result.Success) {
-            val newDailyStreak = calculateDailyStreak(lastAttempt, user.dailyStreak)
             user.copy(
-                dailyStreak = newDailyStreak,
-                bestDailyStreak = maxOf(newDailyStreak, user.bestDailyStreak),
                 problemStreak = user.problemStreak + 1,
                 nbTsumegoSolved = attemptRepository.getTsumegoSolvedCount(),
             )
@@ -77,6 +72,7 @@ class SendGameResultUseCase(
                 problemStreak = 0,
             )
         }
+            .withUpdatedDailyStreak(dailyObjective, newAttempt.id)
             .withUpdatedLevel(gameContext)
 
         userRepository.upsert(updatedUser)
@@ -87,11 +83,35 @@ class SendGameResultUseCase(
                 ?.takeIf { it > (user.level?.classicalRank ?: Rank.entries.first()) },
             objectiveNotif = calculateDailyObjectiveNotif(
                 gameContext = gameContext,
-                dailyObjective = observeDailyObjective().first(),
+                dailyObjective = dailyObjective,
                 currentAttemptId = newAttempt.id,
             ),
         )
     }
+
+    private suspend fun User.withUpdatedDailyStreak(
+        dailyObjective: DailyObjective,
+        currentAttemptId: String,
+    ): User {
+        val justCompleted = dailyObjective.isComplete() && dailyObjective.contains(currentAttemptId)
+        if (!justCompleted) return this
+
+        val yesterdayObjective = observeDailyObjective(daysAgo = 1).first()
+        val newDailyStreak = if (yesterdayObjective.isComplete()) dailyStreak + 1 else 1
+        return copy(
+            dailyStreak = newDailyStreak,
+            bestDailyStreak = maxOf(newDailyStreak, bestDailyStreak),
+        )
+    }
+
+    private fun DailyObjective.isComplete(): Boolean =
+        flashProblemResults.none { it == null } &&
+            classicalProblemResults.none { it == null } &&
+            difficultProblemResults.none { it == null }
+
+    private fun DailyObjective.contains(attemptId: String): Boolean =
+        (flashProblemResults + classicalProblemResults + difficultProblemResults)
+            .any { it?.id == attemptId }
 
     private suspend fun User.withUpdatedLevel(gameContext: GameContext): User {
         if (gameContext !is GameContext.Training) return this
@@ -108,15 +128,6 @@ class SendGameResultUseCase(
         ) ?: return this
 
         return copy(level = updatedLevel)
-    }
-
-    private fun calculateDailyStreak(lastAttempt: Attempt?, currentDailStreak: Int): Int {
-        val dayUntilLastAttempt = lastAttempt?.date?.daysUntil(Clock.System.now())
-        return when {
-            (1..DailyStreakThreshold).contains(dayUntilLastAttempt) -> currentDailStreak + 1
-            dayUntilLastAttempt == 0 -> currentDailStreak
-            else -> 1
-        }
     }
 
     private fun calculateDailyObjectiveNotif(

@@ -12,14 +12,14 @@ import kotlinx.coroutines.flow.map
 import kotlin.collections.plus
 
 interface ObserveDailyObjectiveDelegate {
-    fun observeDailyObjective(): Flow<DailyObjective>
+    fun observeDailyObjective(daysAgo: Int = 0): Flow<DailyObjective>
 }
 
 class ObserveDailyObjectiveDelegateImpl(
     private val attemptRepository: AttemptRepository,
 ) : ObserveDailyObjectiveDelegate {
-    override fun observeDailyObjective(): Flow<DailyObjective> =
-        attemptRepository.observeTodayTrainingAttempts().map { attempts ->
+    override fun observeDailyObjective(daysAgo: Int): Flow<DailyObjective> =
+        attemptRepository.observeTrainingAttemptsOfDay(daysAgo).map { attempts ->
             val flashs = attempts.filterByTrainingMode(TrainingMode.Flash)
                 .take(Config.DailyObjective.FLASH_TOTAL_OBJECTIVE)
             val classicals = attempts.filterByTrainingMode(TrainingMode.Classical)
