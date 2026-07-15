@@ -85,6 +85,10 @@ android {
         if (buildkonfigFlavor != "prod") {
             applicationId = "$applicationId.${buildkonfigFlavor}"
         }
+
+        val iconSuffix = if (buildkonfigFlavor == "prod") "" else "_dev"
+        manifestPlaceholders["appIcon"] = "@mipmap/ic_launcher$iconSuffix"
+        manifestPlaceholders["appIconRound"] = "@mipmap/ic_launcher${iconSuffix}_round"
     }
 
     dependencies {
