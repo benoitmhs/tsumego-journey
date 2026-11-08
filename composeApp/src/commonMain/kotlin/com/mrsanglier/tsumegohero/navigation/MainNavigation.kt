@@ -2,8 +2,8 @@ package com.mrsanglier.tsumegohero.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
-import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
-import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeNavScope
+import com.mrsanglier.tsumegohero.dashboard.navigation.DashboardDestination
+import com.mrsanglier.tsumegohero.dashboard.navigation.DashboardNavScope
 import com.mrsanglier.tsumegohero.game.promotion.LevelPromotionDestination
 import com.mrsanglier.tsumegohero.game.promotion.LevelPromotionNavScope
 import com.mrsanglier.tsumegohero.game.rankestimation.RankEstimationDestination
@@ -25,11 +25,11 @@ fun MainNavigation(
 
     THNavHost(
         navController = navController,
-        startDestination = HomeDestination,
+        startDestination = DashboardDestination,
     ) {
-        HomeDestination.composable(
-            this,
-            HomeNavScope(
+        DashboardDestination.composable(
+            navGraphBuilder = this,
+            navScope = DashboardNavScope(
                 navigateToTraining = { tsumegoId, trainingMode ->
                     navController.navigate(
                         TrainingDestination(

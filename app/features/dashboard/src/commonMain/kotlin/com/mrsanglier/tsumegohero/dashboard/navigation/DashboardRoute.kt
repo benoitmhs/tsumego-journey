@@ -1,6 +1,10 @@
 package com.mrsanglier.tsumegohero.dashboard.navigation
 
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -14,9 +18,9 @@ import com.mrsanglier.tsumegohero.coreui.animation.fadeOutPopExitTransition
 import com.mrsanglier.tsumegohero.coreui.componants.modalbottomsheet.Composable
 import com.mrsanglier.tsumegohero.coreui.componants.navigationbar.THNavigationBarScaffold
 import com.mrsanglier.tsumegohero.coreui.componants.screen.ProvideScreenContext
+import com.mrsanglier.tsumegohero.dashboard.screens.collection.CollectionDestination
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeNavScope
-import com.mrsanglier.tsumegohero.dashboard.screens.profile.ProfileDestination
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -31,7 +35,7 @@ fun DashboardRoute(
     val items = remember(navController, currentDestination) {
         listOf(
             DashboardNavItem.Play,
-            DashboardNavItem.Profile,
+            DashboardNavItem.Collection,
         ).map {
             it.getNavigationBarItemData(
                 navController = navController,
@@ -51,6 +55,8 @@ fun DashboardRoute(
             NavHost(
                 navController = navController,
                 startDestination = HomeDestination,
+                // The navigation bar already handles the system navigation bar inset
+                modifier = Modifier.consumeWindowInsets(WindowInsets.navigationBars),
                 enterTransition = fadeInEnterTransition,
                 exitTransition = fadeOutExitTransition,
                 popEnterTransition = fadeInPopEnterTransition,
@@ -63,7 +69,7 @@ fun DashboardRoute(
                         navigateToRankEstimation = navScope.navigateToRankEstimation,
                     )
                 )
-                ProfileDestination.composable(this)
+                CollectionDestination.composable(this)
             }
         }
     }

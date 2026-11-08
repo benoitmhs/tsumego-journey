@@ -59,6 +59,7 @@
     <string name="connection_register_button">Créer un compte</string>
     <string name="connection_register_emailTextField_label">Email</string>
     <string name="dashboard_navigationBarItem_play">Jouer</string>
+    <string name="dashboard_navigationBarItem_collection">Collections</string>
     <string name="firstName_textField_title">Prénom</string>
     <string name="profile_logoutButton_label">Se déconnecter</string>
     <string name="rankEstimation_declareRank_title">Quel est votre niveau approximatif ?</string>

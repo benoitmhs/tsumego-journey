@@ -59,6 +59,7 @@
     <string name="connection_register_button">New account</string>
     <string name="connection_register_emailTextField_label">Email</string>
     <string name="dashboard_navigationBarItem_play">Play</string>
+    <string name="dashboard_navigationBarItem_collection">Collections</string>
     <string name="firstName_textField_title">First name</string>
     <string name="profile_logoutButton_label">Logout</string>
     <string name="rankEstimation_declareRank_title">What is your approximate level?</string>
