@@ -73,6 +73,7 @@ class BoardViewModelDelegateImpl(
                 Stone.WHITE -> "White to play".toTextSpec() // TODO: loco
             },
             result = when (outcome) {
+                SgfNodeOutcome.NONE if isSubmissionIncomplete -> "⚠️ Réponse incomplète".toTextSpec() // TODO: loco
                 SgfNodeOutcome.NONE -> null
                 SgfNodeOutcome.SUCCESS -> "✅ Correct".toTextSpec() // TODO: loco
                 SgfNodeOutcome.FAILURE -> "❌ Incorrect".toTextSpec() // TODO: loco

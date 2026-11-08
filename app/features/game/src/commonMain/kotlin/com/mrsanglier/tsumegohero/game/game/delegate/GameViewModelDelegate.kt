@@ -16,6 +16,7 @@ import com.mrsanglier.tsumegohero.game.usecase.PlayFreeMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayOpponentMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.PlayPlayerMoveUseCase
 import com.mrsanglier.tsumegohero.game.usecase.RestartGameUseCase
+import com.mrsanglier.tsumegohero.game.usecase.SubmitSequenceUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlin.time.Clock
@@ -49,6 +50,7 @@ class GameViewModelDelegateImpl(
     private val playBothColorsMoveUseCase: PlayBothColorsMoveUseCase,
     private val playOpponentMoveUseCase: PlayOpponentMoveUseCase,
     private val restartGameUseCase: RestartGameUseCase,
+    private val submitSequenceUseCase: SubmitSequenceUseCase,
     private val snackbarManager: SnackbarManager,
 ) : GameViewModelDelegate,
     BoardViewModelDelegate by boardDelegate {
@@ -64,7 +66,7 @@ class GameViewModelDelegateImpl(
         val submitPending = !option.autoPlay && !isSequenceSubmitted
         return GameActionState(
             validateButton = when {
-                submitPending && lastMove != null -> defaultSubmitButton(::submitSequence)
+                submitPending && lastMove != null && !isSubmissionIncomplete -> defaultSubmitButton(::submitSequence)
                 submitPending -> defaultSubmitButton(::submitSequence).copy(enabled = false)
                 option.autoPlay && outcome == SgfNodeOutcome.NONE -> defaultNextButton(onClickNext).copy(enabled = false)
                 else -> defaultNextButton(onClickNext).copy(enabled = true)
@@ -137,7 +139,7 @@ class GameViewModelDelegateImpl(
 
     internal fun submitSequence() {
         gameFlow.value?.let { game ->
-            updateGame(game.copy(isSequenceSubmitted = true))
+            updateGame(submitSequenceUseCase(game))
         }
     }
 

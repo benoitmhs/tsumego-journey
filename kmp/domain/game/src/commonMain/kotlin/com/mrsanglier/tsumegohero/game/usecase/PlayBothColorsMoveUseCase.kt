@@ -46,6 +46,7 @@ class PlayBothColorsMoveUseCase(
         return@catchResult game.copy(
             board = boardUpdated,
             moveStack = game.moveStack + listOf(currentNode),
+            isSubmissionIncomplete = false,
         )
     }
 }

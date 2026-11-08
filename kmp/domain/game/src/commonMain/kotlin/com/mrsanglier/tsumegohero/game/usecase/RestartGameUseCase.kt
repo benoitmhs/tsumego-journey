@@ -11,6 +11,7 @@ class RestartGameUseCase {
             moveStack = emptyList(),
             reviewRoot = null,
             isSequenceSubmitted = false,
+            isSubmissionIncomplete = false,
         )
     }
 }

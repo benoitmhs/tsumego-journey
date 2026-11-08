@@ -13,6 +13,7 @@ data class Game(
     val reviewIndex: Int = 0,
     val option: GameOption = GameOption(autoPlay = true, ghost = false),
     val isSequenceSubmitted: Boolean = false,
+    val isSubmissionIncomplete: Boolean = false,
 ) {
     val playerStone: Stone
         get() = tsumego.playerStone
@@ -34,6 +35,10 @@ data class Game(
             moveStack.any { it.outcome == SgfNodeOutcome.SUCCESS } -> SgfNodeOutcome.SUCCESS
             else -> SgfNodeOutcome.FAILURE
         }
+
+    /** Manual mode only: the played sequence is correct so far but does not reach a success yet. */
+    val isSequenceIncomplete: Boolean
+        get() = moveStack.isIncompleteSequence()
 
     val isReview: Boolean
         get() = reviewRoot != null
