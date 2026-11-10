@@ -1,4 +1,4 @@
-package com.mrsanglier.tsumegohero.collection.edition.step
+package com.mrsanglier.tsumegohero.problemedition.step
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,11 +9,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.mrsanglier.tsumegohero.app.coreui.resources.tsumegoEdition_firstPlayer_title
 import com.mrsanglier.tsumegohero.app.coreui.resources.tsumegoEdition_tools_title
-import com.mrsanglier.tsumegohero.collection.edition.EditionTool
-import com.mrsanglier.tsumegohero.collection.edition.TsumegoEditionViewModelState
-import com.mrsanglier.tsumegohero.collection.edition.composable.EditionSectionHeader
-import com.mrsanglier.tsumegohero.collection.edition.composable.FirstPlayerSelector
-import com.mrsanglier.tsumegohero.collection.edition.composable.StoneToolSelector
+import com.mrsanglier.tsumegohero.problemedition.EditionTool
+import com.mrsanglier.tsumegohero.problemedition.ProblemEditionViewModelState
+import com.mrsanglier.tsumegohero.problemedition.composable.EditionSectionHeader
+import com.mrsanglier.tsumegohero.problemedition.composable.FirstPlayerSelector
+import com.mrsanglier.tsumegohero.problemedition.composable.StoneToolSelector
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.resources.THString
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
@@ -24,7 +24,7 @@ import com.mrsanglier.tsumegohero.game.model.Stone
 /** Step 1: stone tools, the board to place the initial stones, and who plays first. */
 @Composable
 internal fun BoardStepContent(
-    uiState: TsumegoEditionViewModelState,
+    uiState: ProblemEditionViewModelState,
     onClickCell: (Cell) -> Unit,
     onSelectTool: (EditionTool) -> Unit,
     onSelectFirstPlayer: (Stone) -> Unit,
@@ -43,7 +43,7 @@ internal fun BoardStepContent(
         }
 
         Board(
-            boardUiState = uiState.boardUiState,
+            boardUiState = uiState.initialBoardUiState,
             boardSize = uiState.boardSize,
             onClickCell = onClickCell,
             modifier = Modifier.fillMaxWidth(),

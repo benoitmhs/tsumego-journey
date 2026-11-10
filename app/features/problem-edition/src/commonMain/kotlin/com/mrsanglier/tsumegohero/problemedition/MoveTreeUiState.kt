@@ -1,4 +1,4 @@
-package com.mrsanglier.tsumegohero.collection.edition
+package com.mrsanglier.tsumegohero.problemedition
 
 import androidx.compose.runtime.Immutable
 import com.mrsanglier.tsumegohero.domain.collection.model.SolutionTree

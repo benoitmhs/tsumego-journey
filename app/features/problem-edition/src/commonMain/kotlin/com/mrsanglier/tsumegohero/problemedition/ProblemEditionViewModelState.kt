@@ -1,4 +1,4 @@
-package com.mrsanglier.tsumegohero.collection.edition
+package com.mrsanglier.tsumegohero.problemedition
 
 import androidx.compose.runtime.Immutable
 import com.mrsanglier.tsumegohero.coreui.componants.button.THButtonState
@@ -17,16 +17,19 @@ internal enum class EditionTool {
     Black, White, Erase;
 }
 
+/** State of every step at once, so that the steps can be displayed side by side (pager). */
 @Immutable
-internal data class TsumegoEditionViewModelState(
+internal data class ProblemEditionViewModelState(
+    val screenTitle: TextSpec? = null,
     val step: EditionStep = EditionStep.Board,
     val boardSize: BoardSize = BoardSize.X19,
-    val boardUiState: BoardUiState = BoardUiState(),
     val mainButton: THButtonState? = null,
     // Board step
+    val initialBoardUiState: BoardUiState = BoardUiState(),
     val tool: EditionTool = EditionTool.Black,
     val firstPlayer: Stone = Stone.BLACK,
     // Solutions step
+    val solutionsBoardUiState: BoardUiState = BoardUiState(),
     val moveNumbers: Map<Cell, Int> = emptyMap(),
     val moveTree: MoveTreeUiState = MoveTreeUiState(),
     val canGoPrevious: Boolean = false,
@@ -41,11 +44,4 @@ internal data class TsumegoEditionViewModelState(
     val title: String = "",
     val notes: String = "",
     val difficulty: TextSpec? = null,
-) {
-    /** Completed steps: the progress bar shows the current step as just started. */
-    val stepNumber: Int
-        get() = step.ordinal
-
-    val stepCount: Int
-        get() = EditionStep.entries.size
-}
+)

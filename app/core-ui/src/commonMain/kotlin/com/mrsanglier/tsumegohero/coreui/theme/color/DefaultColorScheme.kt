@@ -11,6 +11,7 @@ internal object DefaultDarkColorScheme : THColorScheme {
     override val contentDisable: Color = IvoryT30
     override val contentCritical: Color = Pink
     override val contentInvert: Color = Purple950
+    override val contentOnCritical: Color = Ivory
 
     // Stroke
     override val stroke: Color = Ivory
@@ -31,6 +32,7 @@ internal object DefaultDarkColorScheme : THColorScheme {
     override val surfaceAccent: Color = Yellow
     override val surfaceAccentGradient: Color = Orange
     override val surfaceFocus: Color = IvoryT20
+    override val surfaceFocusLight: Color = Purple700T30
     override val surfaceDisable: Color = IvoryT10
     override val surfaceBlur: Color = surface1.copy(alpha = 0.4f)
     override val surfaceCritical: Color = Pink

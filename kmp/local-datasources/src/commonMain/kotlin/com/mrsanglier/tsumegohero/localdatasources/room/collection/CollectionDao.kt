@@ -29,4 +29,10 @@ interface CollectionDao {
 
     @Query("SELECT * FROM user_tsumego WHERE collectionId = :collectionId ORDER BY createdAt ASC")
     fun observeTsumegos(collectionId: String): Flow<List<RoomUserTsumego>>
+
+    @Query("SELECT * FROM user_tsumego WHERE id = :id LIMIT 1")
+    fun observeTsumego(id: String): Flow<RoomUserTsumego?>
+
+    @Query("DELETE FROM user_tsumego WHERE id = :id")
+    suspend fun deleteTsumego(id: String)
 }

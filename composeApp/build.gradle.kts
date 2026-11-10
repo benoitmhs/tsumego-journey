@@ -56,6 +56,7 @@ kotlin {
             implementation(projects.app.features.dashboard)
             implementation(projects.app.features.game)
             implementation(projects.app.features.maintenance)
+            implementation(projects.app.features.problemEdition)
             implementation(projects.kmp.core)
             implementation(projects.kmp.data)
             implementation(projects.kmp.localDatasources)

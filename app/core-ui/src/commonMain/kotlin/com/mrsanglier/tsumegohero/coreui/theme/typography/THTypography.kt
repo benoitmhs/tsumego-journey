@@ -106,15 +106,18 @@ object THTypography {
             fontWeight = FontWeight.Normal,
             letterSpacing = 0.28.sp,
         )
+    val label100Light: TextStyle
+        @Composable
+        get() = label100.copy(
+            fontWeight = FontWeight.Light,
+        )
+
     val label100Medium: TextStyle
         @Composable
-        get() = TextStyle(
-            fontFamily = LexendFontFamily,
-            fontSize = 14.sp,
-            lineHeight = 17.5.sp,
+        get() = label100.copy(
             fontWeight = FontWeight.Medium,
-            letterSpacing = 0.28.sp,
         )
+
     val label50: TextStyle
         @Composable
         get() = TextStyle(

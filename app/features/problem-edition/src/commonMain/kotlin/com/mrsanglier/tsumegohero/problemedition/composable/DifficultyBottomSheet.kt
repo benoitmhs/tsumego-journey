@@ -1,4 +1,4 @@
-package com.mrsanglier.tsumegohero.collection.edition.composable
+package com.mrsanglier.tsumegohero.problemedition.composable
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth

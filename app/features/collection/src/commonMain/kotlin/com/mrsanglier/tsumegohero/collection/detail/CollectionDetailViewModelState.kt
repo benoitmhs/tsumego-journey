@@ -10,6 +10,7 @@ import com.mrsanglier.tsumegohero.game.model.BoardSize
 internal data class CollectionDetailViewModelState(
     val title: TextSpec? = null,
     val problems: List<TsumegoGridItemState>? = null,
+    val isEditMode: Boolean = false,
 )
 
 @Immutable

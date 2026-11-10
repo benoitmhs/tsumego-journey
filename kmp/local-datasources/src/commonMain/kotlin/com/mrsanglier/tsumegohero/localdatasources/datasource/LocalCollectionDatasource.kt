@@ -28,4 +28,11 @@ class LocalCollectionDatasource(
 
     fun observeTsumegos(collectionId: String): Flow<List<UserTsumego>> =
         dao.observeTsumegos(collectionId).map { roomModels -> roomModels.map { it.toAppModel() } }
+
+    fun observeTsumego(id: String): Flow<UserTsumego?> =
+        dao.observeTsumego(id).map { it?.toAppModel() }
+
+    suspend fun deleteTsumego(id: String) {
+        dao.deleteTsumego(id)
+    }
 }

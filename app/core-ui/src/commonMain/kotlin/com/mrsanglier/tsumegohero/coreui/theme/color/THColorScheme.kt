@@ -10,6 +10,7 @@ interface THColorScheme {
     val contentOnSurfaceTint: Color
     val contentDisable: Color
     val contentCritical: Color
+    val contentOnCritical: Color
     val contentInvert: Color
 
     // Stroke
@@ -31,6 +32,7 @@ interface THColorScheme {
     val surfaceAccent: Color
     val surfaceAccentGradient: Color
     val surfaceFocus: Color
+    val surfaceFocusLight: Color
     val surfaceDisable: Color
     val surfaceBlur: Color
     val surfaceCritical: Color
@@ -52,6 +54,7 @@ interface THColorScheme {
     fun copy(
         content: Color? = null,
         contentInvert: Color? = null,
+        contentOnCritical: Color? = null,
         contentSecondary: Color? = null,
         contentTint: Color? = null,
         contentOnSurfaceTint: Color? = null,
@@ -79,6 +82,7 @@ interface THColorScheme {
         surfaceTintSecondaryStrong: Color? = null,
         surfaceAccentGradient: Color? = null,
         surfaceFocus: Color? = null,
+        surfaceFocusLight: Color? = null,
         surfaceDisable: Color? = null,
         surfaceDark: Color? = null,
         surfaceLight: Color? = null,
@@ -103,6 +107,7 @@ interface THColorScheme {
         override val contentDisable: Color = contentDisable ?: this@THColorScheme.contentDisable
         override val contentCritical: Color = contentCritical ?: this@THColorScheme.contentCritical
         override val contentInvert: Color = contentInvert ?: this@THColorScheme.contentInvert
+        override val contentOnCritical: Color = contentOnCritical ?: this@THColorScheme.contentOnCritical
         override val stroke: Color = stroke ?: this@THColorScheme.stroke
         override val strokeSecondary: Color = strokeSecondary ?: this@THColorScheme.strokeSecondary
         override val strokeTint: Color = strokeTint ?: this@THColorScheme.strokeTint
@@ -119,6 +124,7 @@ interface THColorScheme {
         override val surfaceAccent: Color = surfaceTintPrimary ?: this@THColorScheme.surfaceAccent
         override val surfaceAccentGradient: Color = surfaceAccentGradient ?: this@THColorScheme.surfaceAccentGradient
         override val surfaceFocus: Color = surfaceFocus ?: this@THColorScheme.surfaceFocus
+        override val surfaceFocusLight: Color = surfaceFocusLight ?: this@THColorScheme.surfaceFocusLight
         override val surfaceDisable: Color = surfaceDisable ?: this@THColorScheme.surfaceDisable
         override val surfaceBlur: Color = surfaceBlur ?: this@THColorScheme.surfaceBlur
         override val surfaceCritical: Color = surfaceCritical ?: this@THColorScheme.surfaceCritical

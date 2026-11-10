@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import com.mrsanglier.tsumegohero.domain.authenticationModule
 import com.mrsanglier.tsumegohero.domain.authentication.domainAuthenticationModule
 import com.mrsanglier.tsumegohero.collection.di.collectionModule
+import com.mrsanglier.tsumegohero.problemedition.di.problemEditionModule
 import com.mrsanglier.tsumegohero.dashboard.di.dashboardModule
 import com.mrsanglier.tsumegohero.domain.collection.domainCollectionModule
 import com.mrsanglier.tsumegohero.domain.appsettings.domainAppSettingsModule
@@ -49,6 +50,7 @@ fun THKoinApplication(
                 domainRankEstimationModule,
                 authenticationModule,
                 collectionModule,
+                problemEditionModule,
                 dashboardModule,
                 gameModule,
             )

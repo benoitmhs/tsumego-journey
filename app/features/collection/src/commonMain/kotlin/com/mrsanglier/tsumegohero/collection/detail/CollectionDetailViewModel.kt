@@ -9,6 +9,19 @@ import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_untitle
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_import_error
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_import_success
 import com.mrsanglier.tsumegohero.core.result.THResult
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_delete_confirm
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_delete_message
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_delete_title
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_deleted
+import com.mrsanglier.tsumegohero.core.extension.handleResult
+import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.AlertDialogAction
+import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.AlertDialogManager
+import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.common.CommonAlertDialogAction
+import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.common.DefaultAlertDialog
+import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
+import com.mrsanglier.tsumegohero.domain.collection.usecase.DeleteUserTsumegoUseCase
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import com.mrsanglier.tsumegohero.coreui.componants.loading.LoadingManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.THSnackbarState
@@ -23,7 +36,6 @@ import com.mrsanglier.tsumegohero.game.game.section.BoardUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -36,6 +48,8 @@ class CollectionDetailViewModel(
     private val snackbarManager: SnackbarManager,
     private val loadingManager: LoadingManager,
     private val importUserTsumegoUseCase: ImportUserTsumegoUseCase,
+    private val deleteUserTsumegoUseCase: DeleteUserTsumegoUseCase,
+    private val alertDialogManager: AlertDialogManager,
     observeCollectionDetailUseCase: ObserveCollectionDetailUseCase,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
@@ -44,18 +58,23 @@ class CollectionDetailViewModel(
 
     internal val navEvent = MutableStateFlow<NavEvent?>(null)
 
+    private val isEditMode = MutableStateFlow(false)
+
     internal val uiState: StateFlow<CollectionDetailViewModelState> =
-        observeCollectionDetailUseCase(args.collectionId)
-            .onEach { detail ->
-                // The collection no longer exists: nothing to show
-                if (detail == null) navEvent.value = NavEvent.Back
-            }
-            .map { detail ->
-                CollectionDetailViewModelState(
-                    title = detail?.collection?.name?.toTextSpec(),
-                    problems = detail?.problems?.mapIndexed { index, problem -> problem.toItemState(index) },
-                )
-            }
+        combine(
+            observeCollectionDetailUseCase(args.collectionId)
+                .onEach { detail ->
+                    // The collection no longer exists: nothing to show
+                    if (detail == null) navEvent.value = NavEvent.Back
+                },
+            isEditMode,
+        ) { detail, isEditMode ->
+            CollectionDetailViewModelState(
+                title = detail?.collection?.name?.toTextSpec(),
+                problems = detail?.problems?.mapIndexed { index, problem -> problem.toItemState(index) },
+                isEditMode = isEditMode,
+            )
+        }
             .stateIn(
                 viewModelScope,
                 SharingStarted.WhileSubscribed(5_000),
@@ -63,7 +82,47 @@ class CollectionDetailViewModel(
             )
 
     internal fun addManually() {
-        navEvent.value = NavEvent.TsumegoEdition(args.collectionId)
+        navEvent.value = NavEvent.TsumegoEdition(collectionId = args.collectionId, tsumegoId = null)
+    }
+
+    internal fun toggleEditMode() {
+        isEditMode.update { !it }
+    }
+
+    /** Opens the problem: edition flow in edit mode, game otherwise. */
+    internal fun openProblem(tsumegoId: String) {
+        navEvent.value = if (isEditMode.value) {
+            NavEvent.TsumegoEdition(collectionId = args.collectionId, tsumegoId = tsumegoId)
+        } else {
+            NavEvent.Problem(collectionId = args.collectionId, tsumegoId = tsumegoId)
+        }
+    }
+
+    /** Asks for confirmation, then deletes the problem. */
+    internal fun deleteProblem(tsumegoId: String) {
+        alertDialogManager.showDialog(
+            DefaultAlertDialog(
+                title = THString.collection_detail_delete_title.toTextSpec(),
+                description = THString.collection_detail_delete_message.toTextSpec(),
+                actions = listOf(
+                    CommonAlertDialogAction.cancel(),
+                    AlertDialogAction(
+                        text = THString.collection_detail_delete_confirm.toTextSpec(),
+                        type = AlertDialogAction.Type.Dangerous,
+                        onClick = { confirmDelete(tsumegoId) },
+                    ),
+                ),
+            ),
+        )
+    }
+
+    private fun confirmDelete(tsumegoId: String) {
+        viewModelScope.launch {
+            deleteUserTsumegoUseCase(tsumegoId).handleResult(
+                onSuccess = { snackbarManager.showDone(THString.collection_detail_deleted.toTextSpec()) },
+                onError = snackbarManager::showError,
+            )
+        }
     }
 
     /** Imports each file as a problem, then reports successes and the files that could not be read. */
@@ -122,6 +181,7 @@ class CollectionDetailViewModel(
 
     internal sealed interface NavEvent {
         data object Back : NavEvent
-        data class TsumegoEdition(val collectionId: String) : NavEvent
+        data class TsumegoEdition(val collectionId: String, val tsumegoId: String?) : NavEvent
+        data class Problem(val collectionId: String, val tsumegoId: String) : NavEvent
     }
 }

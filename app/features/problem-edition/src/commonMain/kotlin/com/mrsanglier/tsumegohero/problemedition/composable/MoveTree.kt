@@ -1,4 +1,4 @@
-package com.mrsanglier.tsumegohero.collection.edition.composable
+package com.mrsanglier.tsumegohero.problemedition.composable
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -22,9 +22,9 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.mrsanglier.tsumegohero.collection.edition.MoveTreeNode
-import com.mrsanglier.tsumegohero.collection.edition.MoveTreeOutcome
-import com.mrsanglier.tsumegohero.collection.edition.MoveTreeUiState
+import com.mrsanglier.tsumegohero.problemedition.MoveTreeNode
+import com.mrsanglier.tsumegohero.problemedition.MoveTreeOutcome
+import com.mrsanglier.tsumegohero.problemedition.MoveTreeUiState
 import com.mrsanglier.tsumegohero.coreui.componants.text.THText
 import com.mrsanglier.tsumegohero.coreui.extension.thClickable
 import com.mrsanglier.tsumegohero.coreui.extension.thCard

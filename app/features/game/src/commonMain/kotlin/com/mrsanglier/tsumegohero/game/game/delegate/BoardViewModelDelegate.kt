@@ -5,6 +5,8 @@ import com.mrsanglier.tsumegohero.core.result.THResult
 import com.mrsanglier.tsumegohero.coreui.extension.composed
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
+import com.mrsanglier.tsumegohero.data.model.game.TsumegoSource
+import com.mrsanglier.tsumegohero.domain.collection.usecase.StartUserTsumegoGameUseCase
 import com.mrsanglier.tsumegohero.game.game.section.BoardUiState
 import com.mrsanglier.tsumegohero.game.model.BoardConfig
 import com.mrsanglier.tsumegohero.game.model.Game
@@ -28,6 +30,7 @@ interface BoardViewModelDelegate {
         tsumegoId: String,
         option: GameOption,
         boardConfig: BoardConfig? = null,
+        source: TsumegoSource = TsumegoSource.Library,
     ): THResult<Game>
 
     fun updateGame(game: Game)
@@ -37,6 +40,7 @@ interface BoardViewModelDelegate {
 
 class BoardViewModelDelegateImpl(
     private val startGameUseCase: StartGameUseCase,
+    private val startUserTsumegoGameUseCase: StartUserTsumegoGameUseCase,
 ) : BoardViewModelDelegate {
 
     private val _gameFlow = MutableStateFlow<Game?>(null)
@@ -46,8 +50,13 @@ class BoardViewModelDelegateImpl(
         tsumegoId: String,
         option: GameOption,
         boardConfig: BoardConfig?,
+        source: TsumegoSource,
     ): THResult<Game> {
-        val result = startGameUseCase(tsumegoId, option, boardConfig)
+        // User problems are always shown as entered: the board config does not apply to them
+        val result = when (source) {
+            TsumegoSource.Library -> startGameUseCase(tsumegoId, option, boardConfig)
+            TsumegoSource.UserCollection -> startUserTsumegoGameUseCase(tsumegoId, option)
+        }
         if (result is THResult.Success) {
             updateGame(result.successData)
         }

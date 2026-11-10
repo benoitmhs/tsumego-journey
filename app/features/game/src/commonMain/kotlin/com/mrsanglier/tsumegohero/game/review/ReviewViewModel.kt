@@ -45,6 +45,7 @@ class ReviewViewModel(
                 tsumegoId = args.tsumegoId,
                 boardConfig = boardConfig,
                 option = GameOption(autoPlay = false, ghost = false),
+                source = args.source,
             ).handleResult(
                 onSuccess = { game -> updateGame(startReviewUseCase(game)) },
                 onError = snackbarManager::showError,

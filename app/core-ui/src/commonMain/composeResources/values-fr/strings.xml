@@ -86,6 +86,11 @@
     <string name="collection_detail_empty_title">Aucun problème</string>
     <string name="collection_detail_empty_message">Ajoute un problème en important un fichier .sgf ou en le saisissant manuellement.</string>
     <string name="collection_detail_fab_addProblem">Ajouter un problème</string>
+    <string name="collection_detail_delete_title">Supprimer ce problème ?</string>
+    <string name="collection_detail_delete_message">Il sera définitivement retiré de la collection.</string>
+    <string name="collection_detail_delete_confirm">Supprimer</string>
+    <string name="collection_detail_deleted">Problème supprimé</string>
+    <string name="userTsumegoGame_defaultTitle">Problème</string>
     <string name="collection_detail_fab_importSgf">Importer un .sgf</string>
     <string name="collection_detail_fab_manualEntry">Saisie manuelle</string>
     <string name="collection_detail_untitledProblem">Problème %1$d</string>
@@ -104,6 +109,7 @@
     <string name="tsumegoEdition_info_noDifficulty">Aucune difficulté</string>
     <string name="tsumegoEdition_save">Enregistrer</string>
     <string name="tsumegoEdition_saved">Problème ajouté à la collection</string>
+    <string name="tsumegoEdition_updated">Problème modifié</string>
     <plurals name="collection_problemCount">
         <item quantity="one">%1$d problème</item>
         <item quantity="other">%1$d problèmes</item>

@@ -24,5 +24,7 @@ data class CollectionDetailDestination(
 
 data class CollectionDetailNavScope(
     val navigateBack: () -> Unit,
-    val navigateToTsumegoEdition: (collectionId: String) -> Unit,
+    /** [tsumegoId] null: entry of a new problem */
+    val navigateToTsumegoEdition: (collectionId: String, tsumegoId: String?) -> Unit,
+    val navigateToProblem: (collectionId: String, tsumegoId: String) -> Unit,
 )

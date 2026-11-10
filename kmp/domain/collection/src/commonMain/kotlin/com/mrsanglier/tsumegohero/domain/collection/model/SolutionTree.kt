@@ -1,6 +1,9 @@
 package com.mrsanglier.tsumegohero.domain.collection.model
 
 import com.mrsanglier.tsumegohero.game.model.Move
+import com.mrsanglier.tsumegohero.game.model.MoveNode
+import com.mrsanglier.tsumegohero.game.model.RootNode
+import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
 
 /**
  * Solution tree being entered. A node is identified by its path: the moves played from the initial position
@@ -63,4 +66,26 @@ data class SolutionTree(
 
     private fun List<Move>.startsWith(prefix: List<Move>): Boolean =
         size >= prefix.size && subList(0, prefix.size) == prefix
+
+    companion object {
+        /** Tree of a parsed SGF: only leaves keep their outcome (success = correct, failure = wrong). */
+        fun fromRoot(root: RootNode): SolutionTree {
+            val paths = mutableListOf<List<Move>>()
+            val outcomes = mutableMapOf<List<Move>, Boolean>()
+            fun visit(node: MoveNode, parent: List<Move>) {
+                val path = parent + node.move
+                paths += path
+                if (node.children.isEmpty()) {
+                    when (node.outcome) {
+                        SgfNodeOutcome.SUCCESS -> outcomes[path] = true
+                        SgfNodeOutcome.FAILURE -> outcomes[path] = false
+                        SgfNodeOutcome.NONE -> Unit
+                    }
+                }
+                node.children.forEach { visit(it, path) }
+            }
+            root.children.forEach { visit(it, emptyList()) }
+            return SolutionTree(paths = paths, outcomes = outcomes)
+        }
+    }
 }

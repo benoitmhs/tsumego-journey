@@ -2,6 +2,9 @@ package edition
 
 import com.mrsanglier.tsumegohero.domain.collection.model.SolutionSequence
 import com.mrsanglier.tsumegohero.domain.collection.model.SolutionTree
+import com.mrsanglier.tsumegohero.domain.collection.model.TsumegoDraft
+import com.mrsanglier.tsumegohero.domain.collection.utils.UserTsumegoSgf
+import com.mrsanglier.tsumegohero.game.model.BoardSize
 import com.mrsanglier.tsumegohero.game.model.Cell
 import com.mrsanglier.tsumegohero.game.model.Move
 import com.mrsanglier.tsumegohero.game.model.Stone
@@ -55,5 +58,23 @@ class SolutionTreeTest : FunSpec({
         )
         tree.leadsTo(listOf(b1), isCorrect = true) shouldBe true
         tree.leadsTo(listOf(b1bis), isCorrect = true) shouldBe false
+    }
+
+    test("a tree written to SGF and read back keeps its moves and leaf outcomes") {
+        val tree = SolutionTree()
+            .add(listOf(b1, w2)).mark(listOf(b1, w2), isCorrect = true)
+            .add(listOf(b1bis)).mark(listOf(b1bis), isCorrect = false)
+        val draft = TsumegoDraft(
+            boardSize = BoardSize.X9,
+            blackStones = setOf(Cell(4, 4)),
+            whiteStones = setOf(Cell(5, 5)),
+            solutions = tree.toSequences(),
+        )
+
+        val (_, root) = UserTsumegoSgf.read(UserTsumegoSgf.write(draft, rank = null))
+        val readTree = SolutionTree.fromRoot(root)
+
+        readTree.paths.toSet() shouldBe tree.paths.toSet()
+        readTree.outcomes shouldBe tree.outcomes
     }
 })

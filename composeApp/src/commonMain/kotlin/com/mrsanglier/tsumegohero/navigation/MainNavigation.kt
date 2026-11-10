@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
 import com.mrsanglier.tsumegohero.collection.detail.CollectionDetailDestination
 import com.mrsanglier.tsumegohero.collection.detail.CollectionDetailNavScope
-import com.mrsanglier.tsumegohero.collection.edition.TsumegoEditionDestination
-import com.mrsanglier.tsumegohero.collection.edition.TsumegoEditionNavScope
+import com.mrsanglier.tsumegohero.problemedition.create.CreateProblemDestination
+import com.mrsanglier.tsumegohero.problemedition.create.CreateProblemNavScope
+import com.mrsanglier.tsumegohero.problemedition.edit.EditProblemDestination
+import com.mrsanglier.tsumegohero.problemedition.edit.EditProblemNavScope
 import com.mrsanglier.tsumegohero.dashboard.navigation.DashboardDestination
 import com.mrsanglier.tsumegohero.dashboard.navigation.DashboardNavScope
 import com.mrsanglier.tsumegohero.game.promotion.LevelPromotionDestination
@@ -18,6 +20,9 @@ import com.mrsanglier.tsumegohero.game.review.ReviewDestination
 import com.mrsanglier.tsumegohero.game.review.ReviewNavScope
 import com.mrsanglier.tsumegohero.game.training.TrainingDestination
 import com.mrsanglier.tsumegohero.game.training.TrainingNavScope
+import com.mrsanglier.tsumegohero.game.usertsumego.UserTsumegoGameDestination
+import com.mrsanglier.tsumegohero.game.usertsumego.UserTsumegoGameNavScope
+import com.mrsanglier.tsumegohero.data.model.game.TsumegoSource
 import com.mrsanglier.tsumegohero.navigation.animation.THNavHost
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -55,15 +60,51 @@ fun MainNavigation(
             navGraphBuilder = this,
             navScope = CollectionDetailNavScope(
                 navigateBack = navController::popBackStack,
-                navigateToTsumegoEdition = { collectionId ->
-                    navController.navigate(TsumegoEditionDestination(collectionId = collectionId))
+                navigateToTsumegoEdition = { collectionId, tsumegoId ->
+                    navController.navigate(
+                        if (tsumegoId == null) {
+                            CreateProblemDestination(collectionId = collectionId)
+                        } else {
+                            EditProblemDestination(collectionId = collectionId, tsumegoId = tsumegoId)
+                        }
+                    )
+                },
+                navigateToProblem = { collectionId, tsumegoId ->
+                    navController.navigate(UserTsumegoGameDestination(collectionId = collectionId, tsumegoId = tsumegoId))
                 },
             ),
         )
 
-        TsumegoEditionDestination.composable(
+        UserTsumegoGameDestination.composable(
             navGraphBuilder = this,
-            navScope = TsumegoEditionNavScope(
+            navScope = UserTsumegoGameNavScope(
+                navigateBack = navController::popBackStack,
+                navigateToReview = { tsumegoId ->
+                    navController.navigate(
+                        ReviewDestination(
+                            tsumegoId = tsumegoId,
+                            rotation = null,
+                            changeColor = null,
+                            source = TsumegoSource.UserCollection,
+                        )
+                    )
+                },
+                navigateToEdition = { collectionId, tsumegoId ->
+                    navController.navigate(EditProblemDestination(collectionId = collectionId, tsumegoId = tsumegoId))
+                },
+            ),
+        )
+
+        CreateProblemDestination.composable(
+            navGraphBuilder = this,
+            navScope = CreateProblemNavScope(
+                navigateBack = navController::popBackStack,
+            ),
+        )
+
+        EditProblemDestination.composable(
+            navGraphBuilder = this,
+            navScope = EditProblemNavScope(
                 navigateBack = navController::popBackStack,
             ),
         )

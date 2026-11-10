@@ -21,6 +21,7 @@ import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_empty_t
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_fab_importSgf
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_fab_manualEntry
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_add
+import com.mrsanglier.tsumegohero.app.coreui.resources.ic_check
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_edit
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_import
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_puzzle
@@ -38,6 +39,8 @@ import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.navigation.safeNavigation
 import com.mrsanglier.tsumegohero.coreui.resources.THDrawable
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_fab_addProblem
+import com.mrsanglier.tsumegohero.app.coreui.resources.ic_clock
+import com.mrsanglier.tsumegohero.app.coreui.resources.ic_close
 import com.mrsanglier.tsumegohero.coreui.resources.THString
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import dev.chrisbanes.haze.HazeState
@@ -57,7 +60,10 @@ fun CollectionDetailRoute(
     safeNavigation(viewModel.navEvent, viewModel::consumeNavigation) { event ->
         when (event) {
             CollectionDetailViewModel.NavEvent.Back -> navScope.navigateBack()
-            is CollectionDetailViewModel.NavEvent.TsumegoEdition -> navScope.navigateToTsumegoEdition(event.collectionId)
+            is CollectionDetailViewModel.NavEvent.TsumegoEdition ->
+                navScope.navigateToTsumegoEdition(event.collectionId, event.tsumegoId)
+
+            is CollectionDetailViewModel.NavEvent.Problem -> navScope.navigateToProblem(event.collectionId, event.tsumegoId)
         }
     }
 
@@ -72,6 +78,9 @@ fun CollectionDetailRoute(
     CollectionDetailScreen(
         uiState = uiState,
         navigateBack = navScope.navigateBack,
+        onToggleEditMode = viewModel::toggleEditMode,
+        onClickProblem = viewModel::openProblem,
+        onDeleteProblem = viewModel::deleteProblem,
         fabItems = remember(viewModel, sgfPicker) {
             listOf(
                 THFabMenuItem(
@@ -93,6 +102,9 @@ fun CollectionDetailRoute(
 private fun CollectionDetailScreen(
     uiState: CollectionDetailViewModelState,
     navigateBack: () -> Unit,
+    onToggleEditMode: () -> Unit,
+    onClickProblem: (tsumegoId: String) -> Unit,
+    onDeleteProblem: (tsumegoId: String) -> Unit,
     fabItems: List<THFabMenuItem>,
 ) {
     val gridState = rememberLazyGridState()
@@ -106,6 +118,14 @@ private fun CollectionDetailScreen(
                 hazeState = topBarHazeState,
                 elevation = topBarElevation,
                 navAction = TopBarAction.back(navigateBack),
+                trailingAction = if (uiState.problems.isNullOrEmpty()) {
+                    null
+                } else {
+                    TopBarAction.Icon(
+                        icon = (if (uiState.isEditMode) THDrawable.ic_close else THDrawable.ic_edit).toIconSpec(),
+                        onClick = onToggleEditMode,
+                    )
+                },
             )
         },
     ) { innerPadding ->
@@ -139,7 +159,12 @@ private fun CollectionDetailScreen(
                         key = { it.id },
                         contentType = { "tsumego.item" },
                     ) { item ->
-                        TsumegoGridItem(item)
+                        TsumegoGridItem(
+                            state = item,
+                            isEditMode = uiState.isEditMode,
+                            onClick = { onClickProblem(item.id) },
+                            onDelete = { onDeleteProblem(item.id) },
+                        )
                     }
                 }
             }

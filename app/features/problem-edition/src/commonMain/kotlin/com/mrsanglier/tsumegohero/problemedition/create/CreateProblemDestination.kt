@@ -1,28 +1,28 @@
-package com.mrsanglier.tsumegohero.collection.edition
+package com.mrsanglier.tsumegohero.problemedition.create
 
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.mrsanglier.tsumegohero.coreui.navigation.THDestination
 import kotlinx.serialization.Serializable
 
-/** Manual entry of a new problem, added to the collection [collectionId] at the end of the flow. */
+/** Step by step entry of a new problem, added to the collection [collectionId] at the end of the flow. */
 @Serializable
-data class TsumegoEditionDestination(
+data class CreateProblemDestination(
     val collectionId: String,
 ) : THDestination {
 
     companion object {
         fun composable(
             navGraphBuilder: NavGraphBuilder,
-            navScope: TsumegoEditionNavScope,
+            navScope: CreateProblemNavScope,
         ) {
-            navGraphBuilder.composable<TsumegoEditionDestination> {
-                TsumegoEditionRoute(navScope)
+            navGraphBuilder.composable<CreateProblemDestination> {
+                CreateProblemRoute(navScope)
             }
         }
     }
 }
 
-data class TsumegoEditionNavScope(
+data class CreateProblemNavScope(
     val navigateBack: () -> Unit,
 )

@@ -1,4 +1,4 @@
-package com.mrsanglier.tsumegohero.collection.edition.composable
+package com.mrsanglier.tsumegohero.problemedition.composable
 
 import androidx.compose.foundation.layout.Arrangement
 import com.mrsanglier.tsumegohero.coreui.extension.thClickable
@@ -26,8 +26,8 @@ import com.mrsanglier.tsumegohero.app.coreui.resources.stone_white
 import com.mrsanglier.tsumegohero.app.coreui.resources.tsumegoEdition_tool_black
 import com.mrsanglier.tsumegohero.app.coreui.resources.tsumegoEdition_tool_erase
 import com.mrsanglier.tsumegohero.app.coreui.resources.tsumegoEdition_tool_white
-import com.mrsanglier.tsumegohero.collection.edition.EditionTool
-import com.mrsanglier.tsumegohero.collection.edition.TsumegoEditionViewModelState
+import com.mrsanglier.tsumegohero.problemedition.EditionTool
+import com.mrsanglier.tsumegohero.problemedition.ProblemEditionViewModelState
 import com.mrsanglier.tsumegohero.coreui.componants.button.ButtonStatus
 import com.mrsanglier.tsumegohero.coreui.componants.button.ButtonStyle
 import com.mrsanglier.tsumegohero.coreui.componants.button.THButton
@@ -130,7 +130,7 @@ internal fun EditionSectionHeader(
 /** Review-like controls: previous / next move, mark the current leaf as correct or wrong, delete the move. */
 @Composable
 internal fun SolutionsStepActions(
-    uiState: TsumegoEditionViewModelState,
+    uiState: ProblemEditionViewModelState,
     onPrevious: () -> Unit,
     onNext: () -> Unit,
     onToggleOutcome: (isCorrect: Boolean) -> Unit,

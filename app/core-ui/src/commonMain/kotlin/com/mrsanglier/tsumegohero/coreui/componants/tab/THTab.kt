@@ -29,7 +29,7 @@ fun THTab(
     onClick: () -> Unit,
 ) {
     val contentColor = if (enabled) THTheme.colors.content else THTheme.colors.contentDisable
-    val textStyle = if (isSelected) THTheme.typography.label50Semibold else THTheme.typography.label50Light
+    val textStyle = if (isSelected) THTheme.typography.label100Medium else THTheme.typography.label100Light
 
     Tab(
         selected = isSelected,
@@ -56,7 +56,7 @@ fun THTab(
                 color = contentColor,
                 style = textStyle,
             )
-            THTheme.spacing.xsmall.THVerticalSpacer()
+            THTheme.spacing.medium.THVerticalSpacer()
         }
     }
 }

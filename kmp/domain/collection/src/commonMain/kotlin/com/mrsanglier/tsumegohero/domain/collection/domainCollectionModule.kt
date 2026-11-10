@@ -7,6 +7,10 @@ import com.mrsanglier.tsumegohero.domain.collection.usecase.ObserveCollectionDet
 import com.mrsanglier.tsumegohero.domain.collection.usecase.ObserveCollectionsUseCase
 import com.mrsanglier.tsumegohero.domain.collection.usecase.PlayEditionMoveUseCase
 import com.mrsanglier.tsumegohero.domain.collection.usecase.SaveUserTsumegoUseCase
+import com.mrsanglier.tsumegohero.domain.collection.usecase.DeleteUserTsumegoUseCase
+import com.mrsanglier.tsumegohero.domain.collection.usecase.GetEditableUserTsumegoUseCase
+import com.mrsanglier.tsumegohero.domain.collection.usecase.ObserveUserTsumegoUseCase
+import com.mrsanglier.tsumegohero.domain.collection.usecase.StartUserTsumegoGameUseCase
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -19,4 +23,8 @@ val domainCollectionModule: Module = module {
     singleOf(::ObserveCollectionsUseCase)
     singleOf(::PlayEditionMoveUseCase)
     singleOf(::SaveUserTsumegoUseCase)
+    singleOf(::StartUserTsumegoGameUseCase)
+    singleOf(::ObserveUserTsumegoUseCase)
+    singleOf(::GetEditableUserTsumegoUseCase)
+    singleOf(::DeleteUserTsumegoUseCase)
 }
