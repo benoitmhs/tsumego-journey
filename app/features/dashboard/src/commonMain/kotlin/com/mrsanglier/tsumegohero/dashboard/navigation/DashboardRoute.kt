@@ -11,6 +11,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.mrsanglier.tsumegohero.collection.list.CollectionListDestination
+import com.mrsanglier.tsumegohero.collection.list.CollectionListNavScope
 import com.mrsanglier.tsumegohero.coreui.animation.fadeInEnterTransition
 import com.mrsanglier.tsumegohero.coreui.animation.fadeInPopEnterTransition
 import com.mrsanglier.tsumegohero.coreui.animation.fadeOutExitTransition
@@ -18,7 +20,6 @@ import com.mrsanglier.tsumegohero.coreui.animation.fadeOutPopExitTransition
 import com.mrsanglier.tsumegohero.coreui.componants.modalbottomsheet.Composable
 import com.mrsanglier.tsumegohero.coreui.componants.navigationbar.THNavigationBarScaffold
 import com.mrsanglier.tsumegohero.coreui.componants.screen.ProvideScreenContext
-import com.mrsanglier.tsumegohero.dashboard.screens.collection.CollectionDestination
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeNavScope
 import org.koin.compose.viewmodel.koinViewModel
@@ -69,7 +70,12 @@ fun DashboardRoute(
                         navigateToRankEstimation = navScope.navigateToRankEstimation,
                     )
                 )
-                CollectionDestination.composable(this)
+                CollectionListDestination.composable(
+                    navGraphBuilder = this,
+                    navScope = CollectionListNavScope(
+                        navigateToCollection = navScope.navigateToCollection,
+                    ),
+                )
             }
         }
     }

@@ -51,6 +51,7 @@ kotlin {
 
             // Project
             implementation(projects.app.coreUi)
+            implementation(projects.app.features.collection)
             implementation(projects.kmp.core)
             implementation(projects.kmp.data)
             implementation(projects.kmp.domain.authentication)

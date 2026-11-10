@@ -2,6 +2,10 @@ package com.mrsanglier.tsumegohero.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.rememberNavController
+import com.mrsanglier.tsumegohero.collection.detail.CollectionDetailDestination
+import com.mrsanglier.tsumegohero.collection.detail.CollectionDetailNavScope
+import com.mrsanglier.tsumegohero.collection.edition.TsumegoEditionDestination
+import com.mrsanglier.tsumegohero.collection.edition.TsumegoEditionNavScope
 import com.mrsanglier.tsumegohero.dashboard.navigation.DashboardDestination
 import com.mrsanglier.tsumegohero.dashboard.navigation.DashboardNavScope
 import com.mrsanglier.tsumegohero.game.promotion.LevelPromotionDestination
@@ -41,6 +45,26 @@ fun MainNavigation(
                 navigateToRankEstimation = { tsumegoId ->
                     navController.navigate(RankEstimationDestination(tsumegoId = tsumegoId))
                 },
+                navigateToCollection = { collectionId ->
+                    navController.navigate(CollectionDetailDestination(collectionId = collectionId))
+                },
+            ),
+        )
+
+        CollectionDetailDestination.composable(
+            navGraphBuilder = this,
+            navScope = CollectionDetailNavScope(
+                navigateBack = navController::popBackStack,
+                navigateToTsumegoEdition = { collectionId ->
+                    navController.navigate(TsumegoEditionDestination(collectionId = collectionId))
+                },
+            ),
+        )
+
+        TsumegoEditionDestination.composable(
+            navGraphBuilder = this,
+            navScope = TsumegoEditionNavScope(
+                navigateBack = navController::popBackStack,
             ),
         )
 

@@ -5,6 +5,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.text.TextMeasurer
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.round
 import com.mrsanglier.tsumegohero.coreui.theme.color.DarkGreen
@@ -23,6 +27,8 @@ internal fun DrawScope.drawBoard(
     whiteStoneImageBitmap: ImageBitmap,
     lastMove: Move?,
     goodMoves: Set<Cell>?,
+    moveNumbers: Map<Cell, Int>? = null,
+    textMeasurer: TextMeasurer? = null,
     badMoves: Set<Cell>?,
     lastMoveAlpha: Float = 1f,
 ) {
@@ -86,6 +92,30 @@ internal fun DrawScope.drawBoard(
             cellSpacing = cellSpacing,
             startOffset = startOffset,
         )
+    }
+
+    // Draw move numbers
+    if (textMeasurer != null) {
+        moveNumbers?.forEach { (cell, number) ->
+            val textColor = when (cell) {
+                in blackStones -> Color.White
+                in whiteStones -> Color.Black
+                else -> return@forEach
+            }
+            val layout = textMeasurer.measure(
+                text = number.toString(),
+                style = TextStyle(
+                    color = textColor,
+                    fontSize = (cellSpacing * MOVE_NUMBER_SIZE_RATIO).toSp(),
+                    fontWeight = FontWeight.SemiBold,
+                ),
+            )
+            val center = Offset(x = cell.x * cellSpacing, y = cell.y * cellSpacing) + startOffset
+            drawText(
+                textLayoutResult = layout,
+                topLeft = center - Offset(layout.size.width / 2f, layout.size.height / 2f),
+            )
+        }
     }
 
     // Draw review marker
@@ -169,3 +199,4 @@ private const val LAST_STONE_RATIO: Float = 0.6f
 private const val STONE_SHADOW_RATIO: Float = 1.02f
 private const val REVIEW_MARKER_RATIO: Float = 0.3f
 private const val REVIEW_MARKER_ALPHA: Float = 0.6f
+private const val MOVE_NUMBER_SIZE_RATIO: Float = 0.45f

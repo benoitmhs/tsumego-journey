@@ -3,7 +3,9 @@ package com.mrsanglier.tsumegohero.di
 import androidx.compose.runtime.Composable
 import com.mrsanglier.tsumegohero.domain.authenticationModule
 import com.mrsanglier.tsumegohero.domain.authentication.domainAuthenticationModule
+import com.mrsanglier.tsumegohero.collection.di.collectionModule
 import com.mrsanglier.tsumegohero.dashboard.di.dashboardModule
+import com.mrsanglier.tsumegohero.domain.collection.domainCollectionModule
 import com.mrsanglier.tsumegohero.domain.appsettings.domainAppSettingsModule
 import com.mrsanglier.tsumegohero.game.domainGameModule
 import com.mrsanglier.tsumegohero.game.gameModule
@@ -39,12 +41,14 @@ fun THKoinApplication(
                 repositoryModule,
                 domainAppSettingsModule,
                 domainAuthenticationModule,
+                domainCollectionModule,
                 domainCommonModule,
                 domainDashboardGameModule,
                 domainProfileModule,
                 domainGameModule,
                 domainRankEstimationModule,
                 authenticationModule,
+                collectionModule,
                 dashboardModule,
                 gameModule,
             )

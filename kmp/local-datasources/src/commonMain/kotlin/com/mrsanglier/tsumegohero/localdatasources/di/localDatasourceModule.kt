@@ -1,6 +1,7 @@
 package com.mrsanglier.tsumegohero.localdatasources.di
 
 import com.mrsanglier.tsumegohero.localdatasources.datasource.LocalAttemptDataSource
+import com.mrsanglier.tsumegohero.localdatasources.datasource.LocalCollectionDatasource
 import com.mrsanglier.tsumegohero.localdatasources.datasource.LocalTsumegoDatasource
 import com.mrsanglier.tsumegohero.localdatasources.datasource.LocalUserDataSource
 import org.koin.core.module.Module
@@ -11,4 +12,5 @@ val localDatasourceModule: Module = module {
     singleOf(::LocalTsumegoDatasource)
     singleOf(::LocalUserDataSource)
     singleOf(::LocalAttemptDataSource)
+    singleOf(::LocalCollectionDatasource)
 }

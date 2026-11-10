@@ -75,4 +75,42 @@
     <string name="topBanner_dailyStreak">Série quotidienne : %1$d</string>
     <string name="training_screen_title">Problème %1$s</string>
     <string name="training_objective_title">Objectif Quotidien</string>
+    <string name="collection_list_title">Collections</string>
+    <string name="collection_list_empty_title">Aucune collection</string>
+    <string name="collection_list_empty_message">Crée une collection pour rassembler tes propres problèmes, ou importes-en une.</string>
+    <string name="collection_fab_newCollection">Nouvelle collection</string>
+    <string name="collection_fab_import">Importer</string>
+    <string name="collection_newCollection_placeholder">Nom de la collection</string>
+    <string name="collection_newCollection_create">Créer</string>
+    <string name="collection_import_comingSoon">Import bientôt disponible</string>
+    <string name="collection_detail_empty_title">Aucun problème</string>
+    <string name="collection_detail_empty_message">Ajoute un problème en important un fichier .sgf ou en le saisissant manuellement.</string>
+    <string name="collection_detail_fab_addProblem">Ajouter un problème</string>
+    <string name="collection_detail_fab_importSgf">Importer un .sgf</string>
+    <string name="collection_detail_fab_manualEntry">Saisie manuelle</string>
+    <string name="collection_detail_untitledProblem">Problème %1$d</string>
+    <string name="tsumegoEdition_title">Nouveau problème</string>
+    <string name="tsumegoEdition_step_board_title">Position initiale</string>
+    <string name="tsumegoEdition_tools_title">Pierres</string>
+    <string name="tsumegoEdition_firstPlayer_title">Qui commence ?</string>
+    <string name="tsumegoEdition_tool_black">Noir</string>
+    <string name="tsumegoEdition_tool_white">Blanc</string>
+    <string name="tsumegoEdition_tool_erase">Gomme</string>
+    <string name="tsumegoEdition_step_solutions_title">Solutions</string>
+    <string name="tsumegoEdition_step_info_title">Informations</string>
+    <string name="tsumegoEdition_info_titleLabel">Titre (optionnel)</string>
+    <string name="tsumegoEdition_info_difficultyLabel">Difficulté (optionnelle)</string>
+    <string name="tsumegoEdition_info_notesLabel">Notes (optionnelles)</string>
+    <string name="tsumegoEdition_info_noDifficulty">Aucune difficulté</string>
+    <string name="tsumegoEdition_save">Enregistrer</string>
+    <string name="tsumegoEdition_saved">Problème ajouté à la collection</string>
+    <plurals name="collection_problemCount">
+        <item quantity="one">%1$d problème</item>
+        <item quantity="other">%1$d problèmes</item>
+    </plurals>
+    <string name="collection_import_error">Fichier non supporté : %1$s</string>
+    <plurals name="collection_import_success">
+        <item quantity="one">%1$d problème importé</item>
+        <item quantity="other">%1$d problèmes importés</item>
+    </plurals>
 </resources>

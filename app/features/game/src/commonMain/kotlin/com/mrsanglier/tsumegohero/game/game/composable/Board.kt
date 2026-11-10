@@ -19,6 +19,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.toSize
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import com.mrsanglier.tsumegohero.game.game.delegate.GHOST_STONE_FADE_DURATION
@@ -34,19 +35,25 @@ import com.mrsanglier.tsumegohero.game.utils.getScalingPivot
 import org.jetbrains.compose.resources.imageResource
 import org.jetbrains.compose.resources.painterResource
 
+/**
+ * @param onClickCell null makes the board read-only (taps are not consumed, e.g. for thumbnails).
+ * @param moveNumbers numbers drawn on the stones occupying these cells (the last move marker is then hidden).
+ */
 @Composable
-internal fun Board(
+fun Board(
     boardUiState: BoardUiState,
-    onClickCell: (Cell) -> Unit,
+    onClickCell: ((Cell) -> Unit)?,
     modifier: Modifier = Modifier,
     boardSize: BoardSize = BoardSize.X19,
     style: BoardStyle = BoardStyle.Default,
     isReview: Boolean = false,
     goodMoves: Set<Cell>? = null,
     badMoves: Set<Cell>? = null,
+    moveNumbers: Map<Cell, Int>? = null,
 ) {
     Board(
         boardSize = boardSize,
+        moveNumbers = moveNumbers,
         modifier = modifier,
         style = style,
         cropBoard = boardUiState.cropBoard,
@@ -72,11 +79,12 @@ private fun Board(
     whiteStones: Set<Cell> = emptySet(),
     goodMoves: Set<Cell>? = null,
     badMoves: Set<Cell>? = null,
+    moveNumbers: Map<Cell, Int>? = null,
     lastMove: Move? = null,
     isGhostMode: Boolean = false,
     isReview: Boolean = false,
     borderColor: Color,
-    onClickCell: (Cell) -> Unit = {},
+    onClickCell: ((Cell) -> Unit)? = null,
 ) {
     val blackStoneImageBitmap = imageResource(style.blackStoneRes)
     val whiteStoneImageBitmap = imageResource(style.whiteStoneRes)
@@ -84,6 +92,7 @@ private fun Board(
         cropBoard.getScaleFactor(boardSize)
     }
     val lastMoveAlphaAnimatable = remember { Animatable(1f) }
+    val textMeasurer = rememberTextMeasurer()
 
     LaunchedEffect(lastMove, isGhostMode, isReview) {
         lastMoveAlphaAnimatable.animateTo(
@@ -117,17 +126,23 @@ private fun Board(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .pointerInput(scaleFactor, cropBoard) {
-                    detectTapGestures { offset ->
-                        convertOffsetToCell(
-                            offset = offset,
-                            size = size.toSize(),
-                            scaleFactor = scaleFactor,
-                            boardSize = boardSize,
-                            cropBoard = cropBoard,
-                        )?.let(onClickCell::invoke)
+                .then(
+                    if (onClickCell == null) {
+                        Modifier
+                    } else {
+                        Modifier.pointerInput(scaleFactor, cropBoard, boardSize, onClickCell) {
+                            detectTapGestures { offset ->
+                                convertOffsetToCell(
+                                    offset = offset,
+                                    size = size.toSize(),
+                                    scaleFactor = scaleFactor,
+                                    boardSize = boardSize,
+                                    cropBoard = cropBoard,
+                                )?.let(onClickCell::invoke)
+                            }
+                        }
                     }
-                },
+                ),
         ) {
             scale(
                 scaleX = scaleFactor,
@@ -141,7 +156,9 @@ private fun Board(
                     whiteStones = whiteStones,
                     blackStoneImageBitmap = blackStoneImageBitmap,
                     whiteStoneImageBitmap = whiteStoneImageBitmap,
-                    lastMove = lastMove,
+                    lastMove = lastMove.takeIf { moveNumbers.isNullOrEmpty() },
+                    moveNumbers = moveNumbers,
+                    textMeasurer = textMeasurer,
                     goodMoves = goodMoves,
                     badMoves = badMoves,
                     lastMoveAlpha = lastMoveAlphaAnimatable.value,

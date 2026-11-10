@@ -9,6 +9,7 @@ import com.mrsanglier.tsumegohero.app.coreui.resources.ic_book_open
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_book_open_filled
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_home
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_home_filled
+import com.mrsanglier.tsumegohero.collection.list.CollectionListDestination
 import com.mrsanglier.tsumegohero.coreui.componants.icon.IconSpec
 import com.mrsanglier.tsumegohero.coreui.componants.navigationbar.FONavigationBarItemData
 import com.mrsanglier.tsumegohero.coreui.componants.text.TextSpec
@@ -18,7 +19,6 @@ import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
 import com.mrsanglier.tsumegohero.coreui.navigation.THDestination
 import com.mrsanglier.tsumegohero.coreui.resources.THDrawable
 import com.mrsanglier.tsumegohero.coreui.resources.THString
-import com.mrsanglier.tsumegohero.dashboard.screens.collection.CollectionDestination
 import com.mrsanglier.tsumegohero.dashboard.screens.home.HomeDestination
 
 sealed interface DashboardNavItem {
@@ -38,7 +38,7 @@ sealed interface DashboardNavItem {
         override val label: TextSpec = THString.dashboard_navigationBarItem_collection.toTextSpec()
         override val selectedIcon: IconSpec = THDrawable.ic_book_open_filled.toIconSpec()
         override val unselectedIcon: IconSpec = THDrawable.ic_book_open.toIconSpec()
-        override val destination: THDestination = CollectionDestination
+        override val destination: THDestination = CollectionListDestination
     }
 
     fun getNavigationBarItemData(

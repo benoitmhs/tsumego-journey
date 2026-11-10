@@ -52,6 +52,7 @@ kotlin {
             // Project modules
             implementation(projects.app.coreUi)
             implementation(projects.app.features.authentication)
+            implementation(projects.app.features.collection)
             implementation(projects.app.features.dashboard)
             implementation(projects.app.features.game)
             implementation(projects.app.features.maintenance)
@@ -62,6 +63,7 @@ kotlin {
             implementation(projects.kmp.repository)
             implementation(projects.kmp.domain.appsettings)
             implementation(projects.kmp.domain.authentication)
+            implementation(projects.kmp.domain.collection)
             implementation(projects.kmp.domain.common)
             implementation(projects.kmp.domain.dashboardGame)
             implementation(projects.kmp.domain.profile)

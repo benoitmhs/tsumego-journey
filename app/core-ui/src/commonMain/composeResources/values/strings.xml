@@ -75,4 +75,42 @@
     <string name="topBanner_dailyStreak">Daily streak: %1$d</string>
     <string name="training_screen_title">%1$s problem</string>
     <string name="training_objective_title">Daily objective</string>
+    <string name="collection_list_title">Collections</string>
+    <string name="collection_list_empty_title">No collection yet</string>
+    <string name="collection_list_empty_message">Create a collection to gather your own problems, or import one.</string>
+    <string name="collection_fab_newCollection">New collection</string>
+    <string name="collection_fab_import">Import</string>
+    <string name="collection_newCollection_placeholder">Collection name</string>
+    <string name="collection_newCollection_create">Create</string>
+    <string name="collection_import_comingSoon">Import coming soon</string>
+    <string name="collection_detail_empty_title">No problem yet</string>
+    <string name="collection_detail_empty_message">Add a problem by importing an .sgf file or by entering it manually.</string>
+    <string name="collection_detail_fab_addProblem">Add a problem</string>
+    <string name="collection_detail_fab_importSgf">Import an .sgf</string>
+    <string name="collection_detail_fab_manualEntry">Manual entry</string>
+    <string name="collection_detail_untitledProblem">Problem %1$d</string>
+    <string name="tsumegoEdition_title">New problem</string>
+    <string name="tsumegoEdition_step_board_title">Initial position</string>
+    <string name="tsumegoEdition_tools_title">Stones</string>
+    <string name="tsumegoEdition_firstPlayer_title">Who plays first?</string>
+    <string name="tsumegoEdition_tool_black">Black</string>
+    <string name="tsumegoEdition_tool_white">White</string>
+    <string name="tsumegoEdition_tool_erase">Erase</string>
+    <string name="tsumegoEdition_step_solutions_title">Solutions</string>
+    <string name="tsumegoEdition_step_info_title">Information</string>
+    <string name="tsumegoEdition_info_titleLabel">Title (optional)</string>
+    <string name="tsumegoEdition_info_difficultyLabel">Difficulty (optional)</string>
+    <string name="tsumegoEdition_info_notesLabel">Notes (optional)</string>
+    <string name="tsumegoEdition_info_noDifficulty">No difficulty</string>
+    <string name="tsumegoEdition_save">Save</string>
+    <string name="tsumegoEdition_saved">Problem added to the collection</string>
+    <plurals name="collection_problemCount">
+        <item quantity="one">%1$d problem</item>
+        <item quantity="other">%1$d problems</item>
+    </plurals>
+    <string name="collection_import_error">Unsupported file: %1$s</string>
+    <plurals name="collection_import_success">
+        <item quantity="one">%1$d problem imported</item>
+        <item quantity="other">%1$d problems imported</item>
+    </plurals>
 </resources>

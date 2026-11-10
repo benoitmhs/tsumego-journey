@@ -1,27 +1,35 @@
 package com.mrsanglier.tsumegohero.game.delegate
 
+import com.mrsanglier.tsumegohero.game.model.Board
 import com.mrsanglier.tsumegohero.game.model.BoardSection
 import com.mrsanglier.tsumegohero.game.model.Cell
 import com.mrsanglier.tsumegohero.game.model.Corner
 import com.mrsanglier.tsumegohero.game.model.CropBoard
 import com.mrsanglier.tsumegohero.game.model.MoveNode
+import com.mrsanglier.tsumegohero.game.model.RootNode
 import com.mrsanglier.tsumegohero.game.model.Tsumego
 import kotlin.math.abs
 import kotlin.math.sqrt
 
 interface GetCropBoardDelegate {
     fun getCropBoard(tsumego: Tsumego): CropBoard
+
+    /** Crop from an initial position and its solution tree (the tree may be empty). */
+    fun getCropBoard(initialBoard: Board, root: RootNode): CropBoard
 }
 
 class GetCropBoardDelegateImpl : GetCropBoardDelegate {
-    override fun getCropBoard(tsumego: Tsumego): CropBoard {
+    override fun getCropBoard(tsumego: Tsumego): CropBoard =
+        getCropBoard(initialBoard = tsumego.initialBoard, root = tsumego.root)
+
+    override fun getCropBoard(initialBoard: Board, root: RootNode): CropBoard {
         val boardBoardSection = BoardSection(
             0,
             0,
-            tsumego.initialBoard.boardSize.size - 1,
-            tsumego.initialBoard.boardSize.size - 1,
+            initialBoard.boardSize.size - 1,
+            initialBoard.boardSize.size - 1,
         )
-        val tsumegoBoardSection = getTsumegoBoardSection(tsumego)
+        val tsumegoBoardSection = getTsumegoBoardSection(initialBoard, root)
 
         // Define closest corner from tsumego node & stones
         val tsumegoCorner: Corner = Corner.entries
@@ -40,8 +48,8 @@ class GetCropBoardDelegateImpl : GetCropBoardDelegate {
         return CropBoard(gameBoardSection, tsumegoCorner)
     }
 
-    private fun getTsumegoBoardSection(tsumego: Tsumego): BoardSection {
-        val initCells = tsumego.initialBoard.blackStones + tsumego.initialBoard.whiteStones
+    private fun getTsumegoBoardSection(initialBoard: Board, root: RootNode): BoardSection {
+        val initCells = initialBoard.blackStones + initialBoard.whiteStones
         val initBoardSection = BoardSection(
             xMin = initCells.minOf { it.x },
             xMax = initCells.maxOf { it.x },
@@ -51,7 +59,7 @@ class GetCropBoardDelegateImpl : GetCropBoardDelegate {
 
         var boardSection = initBoardSection
 
-        tsumego.root.children.forEach { child ->
+        root.children.forEach { child ->
             boardSection = getBoardSectionNode(child, boardSection)
         }
 
