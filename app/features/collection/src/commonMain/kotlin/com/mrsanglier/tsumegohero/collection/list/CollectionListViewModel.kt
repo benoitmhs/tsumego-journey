@@ -5,6 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_import_comingSoon
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_problemCount
 import com.mrsanglier.tsumegohero.core.extension.handleResult
+import com.mrsanglier.tsumegohero.domain.collection.usecase.DeleteCollectionUseCase
+import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showDone
+import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.common.DefaultAlertDialog
+import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.common.CommonAlertDialogAction
+import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.AlertDialogManager
+import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.AlertDialogAction
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_list_deleted
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_list_delete_title
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_list_delete_message
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_delete_confirm
 import com.mrsanglier.tsumegohero.coreui.componants.modalbottomsheet.THModalBottomSheetState
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.THSnackbarState
@@ -18,19 +28,25 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class CollectionListViewModel(
     private val createCollectionUseCase: CreateCollectionUseCase,
+    private val deleteCollectionUseCase: DeleteCollectionUseCase,
+    private val alertDialogManager: AlertDialogManager,
     private val snackbarManager: SnackbarManager,
     observeCollectionsUseCase: ObserveCollectionsUseCase,
 ) : ViewModel() {
 
-    internal val uiState: StateFlow<CollectionListViewModelState> = observeCollectionsUseCase()
-        .map { summaries ->
+    private val isEditMode = MutableStateFlow(false)
+
+    internal val uiState: StateFlow<CollectionListViewModelState> =
+        combine(observeCollectionsUseCase(), isEditMode) { summaries, isEditMode ->
             CollectionListViewModelState(
+                isEditMode = isEditMode,
                 collections = summaries.map { summary ->
                     CollectionItemState(
                         id = summary.collection.id,
@@ -39,7 +55,8 @@ class CollectionListViewModel(
                             summary.problemCount,
                             summary.problemCount,
                         ),
-                        onClick = { navEvent.value = NavEvent.Collection(summary.collection.id) },
+                        onClick = { navEvent.value = NavEvent.Collection(summary.collection.id) }.takeUnless { isEditMode },
+                        onDelete = { deleteCollection(summary.collection.id) },
                     )
                 },
             )
@@ -59,6 +76,37 @@ class CollectionListViewModel(
         _bottomSheet.value = NewCollectionBottomSheet(
             onCreate = ::createCollection,
             onDismiss = { _bottomSheet.value = null },
+        )
+    }
+
+    internal fun toggleEditMode() {
+        isEditMode.update { !it }
+    }
+
+    /** Asks for confirmation, then deletes the collection and its problems. */
+    private fun deleteCollection(collectionId: String) {
+        alertDialogManager.showDialog(
+            DefaultAlertDialog(
+                title = THString.collection_list_delete_title.toTextSpec(),
+                description = THString.collection_list_delete_message.toTextSpec(),
+                actions = listOf(
+                    CommonAlertDialogAction.cancel(),
+                    AlertDialogAction(
+                        text = THString.collection_detail_delete_confirm.toTextSpec(),
+                        type = AlertDialogAction.Type.Dangerous,
+                        onClick = {
+                            viewModelScope.launch {
+                                deleteCollectionUseCase(collectionId).handleResult(
+                                    onSuccess = {
+                                        snackbarManager.showDone(THString.collection_list_deleted.toTextSpec())
+                                    },
+                                    onError = snackbarManager::showError,
+                                )
+                            }
+                        },
+                    ),
+                ),
+            ),
         )
     }
 

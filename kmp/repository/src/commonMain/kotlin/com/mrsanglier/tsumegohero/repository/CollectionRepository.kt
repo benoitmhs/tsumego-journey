@@ -32,4 +32,8 @@ class CollectionRepository(
     suspend fun deleteTsumego(id: String) {
         localCollectionDatasource.deleteTsumego(id)
     }
+
+    suspend fun deleteCollection(id: String) {
+        localCollectionDatasource.deleteCollection(id)
+    }
 }

@@ -2,6 +2,7 @@ package com.mrsanglier.tsumegohero.localdatasources.room.collection
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
@@ -35,4 +36,17 @@ interface CollectionDao {
 
     @Query("DELETE FROM user_tsumego WHERE id = :id")
     suspend fun deleteTsumego(id: String)
+
+    @Query("DELETE FROM user_tsumego WHERE collectionId = :collectionId")
+    suspend fun deleteTsumegosOfCollection(collectionId: String)
+
+    @Query("DELETE FROM collection WHERE id = :id")
+    suspend fun deleteCollectionOnly(id: String)
+
+    /** Deletes the collection and its problems (explicitly, without relying on the foreign key cascade). */
+    @Transaction
+    suspend fun deleteCollection(id: String) {
+        deleteTsumegosOfCollection(id)
+        deleteCollectionOnly(id)
+    }
 }

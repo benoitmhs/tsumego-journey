@@ -35,4 +35,8 @@ class LocalCollectionDatasource(
     suspend fun deleteTsumego(id: String) {
         dao.deleteTsumego(id)
     }
+
+    suspend fun deleteCollection(id: String) {
+        dao.deleteCollection(id)
+    }
 }

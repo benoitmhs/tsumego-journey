@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
+import com.mrsanglier.tsumegohero.collection.common.EditionItemLayout
 import com.mrsanglier.tsumegohero.collection.detail.TsumegoGridItemState
 import com.mrsanglier.tsumegohero.coreui.componants.text.THText
 import com.mrsanglier.tsumegohero.coreui.extension.thClickable

@@ -80,6 +80,9 @@
     <string name="collection_list_empty_message">Create a collection to gather your own problems, or import one.</string>
     <string name="collection_fab_newCollection">New collection</string>
     <string name="collection_fab_import">Import</string>
+    <string name="collection_list_delete_title">Delete this collection?</string>
+    <string name="collection_list_delete_message">The collection and all its problems will be permanently deleted.</string>
+    <string name="collection_list_deleted">Collection deleted</string>
     <string name="collection_newCollection_placeholder">Collection name</string>
     <string name="collection_newCollection_create">Create</string>
     <string name="collection_import_comingSoon">Import coming soon</string>

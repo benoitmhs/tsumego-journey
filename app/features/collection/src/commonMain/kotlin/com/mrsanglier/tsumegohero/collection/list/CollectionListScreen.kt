@@ -28,6 +28,9 @@ import com.mrsanglier.tsumegohero.app.coreui.resources.ic_book_open_filled
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_import
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_library_add
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_next
+import com.mrsanglier.tsumegohero.app.coreui.resources.ic_check
+import com.mrsanglier.tsumegohero.app.coreui.resources.ic_edit
+import com.mrsanglier.tsumegohero.collection.common.EditionItemLayout
 import com.mrsanglier.tsumegohero.collection.common.EmptyState
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.THFabMenu
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.THFabMenuItem
@@ -38,6 +41,7 @@ import com.mrsanglier.tsumegohero.coreui.componants.screen.LocalPiScreenPadding
 import com.mrsanglier.tsumegohero.coreui.componants.screen.THScreen
 import com.mrsanglier.tsumegohero.coreui.componants.text.THText
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.THTopBar
+import com.mrsanglier.tsumegohero.coreui.componants.topbar.TopBarAction
 import com.mrsanglier.tsumegohero.coreui.extension.rememberTopBarElevation
 import com.mrsanglier.tsumegohero.coreui.extension.thCard
 import com.mrsanglier.tsumegohero.coreui.extension.thClickable
@@ -68,6 +72,7 @@ fun CollectionListRoute(
 
     CollectionListScreen(
         uiState = uiState,
+        onToggleEditMode = viewModel::toggleEditMode,
         fabItems = remember(viewModel) {
             listOf(
                 THFabMenuItem(
@@ -90,6 +95,7 @@ fun CollectionListRoute(
 @Composable
 private fun CollectionListScreen(
     uiState: CollectionListViewModelState,
+    onToggleEditMode: () -> Unit,
     fabItems: List<THFabMenuItem>,
 ) {
     val lazyListState = rememberLazyListState()
@@ -103,6 +109,14 @@ private fun CollectionListScreen(
                 title = THString.collection_list_title.toTextSpec(),
                 hazeState = topBarHazeState,
                 elevation = topBarElevation,
+                trailingAction = if (uiState.collections.isNullOrEmpty()) {
+                    null
+                } else {
+                    TopBarAction.Icon(
+                        icon = (if (uiState.isEditMode) THDrawable.ic_check else THDrawable.ic_edit).toIconSpec(),
+                        onClick = onToggleEditMode,
+                    )
+                },
             )
         },
     ) { innerPadding ->
@@ -134,7 +148,7 @@ private fun CollectionListScreen(
                         key = { it.id },
                         contentType = { "collection.item" },
                     ) { item ->
-                        CollectionCell(item)
+                        CollectionCell(item = item, isEditMode = uiState.isEditMode)
                     }
                 }
             }
@@ -151,8 +165,23 @@ private fun CollectionListScreen(
     }
 }
 
+/** In edit mode, the collection is covered by the edition overlay with its delete button. */
 @Composable
-private fun CollectionCell(item: CollectionItemState) {
+private fun CollectionCell(item: CollectionItemState, isEditMode: Boolean) {
+    EditionItemLayout(
+        isEditMode = isEditMode,
+        onDelete = item.onDelete,
+        showEditIcon = false,
+        shape = THTheme.shape.roundLarge,
+        deleteAlignment = Alignment.CenterEnd,
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        CollectionCellContent(item = item, isEditMode = isEditMode)
+    }
+}
+
+@Composable
+private fun CollectionCellContent(item: CollectionItemState, isEditMode: Boolean) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -178,10 +207,13 @@ private fun CollectionCell(item: CollectionItemState) {
                 color = THTheme.colors.contentSecondary,
             )
         }
-        THDrawable.ic_next.toIconSpec().Content(
-            iconSize = IconSize.Small,
-            tint = THTheme.colors.contentSecondary,
-        )
+        // The delete button takes this place in edit mode
+        if (!isEditMode) {
+            THDrawable.ic_next.toIconSpec().Content(
+                iconSize = IconSize.Small,
+                tint = THTheme.colors.contentSecondary,
+            )
+        }
     }
 }
 

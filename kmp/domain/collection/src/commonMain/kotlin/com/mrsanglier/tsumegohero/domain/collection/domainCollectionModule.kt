@@ -11,12 +11,14 @@ import com.mrsanglier.tsumegohero.domain.collection.usecase.DeleteUserTsumegoUse
 import com.mrsanglier.tsumegohero.domain.collection.usecase.GetEditableUserTsumegoUseCase
 import com.mrsanglier.tsumegohero.domain.collection.usecase.ObserveUserTsumegoUseCase
 import com.mrsanglier.tsumegohero.domain.collection.usecase.StartUserTsumegoGameUseCase
+import com.mrsanglier.tsumegohero.domain.collection.usecase.DeleteCollectionUseCase
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val domainCollectionModule: Module = module {
     singleOf(::CreateCollectionUseCase)
+    singleOf(::DeleteCollectionUseCase)
     singleOf(::GetEditionCropBoardUseCase)
     singleOf(::ImportUserTsumegoUseCase)
     singleOf(::ObserveCollectionDetailUseCase)
