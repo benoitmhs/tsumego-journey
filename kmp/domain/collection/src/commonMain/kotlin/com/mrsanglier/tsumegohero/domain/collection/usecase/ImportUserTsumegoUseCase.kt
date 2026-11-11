@@ -7,6 +7,7 @@ import com.mrsanglier.tsumegohero.data.model.collection.UserTsumego
 import com.mrsanglier.tsumegohero.domain.collection.utils.UserTsumegoSgf
 import com.mrsanglier.tsumegohero.repository.CollectionRepository
 import kotlin.time.Clock
+import kotlin.time.Instant
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -23,6 +24,7 @@ class ImportUserTsumegoUseCase(
         collectionId: String,
         fileName: String,
         sgf: String,
+        createdAt: Instant = Clock.System.now(),
     ): THResult<String> = THResult.catchResult {
         val content = sgf.trim()
         val board = try {
@@ -41,7 +43,7 @@ class ImportUserTsumegoUseCase(
             rank = UserTsumegoSgf.readRank(content),
             notes = null,
             sgf = content,
-            createdAt = Clock.System.now(),
+            createdAt = createdAt,
         )
         repository.upsertTsumego(tsumego)
         tsumego.id

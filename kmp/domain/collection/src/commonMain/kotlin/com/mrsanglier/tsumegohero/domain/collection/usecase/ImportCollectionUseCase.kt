@@ -6,6 +6,7 @@ import com.mrsanglier.tsumegohero.data.model.collection.TsumegoCollection
 import com.mrsanglier.tsumegohero.domain.collection.utils.SgfZipReader
 import com.mrsanglier.tsumegohero.repository.CollectionRepository
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -37,8 +38,16 @@ class ImportCollectionUseCase(
             )
 
             val failedFiles = mutableListOf<String>()
-            files.forEach { file ->
-                val result = importUserTsumegoUseCase(collectionId = collectionId, fileName = file.name, sgf = file.content)
+            // Problems are displayed by date of addition: one millisecond apart, they keep the order of the archive
+            // (dates are stored to the millisecond, a fast import could give several problems the same date)
+            val importStart = Clock.System.now()
+            files.forEachIndexed { index, file ->
+                val result = importUserTsumegoUseCase(
+                    collectionId = collectionId,
+                    fileName = file.name,
+                    sgf = file.content,
+                    createdAt = importStart + index.milliseconds,
+                )
                 if (result is THResult.Failure) {
                     Logger.w { "Cannot import ${file.name}: ${result.error}" }
                     failedFiles += file.name

@@ -18,7 +18,10 @@ class SgfZipReader(
     private val fileSystem: FileSystem = FileSystem.SYSTEM,
     private val tempDirectory: Path = FileSystem.SYSTEM_TEMPORARY_DIRECTORY,
 ) {
-    /** @return the .sgf files sorted by path; system files (`__MACOSX`, hidden files) are ignored */
+    /**
+     * @return the .sgf files sorted by path in natural order ("p8" before "p12");
+     * system files (`__MACOSX`, hidden files) are ignored
+     */
     @OptIn(ExperimentalUuidApi::class)
     fun read(zipBytes: ByteArray): List<SgfFile> {
         // The zip file system reads from a file: the archive is written to a temporary one
@@ -30,7 +33,7 @@ class SgfZipReader(
             val root = "/".toPath()
             return zip.listRecursively(root)
                 .filter { path -> path.isSgf() && zip.metadataOrNull(path)?.isRegularFile == true }
-                .sortedBy { it.toString() }
+                .sortedWith(compareBy(NaturalOrderComparator) { it.toString() })
                 .map { path ->
                     SgfFile(
                         name = path.name.substringBeforeLast('.'),
