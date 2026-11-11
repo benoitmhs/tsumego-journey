@@ -2,7 +2,16 @@ package com.mrsanglier.tsumegohero.collection.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.mrsanglier.tsumegohero.app.coreui.resources.collection_import_comingSoon
+import co.touchlab.kermit.Logger
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_import_error
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_import_noProblem
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_import_success
+import com.mrsanglier.tsumegohero.coreui.componants.loading.LoadingManager
+import com.mrsanglier.tsumegohero.domain.collection.usecase.ImportCollectionUseCase
+import io.github.vinceglb.filekit.PlatformFile
+import io.github.vinceglb.filekit.name
+import io.github.vinceglb.filekit.nameWithoutExtension
+import io.github.vinceglb.filekit.readBytes
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_problemCount
 import com.mrsanglier.tsumegohero.core.extension.handleResult
 import com.mrsanglier.tsumegohero.domain.collection.usecase.DeleteCollectionUseCase
@@ -35,6 +44,8 @@ import kotlinx.coroutines.launch
 
 class CollectionListViewModel(
     private val createCollectionUseCase: CreateCollectionUseCase,
+    private val importCollectionUseCase: ImportCollectionUseCase,
+    private val loadingManager: LoadingManager,
     private val deleteCollectionUseCase: DeleteCollectionUseCase,
     private val alertDialogManager: AlertDialogManager,
     private val snackbarManager: SnackbarManager,
@@ -110,9 +121,56 @@ class CollectionListViewModel(
         )
     }
 
-    internal fun importCollection() {
+    /** Asks for the name of the collection, prefilled with the archive name, then imports it. */
+    internal fun onArchivePicked(file: PlatformFile) {
+        _bottomSheet.value = ImportCollectionBottomSheet(
+            initialName = file.nameWithoutExtension,
+            onImport = { name ->
+                _bottomSheet.value = null
+                importCollection(file, name)
+            },
+            onDismiss = { _bottomSheet.value = null },
+        )
+    }
+
+    /** Creates the collection [name], with one problem per readable .sgf file of the archive, then opens it. */
+    private fun importCollection(file: PlatformFile, name: String) {
+        viewModelScope.launch {
+            loadingManager.withLoading {
+                val bytes = try {
+                    file.readBytes()
+                } catch (e: Exception) {
+                    Logger.e(e) { "Cannot read ${file.name}" }
+                    null
+                }
+                if (bytes == null) {
+                    showImportError(listOf(file.name))
+                    return@withLoading
+                }
+                importCollectionUseCase(name = name, zipBytes = bytes).handleResult(
+                    onSuccess = { result ->
+                        val collectionId = result.collectionId
+                        if (collectionId == null) {
+                            snackbarManager.showSnackBar(
+                                THSnackbarState.Error(text = THString.collection_import_noProblem.toTextSpec()),
+                            )
+                            return@handleResult
+                        }
+                        snackbarManager.showDone(
+                            THPlurals.collection_import_success.toTextSpec(result.importedCount, result.importedCount),
+                        )
+                        if (result.failedFiles.isNotEmpty()) showImportError(result.failedFiles)
+                        navEvent.value = NavEvent.Collection(collectionId)
+                    },
+                    onError = snackbarManager::showError,
+                )
+            }
+        }
+    }
+
+    private fun showImportError(fileNames: List<String>) {
         snackbarManager.showSnackBar(
-            THSnackbarState.Short(text = THString.collection_import_comingSoon.toTextSpec()),
+            THSnackbarState.Error(text = THString.collection_import_error.toTextSpec(fileNames.joinToString())),
         )
     }
 

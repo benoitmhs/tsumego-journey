@@ -15,11 +15,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_empty_message
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_empty_title
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_fab_importSgf
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_detail_fab_manualEntry
+import com.mrsanglier.tsumegohero.app.coreui.resources.collection_newCollection_placeholder
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_add
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_check
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_edit
@@ -29,10 +31,13 @@ import com.mrsanglier.tsumegohero.collection.common.EmptyState
 import com.mrsanglier.tsumegohero.collection.detail.composable.TsumegoGridItem
 import com.mrsanglier.tsumegohero.collection.list.FabMenuContentPadding
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.THFabMenu
+import com.mrsanglier.tsumegohero.coreui.componants.loading.BackHandler
+import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.rememberHideOnScrollState
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.THFabMenuItem
 import com.mrsanglier.tsumegohero.coreui.componants.screen.THScreen
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.THTopBar
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.TopBarAction
+import com.mrsanglier.tsumegohero.coreui.componants.topbar.TopBarTitleTextField
 import com.mrsanglier.tsumegohero.coreui.extension.rememberTopBarElevation
 import com.mrsanglier.tsumegohero.coreui.extension.toIconSpec
 import com.mrsanglier.tsumegohero.coreui.extension.toTextSpec
@@ -67,6 +72,9 @@ fun CollectionDetailRoute(
         }
     }
 
+    // Back leaves the edit mode first (and saves the name)
+    BackHandler(enabled = uiState.isEditMode, onBack = viewModel::toggleEditMode)
+
     // No extension filter: .sgf has no reliable MIME type, so it may not be selectable on Android
     val sgfPicker = rememberFilePickerLauncher(
         type = FileKitType.File(),
@@ -79,6 +87,7 @@ fun CollectionDetailRoute(
         uiState = uiState,
         navigateBack = navScope.navigateBack,
         onToggleEditMode = viewModel::toggleEditMode,
+        onNameChange = viewModel::onNameChange,
         onClickProblem = viewModel::openProblem,
         onDeleteProblem = viewModel::deleteProblem,
         fabItems = remember(viewModel, sgfPicker) {
@@ -103,11 +112,13 @@ private fun CollectionDetailScreen(
     uiState: CollectionDetailViewModelState,
     navigateBack: () -> Unit,
     onToggleEditMode: () -> Unit,
+    onNameChange: (String) -> Unit,
     onClickProblem: (tsumegoId: String) -> Unit,
     onDeleteProblem: (tsumegoId: String) -> Unit,
     fabItems: List<THFabMenuItem>,
 ) {
     val gridState = rememberLazyGridState()
+    val fabVisibility = rememberHideOnScrollState()
     val topBarHazeState = remember { HazeState() }
     val topBarElevation by rememberTopBarElevation(gridState)
 
@@ -117,8 +128,18 @@ private fun CollectionDetailScreen(
                 title = uiState.title,
                 hazeState = topBarHazeState,
                 elevation = topBarElevation,
+                maxLines = 3,
                 navAction = TopBarAction.back(navigateBack),
-                trailingAction = if (uiState.problems.isNullOrEmpty()) {
+                titleContent = uiState.editedName?.let { name ->
+                    {
+                        TopBarTitleTextField(
+                            value = name,
+                            onValueChange = onNameChange,
+                            placeholder = THString.collection_newCollection_placeholder.toTextSpec(),
+                        )
+                    }
+                },
+                trailingAction = if (uiState.problems == null) {
                     null
                 } else {
                     TopBarAction.Icon(
@@ -129,7 +150,11 @@ private fun CollectionDetailScreen(
             )
         },
     ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(fabVisibility.nestedScrollConnection),
+        ) {
             when {
                 uiState.problems == null -> Unit
                 uiState.problems.isEmpty() -> EmptyState(
@@ -173,6 +198,7 @@ private fun CollectionDetailScreen(
                 icon = THDrawable.ic_add.toIconSpec(),
                 label = THString.collection_detail_fab_addProblem.toTextSpec(),
                 items = fabItems,
+                visible = fabVisibility.isVisible,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .navigationBarsPadding(),

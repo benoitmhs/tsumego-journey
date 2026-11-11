@@ -38,7 +38,6 @@ internal fun InfoStepContent(
             onValueChange = onTitleChange,
             description = THString.tsumegoEdition_info_titleLabel.toTextSpec(),
             title = THString.tsumegoEdition_info_titleLabel.toTextSpec(),
-            maxLines = 1,
         )
         Column(verticalArrangement = Arrangement.spacedBy(THTheme.spacing.small)) {
             THText(

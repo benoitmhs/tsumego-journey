@@ -2,8 +2,10 @@ package com.mrsanglier.tsumegohero.collection.detail.composable
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import com.mrsanglier.tsumegohero.collection.common.EditionItemLayout
@@ -39,17 +41,22 @@ internal fun TsumegoGridItem(
                 onClickCell = null,
                 modifier = Modifier.fillMaxWidth(),
             )
-            THText(
-                text = state.title,
-                style = THTheme.typography.label100Medium,
-                maxLines = 1,
-            )
-            state.difficulty?.let { difficulty ->
+            Row (
+                horizontalArrangement = Arrangement.spacedBy(THTheme.spacing.small),
+            ){
                 THText(
-                    text = difficulty,
-                    style = THTheme.typography.label50,
-                    color = THTheme.colors.contentSecondary,
+                    text = state.title,
+                    style = THTheme.typography.label100Medium,
+                    maxLines = 3,
+                    modifier = Modifier.weight(1f),
                 )
+                state.difficulty?.let { difficulty ->
+                    THText(
+                        text = difficulty,
+                        style = THTheme.typography.label50,
+                        color = THTheme.colors.contentSecondary,
+                    )
+                }
             }
         }
     }

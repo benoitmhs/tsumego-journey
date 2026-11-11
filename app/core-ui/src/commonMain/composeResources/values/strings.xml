@@ -80,12 +80,13 @@
     <string name="collection_list_empty_message">Create a collection to gather your own problems, or import one.</string>
     <string name="collection_fab_newCollection">New collection</string>
     <string name="collection_fab_import">Import</string>
+    <string name="collection_importCollection_title">Collection name</string>
     <string name="collection_list_delete_title">Delete this collection?</string>
     <string name="collection_list_delete_message">The collection and all its problems will be permanently deleted.</string>
     <string name="collection_list_deleted">Collection deleted</string>
     <string name="collection_newCollection_placeholder">Collection name</string>
     <string name="collection_newCollection_create">Create</string>
-    <string name="collection_import_comingSoon">Import coming soon</string>
+    <string name="collection_import_noProblem">No readable .sgf file in this archive</string>
     <string name="collection_detail_empty_title">No problem yet</string>
     <string name="collection_detail_empty_message">Add a problem by importing an .sgf file or by entering it manually.</string>
     <string name="collection_detail_fab_addProblem">Add a problem</string>

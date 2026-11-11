@@ -11,6 +11,8 @@ internal data class CollectionDetailViewModelState(
     val title: TextSpec? = null,
     val problems: List<TsumegoGridItemState>? = null,
     val isEditMode: Boolean = false,
+    /** Collection name being edited in the top bar (edit mode only) */
+    val editedName: String? = null,
 )
 
 @Immutable

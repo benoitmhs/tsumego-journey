@@ -87,6 +87,7 @@ private fun EditProblemScreen(
                 hazeState = topBarHazeState,
                 elevation = 8.dp,
                 navAction = TopBarAction.close(close),
+                maxLines = 3,
                 bottomContent = {
                     TabRow(
                         tabs = steps.mapIndexed { index, step ->

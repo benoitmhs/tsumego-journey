@@ -37,7 +37,7 @@ fun PickerCell(
         modifier = modifier
             .surface(
                 shape = THTheme.shape.roundMedium,
-                background = THTheme.colors.surface1,
+                background = THTheme.colors.surface2,
                 borderWidth = THTheme.stroke.xthin,
             ),
     ) {

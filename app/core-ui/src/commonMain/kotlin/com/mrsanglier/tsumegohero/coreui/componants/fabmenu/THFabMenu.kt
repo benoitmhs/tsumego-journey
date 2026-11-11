@@ -1,6 +1,11 @@
 package com.mrsanglier.tsumegohero.coreui.componants.fabmenu
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +29,7 @@ import androidx.compose.material3.FloatingActionButtonMenu
 import androidx.compose.material3.FloatingActionButtonMenuItem
 import androidx.compose.material3.ToggleFloatingActionButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -50,8 +56,12 @@ fun THFabMenu(
     items: List<THFabMenuItem>,
     modifier: Modifier = Modifier,
     label: TextSpec? = null,
+    visible: Boolean = true,
 ) {
     var expanded by rememberSaveable { mutableStateOf(false) }
+
+    // A hidden menu does not stay open
+    LaunchedEffect(visible) { if (!visible) expanded = false }
 
     BackHandler(enabled = expanded) { expanded = false }
 
@@ -60,57 +70,64 @@ fun THFabMenu(
     val closedContentColor = THTheme.colors.contentOnSurfaceTint
     val openContentColor = THTheme.colors.content
 
-    FloatingActionButtonMenu(
-        expanded = expanded,
+    // Slides out below the screen edge (twice its height to also clear the bottom padding)
+    AnimatedVisibility(
+        visible = visible,
         modifier = modifier,
-        button = {
-            if (label != null) {
-                ExtendedToggleButton(
-                    expanded = expanded,
-                    onExpandedChange = { expanded = it },
-                    icon = icon,
-                    label = label,
-                    closedContainerColor = closedContainerColor,
-                    openContainerColor = openContainerColor,
-                    closedContentColor = closedContentColor,
-                    openContentColor = openContentColor,
-                )
-            } else {
-                ToggleFloatingActionButton(
-                    checked = expanded,
-                    onCheckedChange = { expanded = it },
-                    containerColor = { progress -> lerp(closedContainerColor, openContainerColor, progress) },
-                ) {
-                    icon.Content(
-                        iconSize = IconSize.Regular,
-                        tint = lerp(closedContentColor, openContentColor, checkedProgress),
-                        modifier = Modifier.graphicsLayer { rotationZ = checkedProgress * OpenRotation },
-                    )
-                }
-            }
-        },
+        enter = slideInVertically { it * 2 } + fadeIn(),
+        exit = slideOutVertically { it * 2 } + fadeOut(),
     ) {
-        items.forEach { item ->
-            FloatingActionButtonMenuItem(
-                onClick = {
-                    expanded = false
-                    item.onClick()
-                },
-                text = {
-                    THText(
-                        text = item.label,
-                        style = THTheme.typography.label100,
-                        color = closedContentColor,
+        FloatingActionButtonMenu(
+            expanded = expanded,
+            button = {
+                if (label != null) {
+                    ExtendedToggleButton(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        icon = icon,
+                        label = label,
+                        closedContainerColor = closedContainerColor,
+                        openContainerColor = openContainerColor,
+                        closedContentColor = closedContentColor,
+                        openContentColor = openContentColor,
                     )
-                },
-                icon = {
-                    item.icon.Content(
-                        iconSize = IconSize.Regular,
-                        tint = closedContentColor,
-                    )
-                },
-                containerColor = closedContainerColor,
-            )
+                } else {
+                    ToggleFloatingActionButton(
+                        checked = expanded,
+                        onCheckedChange = { expanded = it },
+                        containerColor = { progress -> lerp(closedContainerColor, openContainerColor, progress) },
+                    ) {
+                        icon.Content(
+                            iconSize = IconSize.Regular,
+                            tint = lerp(closedContentColor, openContentColor, checkedProgress),
+                            modifier = Modifier.graphicsLayer { rotationZ = checkedProgress * OpenRotation },
+                        )
+                    }
+                }
+            },
+        ) {
+            items.forEach { item ->
+                FloatingActionButtonMenuItem(
+                    onClick = {
+                        expanded = false
+                        item.onClick()
+                    },
+                    text = {
+                        THText(
+                            text = item.label,
+                            style = THTheme.typography.label100,
+                            color = closedContentColor,
+                        )
+                    },
+                    icon = {
+                        item.icon.Content(
+                            iconSize = IconSize.Regular,
+                            tint = closedContentColor,
+                        )
+                    },
+                    containerColor = closedContainerColor,
+                )
+            }
         }
     }
 }

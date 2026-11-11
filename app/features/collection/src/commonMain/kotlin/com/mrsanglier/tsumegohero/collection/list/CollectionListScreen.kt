@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mrsanglier.tsumegohero.app.coreui.resources.collection_fab_import
@@ -29,10 +30,12 @@ import com.mrsanglier.tsumegohero.app.coreui.resources.ic_import
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_library_add
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_next
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_check
+import com.mrsanglier.tsumegohero.app.coreui.resources.ic_close
 import com.mrsanglier.tsumegohero.app.coreui.resources.ic_edit
 import com.mrsanglier.tsumegohero.collection.common.EditionItemLayout
 import com.mrsanglier.tsumegohero.collection.common.EmptyState
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.THFabMenu
+import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.rememberHideOnScrollState
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.THFabMenuItem
 import com.mrsanglier.tsumegohero.coreui.componants.icon.Content
 import com.mrsanglier.tsumegohero.coreui.componants.icon.IconSize
@@ -54,6 +57,8 @@ import com.mrsanglier.tsumegohero.coreui.resources.THString
 import com.mrsanglier.tsumegohero.coreui.theme.THTheme
 import dev.chrisbanes.haze.HazeState
 import dev.chrisbanes.haze.hazeSource
+import io.github.vinceglb.filekit.dialogs.FileKitType
+import io.github.vinceglb.filekit.dialogs.compose.rememberFilePickerLauncher
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -70,10 +75,16 @@ fun CollectionListRoute(
         }
     }
 
+    val zipPicker = rememberFilePickerLauncher(
+        type = FileKitType.File(extensions = listOf("zip")),
+    ) { file ->
+        file?.let(viewModel::onArchivePicked)
+    }
+
     CollectionListScreen(
         uiState = uiState,
         onToggleEditMode = viewModel::toggleEditMode,
-        fabItems = remember(viewModel) {
+        fabItems = remember(viewModel, zipPicker) {
             listOf(
                 THFabMenuItem(
                     label = THString.collection_fab_newCollection.toTextSpec(),
@@ -83,7 +94,7 @@ fun CollectionListRoute(
                 THFabMenuItem(
                     label = THString.collection_fab_import.toTextSpec(),
                     icon = THDrawable.ic_import.toIconSpec(),
-                    onClick = viewModel::importCollection,
+                    onClick = { zipPicker.launch() },
                 ),
             )
         },
@@ -99,6 +110,7 @@ private fun CollectionListScreen(
     fabItems: List<THFabMenuItem>,
 ) {
     val lazyListState = rememberLazyListState()
+    val fabVisibility = rememberHideOnScrollState()
     val topBarHazeState = remember { HazeState() }
     val topBarElevation by rememberTopBarElevation(lazyListState)
 
@@ -113,14 +125,18 @@ private fun CollectionListScreen(
                     null
                 } else {
                     TopBarAction.Icon(
-                        icon = (if (uiState.isEditMode) THDrawable.ic_check else THDrawable.ic_edit).toIconSpec(),
+                        icon = (if (uiState.isEditMode) THDrawable.ic_close else THDrawable.ic_edit).toIconSpec(),
                         onClick = onToggleEditMode,
                     )
                 },
             )
         },
     ) { innerPadding ->
-        Box(modifier = Modifier.fillMaxSize()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .nestedScroll(fabVisibility.nestedScrollConnection),
+        ) {
             when {
                 uiState.collections == null -> Unit
                 uiState.collections.isEmpty() -> EmptyState(
@@ -157,6 +173,7 @@ private fun CollectionListScreen(
                 icon = THDrawable.ic_create_new_folder.toIconSpec(),
                 label = THString.collection_fab_newCollection.toTextSpec(),
                 items = fabItems,
+                visible = fabVisibility.isVisible,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(bottom = innerPadding.calculateBottomPadding()),
@@ -199,7 +216,6 @@ private fun CollectionCellContent(item: CollectionItemState, isEditMode: Boolean
             THText(
                 text = item.name,
                 style = THTheme.typography.title100,
-                maxLines = 1,
             )
             THText(
                 text = item.problemCount,

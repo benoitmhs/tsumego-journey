@@ -20,8 +20,8 @@ import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.common.CommonAle
 import com.mrsanglier.tsumegohero.coreui.componants.alertdialog.common.DefaultAlertDialog
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.showError
 import com.mrsanglier.tsumegohero.domain.collection.usecase.DeleteUserTsumegoUseCase
+import com.mrsanglier.tsumegohero.domain.collection.usecase.RenameCollectionUseCase
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
 import com.mrsanglier.tsumegohero.coreui.componants.loading.LoadingManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.SnackbarManager
 import com.mrsanglier.tsumegohero.coreui.componants.snackbar.THSnackbarState
@@ -49,6 +49,7 @@ class CollectionDetailViewModel(
     private val loadingManager: LoadingManager,
     private val importUserTsumegoUseCase: ImportUserTsumegoUseCase,
     private val deleteUserTsumegoUseCase: DeleteUserTsumegoUseCase,
+    private val renameCollectionUseCase: RenameCollectionUseCase,
     private val alertDialogManager: AlertDialogManager,
     observeCollectionDetailUseCase: ObserveCollectionDetailUseCase,
     savedStateHandle: SavedStateHandle,
@@ -60,19 +61,26 @@ class CollectionDetailViewModel(
 
     private val isEditMode = MutableStateFlow(false)
 
+    /** Name typed in the top bar while in edit mode */
+    private val editedName = MutableStateFlow<String?>(null)
+    private var collectionName: String? = null
+
     internal val uiState: StateFlow<CollectionDetailViewModelState> =
         combine(
             observeCollectionDetailUseCase(args.collectionId)
                 .onEach { detail ->
                     // The collection no longer exists: nothing to show
                     if (detail == null) navEvent.value = NavEvent.Back
+                    collectionName = detail?.collection?.name
                 },
             isEditMode,
-        ) { detail, isEditMode ->
+            editedName,
+        ) { detail, isEditMode, editedName ->
             CollectionDetailViewModelState(
                 title = detail?.collection?.name?.toTextSpec(),
                 problems = detail?.problems?.mapIndexed { index, problem -> problem.toItemState(index) },
                 isEditMode = isEditMode,
+                editedName = editedName.takeIf { isEditMode },
             )
         }
             .stateIn(
@@ -85,8 +93,30 @@ class CollectionDetailViewModel(
         navEvent.value = NavEvent.TsumegoEdition(collectionId = args.collectionId, tsumegoId = null)
     }
 
+    /** Entering edit mode makes the name editable; leaving it saves the new name (a blank name is ignored). */
     internal fun toggleEditMode() {
-        isEditMode.update { !it }
+        if (isEditMode.value) {
+            val name = editedName.value
+            isEditMode.value = false
+            editedName.value = null
+            if (name != null && name.trim() != collectionName) saveName(name)
+        } else {
+            editedName.value = collectionName.orEmpty()
+            isEditMode.value = true
+        }
+    }
+
+    internal fun onNameChange(name: String) {
+        editedName.value = name
+    }
+
+    private fun saveName(name: String) {
+        viewModelScope.launch {
+            renameCollectionUseCase(collectionId = args.collectionId, name = name).handleResult(
+                onSuccess = {},
+                onError = snackbarManager::showError,
+            )
+        }
     }
 
     /** Opens the problem: edition flow in edit mode, game otherwise. */

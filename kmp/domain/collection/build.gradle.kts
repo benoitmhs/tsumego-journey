@@ -11,6 +11,9 @@ kotlin {
             // Log
             implementation(libs.kermit)
 
+            // Zip reading
+            implementation(libs.okio)
+
             implementation(projects.kmp.core)
             implementation(projects.kmp.data)
             implementation(projects.kmp.domain.game)
@@ -20,6 +23,7 @@ kotlin {
             // Unit test
             implementation(libs.kotest.engine)
             implementation(libs.kotest.assertions)
+            implementation(libs.okio.fakefilesystem)
         }
     }
 }

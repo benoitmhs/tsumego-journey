@@ -68,6 +68,7 @@ private fun UserTsumegoGameScreen(
                     onClick = onEdit,
                 ),
                 elevation = topBarElevation,
+                maxLines = 3,
             )
         },
     ) { innerPadding ->

@@ -42,6 +42,9 @@ fun THTopBar(
     navAction: TopBarAction? = null,
     trailingAction: TopBarAction? = null,
     bottomContent: @Composable (() -> Unit)? = null,
+    maxLines: Int = 1,
+    /** Replaces the [title] text, e.g. by a [TopBarTitleTextField] to edit it */
+    titleContent: @Composable (() -> Unit)? = null,
 ) {
     val backgroundColor by animateColorAsState(if (elevation == 0.dp) THTheme.colors.background else THTheme.colors.surface1)
     Column(
@@ -69,11 +72,14 @@ fun THTopBar(
             Box(
                 modifier = Modifier.weight(1f)
             ) {
-                title?.let {
+                if (titleContent != null) {
+                    titleContent()
+                } else if (title != null) {
                     THTextResponsive(
                         text = title,
                         style = THTheme.typography.title200,
                         modifier = Modifier.padding(horizontal = THTheme.spacing.medium),
+                        maxLines = maxLines,
                     )
                 }
             }

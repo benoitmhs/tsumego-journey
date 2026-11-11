@@ -142,7 +142,7 @@ fun THTextField(
 @Composable
 internal fun thOutlinedTextFieldColors(): TextFieldColors = TextFieldDefaults.outlinedTextFieldColors(
     unfocusedBorderColor = Transparent,
-    focusedBorderColor = Transparent,
+    focusedBorderColor = THTheme.colors.strokeSecondary,
     cursorColor = THTheme.colors.contentTint,
     textColor = THTheme.colors.content,
     unfocusedLabelColor = THTheme.colors.contentSecondary,
@@ -158,7 +158,7 @@ internal fun thOutlinedTextFieldColors(): TextFieldColors = TextFieldDefaults.ou
     errorCursorColor = THTheme.colors.contentCritical,
     errorLabelColor = THTheme.colors.contentCritical,
     errorLeadingIconColor = THTheme.colors.contentCritical,
-    backgroundColor = THTheme.colors.surface1,
+    backgroundColor = THTheme.colors.surface2,
     leadingIconColor = THTheme.colors.content,
     disabledLeadingIconColor = THTheme.colors.contentDisable,
     disabledTrailingIconColor = THTheme.colors.contentDisable,

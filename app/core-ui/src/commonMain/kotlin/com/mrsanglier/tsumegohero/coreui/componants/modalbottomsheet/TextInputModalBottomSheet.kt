@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -14,6 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import com.mrsanglier.tsumegohero.coreui.componants.button.ButtonStatus
 import com.mrsanglier.tsumegohero.coreui.componants.button.THButton
@@ -39,7 +42,14 @@ fun TextInputModalBottomSheet(
     state: MutableState<String> = rememberSaveable { mutableStateOf(initialValue) },
     errorToShown: (String) -> TextSpec? = { null },
     textFieldTrailingAction: TrailingTextFieldOption.ActionIcon? = null,
+    /** Focuses the text field (and opens the keyboard) when the sheet appears */
+    requestFocus: Boolean = false,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    if (requestFocus) {
+        LaunchedEffect(Unit) { focusRequester.requestFocus() }
+    }
+
     val error by remember(state.value) {
         derivedStateOf { errorToShown(state.value) }
     }
@@ -76,7 +86,8 @@ fun TextInputModalBottomSheet(
             trailingAction = textFieldTrailingAction,
             errorText = error,
             modifier = Modifier
-                .padding(vertical = THTheme.spacing.large),
+                .padding(vertical = THTheme.spacing.large)
+                .focusRequester(focusRequester),
         )
         THButton(
             text = buttonText,

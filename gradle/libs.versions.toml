@@ -38,6 +38,7 @@ filekit = "0.12.0"
 haze = "1.5.4"
 junit = "4.13.2"
 kermit = "2.0.8"
+okio = "3.15.0"
 koin = "4.1.1"
 koin_annotations = "2.3.1"
 kotest = "6.1.2"
@@ -96,6 +97,8 @@ filekit-dialogs-compose = { module = "io.github.vinceglb:filekit-dialogs-compose
 
 haze = { group = "dev.chrisbanes.haze", name = "haze", version.ref = "haze" }
 kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
+okio-fakefilesystem = { module = "com.squareup.okio:okio-fakefilesystem", version.ref = "okio" }
 
 jindong-core = { module = "io.github.compose-jindong:jindong-core", version.ref = "jindong" }
 jindong-compose = { module = "io.github.compose-jindong:jindong-compose", version.ref = "jindong" }

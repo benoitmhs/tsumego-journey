@@ -12,12 +12,18 @@ import com.mrsanglier.tsumegohero.domain.collection.usecase.GetEditableUserTsume
 import com.mrsanglier.tsumegohero.domain.collection.usecase.ObserveUserTsumegoUseCase
 import com.mrsanglier.tsumegohero.domain.collection.usecase.StartUserTsumegoGameUseCase
 import com.mrsanglier.tsumegohero.domain.collection.usecase.DeleteCollectionUseCase
+import com.mrsanglier.tsumegohero.domain.collection.usecase.ImportCollectionUseCase
+import com.mrsanglier.tsumegohero.domain.collection.utils.SgfZipReader
+import com.mrsanglier.tsumegohero.domain.collection.usecase.RenameCollectionUseCase
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val domainCollectionModule: Module = module {
     singleOf(::CreateCollectionUseCase)
+    singleOf(::RenameCollectionUseCase)
+    singleOf(::ImportCollectionUseCase)
+    single { SgfZipReader() }
     singleOf(::DeleteCollectionUseCase)
     singleOf(::GetEditionCropBoardUseCase)
     singleOf(::ImportUserTsumegoUseCase)

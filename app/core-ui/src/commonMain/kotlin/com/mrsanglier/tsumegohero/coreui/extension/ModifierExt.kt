@@ -183,5 +183,22 @@ fun Modifier.drawLineTop(
     }
 }
 
+fun Modifier.drawLineBottom(
+    stroke: Dp,
+    color: Color,
+): Modifier = composed {
+    val density = LocalDensity.current
+    val strokeWidthPx = density.run { stroke.toPx() }
+
+    this.drawBehind {
+        drawLine(
+            color = color,
+            start = Offset(0f, size.height),
+            end = Offset(size.width, size.height),
+            strokeWidth = strokeWidthPx,
+        )
+    }
+}
+
 private
 val BlurRadius: Dp = 8.dp
