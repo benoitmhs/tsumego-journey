@@ -6,8 +6,10 @@ import com.mrsanglier.tsumegohero.coreui.navigation.THDestination
 import kotlinx.serialization.Serializable
 
 @Serializable
+/** @property collectionName shown in the top bar while the collection loads */
 data class CollectionDetailDestination(
     val collectionId: String,
+    val collectionName: String? = null,
 ) : THDestination {
 
     companion object {

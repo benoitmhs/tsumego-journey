@@ -32,9 +32,11 @@ import com.mrsanglier.tsumegohero.collection.detail.composable.TsumegoGridItem
 import com.mrsanglier.tsumegohero.collection.list.FabMenuContentPadding
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.THFabMenu
 import com.mrsanglier.tsumegohero.coreui.componants.loading.BackHandler
+import com.mrsanglier.tsumegohero.coreui.componants.loading.ScreenLoadingContent
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.rememberHideOnScrollState
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.THFabMenuItem
 import com.mrsanglier.tsumegohero.coreui.componants.screen.THScreen
+import com.mrsanglier.tsumegohero.coreui.componants.scrollbar.THLazyGridScrollbar
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.THTopBar
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.TopBarAction
 import com.mrsanglier.tsumegohero.coreui.componants.topbar.TopBarTitleTextField
@@ -156,7 +158,7 @@ private fun CollectionDetailScreen(
                 .nestedScroll(fabVisibility.nestedScrollConnection),
         ) {
             when {
-                uiState.problems == null -> Unit
+                uiState.problems == null -> ScreenLoadingContent(modifier = Modifier.padding(innerPadding))
                 uiState.problems.isEmpty() -> EmptyState(
                     icon = THDrawable.ic_puzzle.toIconSpec(),
                     title = THString.collection_detail_empty_title.toTextSpec(),
@@ -194,11 +196,23 @@ private fun CollectionDetailScreen(
                 }
             }
 
+            if (!uiState.problems.isNullOrEmpty()) {
+                // Track between the top bar and the FAB
+                THLazyGridScrollbar(
+                    state = gridState,
+                    modifier = Modifier.padding(
+                        top = innerPadding.calculateTopPadding() + THTheme.spacing.small,
+                        bottom = innerPadding.calculateBottomPadding() + FabMenuContentPadding,
+                    ),
+                )
+            }
+
             THFabMenu(
                 icon = THDrawable.ic_add.toIconSpec(),
                 label = THString.collection_detail_fab_addProblem.toTextSpec(),
                 items = fabItems,
-                visible = fabVisibility.isVisible,
+                // Shown with the content, hidden while scrolling down
+                visible = uiState.problems != null && fabVisibility.isVisible,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .navigationBarsPadding(),

@@ -41,9 +41,9 @@ internal fun TsumegoGridItem(
                 onClickCell = null,
                 modifier = Modifier.fillMaxWidth(),
             )
-            Row (
+            Row(
                 horizontalArrangement = Arrangement.spacedBy(THTheme.spacing.small),
-            ){
+            ) {
                 THText(
                     text = state.title,
                     style = THTheme.typography.label100Medium,

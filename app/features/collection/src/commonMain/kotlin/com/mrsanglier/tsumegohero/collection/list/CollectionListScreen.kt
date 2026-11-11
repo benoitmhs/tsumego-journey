@@ -39,6 +39,7 @@ import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.rememberHideOnScroll
 import com.mrsanglier.tsumegohero.coreui.componants.fabmenu.THFabMenuItem
 import com.mrsanglier.tsumegohero.coreui.componants.icon.Content
 import com.mrsanglier.tsumegohero.coreui.componants.icon.IconSize
+import com.mrsanglier.tsumegohero.coreui.componants.loading.ScreenLoadingContent
 import com.mrsanglier.tsumegohero.coreui.componants.modalbottomsheet.Composable
 import com.mrsanglier.tsumegohero.coreui.componants.screen.LocalPiScreenPadding
 import com.mrsanglier.tsumegohero.coreui.componants.screen.THScreen
@@ -71,7 +72,7 @@ fun CollectionListRoute(
 
     safeNavigation(viewModel.navEvent, viewModel::consumeNavigation) { event ->
         when (event) {
-            is CollectionListViewModel.NavEvent.Collection -> navScope.navigateToCollection(event.collectionId)
+            is CollectionListViewModel.NavEvent.Collection -> navScope.navigateToCollection(event.collectionId, event.collectionName)
         }
     }
 
@@ -138,7 +139,7 @@ private fun CollectionListScreen(
                 .nestedScroll(fabVisibility.nestedScrollConnection),
         ) {
             when {
-                uiState.collections == null -> Unit
+                uiState.collections == null -> ScreenLoadingContent(modifier = Modifier.padding(innerPadding))
                 uiState.collections.isEmpty() -> EmptyState(
                     icon = THDrawable.ic_book_open.toIconSpec(),
                     title = THString.collection_list_empty_title.toTextSpec(),
@@ -173,7 +174,8 @@ private fun CollectionListScreen(
                 icon = THDrawable.ic_create_new_folder.toIconSpec(),
                 label = THString.collection_fab_newCollection.toTextSpec(),
                 items = fabItems,
-                visible = fabVisibility.isVisible,
+                // Shown with the content, hidden while scrolling down
+                visible = uiState.collections != null && fabVisibility.isVisible,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .padding(bottom = innerPadding.calculateBottomPadding()),

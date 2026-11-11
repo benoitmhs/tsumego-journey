@@ -36,8 +36,8 @@ object UserTsumegoSgf {
 
     /** @return the initial position and the solution tree of a user problem. */
     fun read(sgf: String): Pair<Board, RootNode> {
-        val cleaned = sgf.replace(Regex("\\s"), "")
-        val size = Regex("SZ\\[(\\d+)]").find(cleaned)?.groupValues?.get(1)?.toInt() ?: BoardSize.X19.size
+        val cleaned = sgf.replace(WHITESPACE_REGEX, "")
+        val size = SIZE_REGEX.find(cleaned)?.groupValues?.get(1)?.toInt() ?: BoardSize.X19.size
         val board = Board(BoardSize.fromValue(size) ?: BoardSize.X19)
         SgfParser.parseInitialStones(cleaned, "AB").forEach { board.setupStone(it, Stone.BLACK) }
         SgfParser.parseInitialStones(cleaned, "AW").forEach { board.setupStone(it, Stone.WHITE) }
@@ -47,15 +47,15 @@ object UserTsumegoSgf {
 
     /** Rank written as the first comment of the root node (same convention as the bundled problems). */
     fun readRank(sgf: String): Rank? =
-        rootNode(sgf.replace(Regex("\\s"), ""))
-            ?.let { Regex("(?<![A-Z])C\\[([^]]*)]").find(it)?.groupValues?.get(1) }
+        rootNode(sgf.replace(WHITESPACE_REGEX, ""))
+            ?.let { RANK_COMMENT_REGEX.find(it)?.groupValues?.get(1) }
             ?.uppercase()
             ?.let(Rank::safeValueOf)
 
     /** Game name (`GN`) of the root node, if any. */
     fun readGameName(sgf: String): String? =
         rootNode(sgf)
-            ?.let { Regex("GN\\[([^]]*)]").find(it)?.groupValues?.get(1) }
+            ?.let { GAME_NAME_REGEX.find(it)?.groupValues?.get(1) }
             ?.trim()
             ?.takeIf { it.isNotEmpty() }
 
@@ -94,6 +94,12 @@ object UserTsumegoSgf {
     }
 
     private fun Cell.toSgf(): String = "${'a' + x}${'a' + y}"
+
+    // Compiled once: reading a collection reads every problem
+    private val WHITESPACE_REGEX = Regex("\\s")
+    private val SIZE_REGEX = Regex("SZ\\[(\\d+)]")
+    private val RANK_COMMENT_REGEX = Regex("(?<![A-Z])C\\[([^]]*)]")
+    private val GAME_NAME_REGEX = Regex("GN\\[([^]]*)]")
 
     private val cellComparator: Comparator<Cell> = compareBy<Cell> { it.y }.thenBy { it.x }
 }

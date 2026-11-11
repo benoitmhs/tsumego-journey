@@ -18,5 +18,5 @@ object CollectionListDestination : THDestination {
 }
 
 data class CollectionListNavScope(
-    val navigateToCollection: (collectionId: String) -> Unit,
+    val navigateToCollection: (collectionId: String, collectionName: String) -> Unit,
 )

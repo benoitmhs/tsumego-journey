@@ -77,7 +77,7 @@ class CollectionDetailViewModel(
             editedName,
         ) { detail, isEditMode, editedName ->
             CollectionDetailViewModelState(
-                title = detail?.collection?.name?.toTextSpec(),
+                title = (detail?.collection?.name ?: args.collectionName)?.toTextSpec(),
                 problems = detail?.problems?.mapIndexed { index, problem -> problem.toItemState(index) },
                 isEditMode = isEditMode,
                 editedName = editedName.takeIf { isEditMode },
@@ -85,8 +85,9 @@ class CollectionDetailViewModel(
         }
             .stateIn(
                 viewModelScope,
-                SharingStarted.WhileSubscribed(5_000),
-                CollectionDetailViewModelState(),
+                // Kept while the screen is in the back stack: coming back does not rebuild every preview
+                SharingStarted.Lazily,
+                CollectionDetailViewModelState(title = args.collectionName?.toTextSpec()),
             )
 
     internal fun addManually() {

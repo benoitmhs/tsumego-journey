@@ -50,8 +50,10 @@ fun MainNavigation(
                 navigateToRankEstimation = { tsumegoId ->
                     navController.navigate(RankEstimationDestination(tsumegoId = tsumegoId))
                 },
-                navigateToCollection = { collectionId ->
-                    navController.navigate(CollectionDetailDestination(collectionId = collectionId))
+                navigateToCollection = { collectionId, collectionName ->
+                    navController.navigate(
+                        CollectionDetailDestination(collectionId = collectionId, collectionName = collectionName)
+                    )
                 },
             ),
         )

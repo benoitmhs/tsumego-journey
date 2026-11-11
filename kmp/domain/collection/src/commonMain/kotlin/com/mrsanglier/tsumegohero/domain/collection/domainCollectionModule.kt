@@ -15,9 +15,14 @@ import com.mrsanglier.tsumegohero.domain.collection.usecase.DeleteCollectionUseC
 import com.mrsanglier.tsumegohero.domain.collection.usecase.ImportCollectionUseCase
 import com.mrsanglier.tsumegohero.domain.collection.utils.SgfZipReader
 import com.mrsanglier.tsumegohero.domain.collection.usecase.RenameCollectionUseCase
+import kotlinx.coroutines.Dispatchers
 import org.koin.core.module.Module
+import org.koin.core.qualifier.named
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+
+/** Dispatcher for CPU heavy work, injected to be replaceable in tests. */
+val DefaultDispatcher = named("DefaultDispatcher")
 
 val domainCollectionModule: Module = module {
     singleOf(::CreateCollectionUseCase)
@@ -27,7 +32,8 @@ val domainCollectionModule: Module = module {
     singleOf(::DeleteCollectionUseCase)
     singleOf(::GetEditionCropBoardUseCase)
     singleOf(::ImportUserTsumegoUseCase)
-    singleOf(::ObserveCollectionDetailUseCase)
+    single(DefaultDispatcher) { Dispatchers.Default }
+    single { ObserveCollectionDetailUseCase(get(), get(), get(DefaultDispatcher)) }
     singleOf(::ObserveCollectionsUseCase)
     singleOf(::PlayEditionMoveUseCase)
     singleOf(::SaveUserTsumegoUseCase)

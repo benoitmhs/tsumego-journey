@@ -17,11 +17,11 @@ interface ParseSgfTsumegoDelegate {
 
 class ParseSgfTsumegoDelegateImpl : ParseSgfTsumegoDelegate {
     override fun parseSgfTsumego(sgf: String): Tsumego {
-        val cleaned = sgf.replace(Regex("\\s"), "")
+        val cleaned = sgf.replace(WHITESPACE_REGEX, "")
 
-        val size = Regex("SZ\\[(\\d+)]")
+        val size = SIZE_REGEX
             .find(cleaned)?.groupValues?.get(1)?.toInt() ?: 19
-        val difficulty = Regex("C\\[([^]]*)]")
+        val difficulty = COMMENT_REGEX
             .find(cleaned)?.groupValues?.get(1)
             ?.uppercase()
             ?.let(Rank::safeValueOf)
@@ -60,3 +60,7 @@ class ParseSgfTsumegoDelegateImpl : ParseSgfTsumegoDelegate {
         )
     }
 }
+
+private val WHITESPACE_REGEX = Regex("\\s")
+private val SIZE_REGEX = Regex("SZ\\[(\\d+)]")
+private val COMMENT_REGEX = Regex("C\\[([^]]*)]")

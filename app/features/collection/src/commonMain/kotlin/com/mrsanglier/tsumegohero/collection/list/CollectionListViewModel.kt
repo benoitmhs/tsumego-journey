@@ -66,7 +66,9 @@ class CollectionListViewModel(
                             summary.problemCount,
                             summary.problemCount,
                         ),
-                        onClick = { navEvent.value = NavEvent.Collection(summary.collection.id) }.takeUnless { isEditMode },
+                        onClick = {
+                            navEvent.value = NavEvent.Collection(summary.collection.id, summary.collection.name)
+                        }.takeUnless { isEditMode },
                         onDelete = { deleteCollection(summary.collection.id) },
                     )
                 },
@@ -160,7 +162,7 @@ class CollectionListViewModel(
                             THPlurals.collection_import_success.toTextSpec(result.importedCount, result.importedCount),
                         )
                         if (result.failedFiles.isNotEmpty()) showImportError(result.failedFiles)
-                        navEvent.value = NavEvent.Collection(collectionId)
+                        navEvent.value = NavEvent.Collection(collectionId, name.trim())
                     },
                     onError = snackbarManager::showError,
                 )
@@ -178,7 +180,7 @@ class CollectionListViewModel(
         _bottomSheet.value = null
         viewModelScope.launch {
             createCollectionUseCase(name).handleResult(
-                onSuccess = { collectionId -> navEvent.value = NavEvent.Collection(collectionId) },
+                onSuccess = { collectionId -> navEvent.value = NavEvent.Collection(collectionId, name.trim()) },
                 onError = snackbarManager::showError,
             )
         }
@@ -189,6 +191,6 @@ class CollectionListViewModel(
     }
 
     internal sealed interface NavEvent {
-        data class Collection(val collectionId: String) : NavEvent
+        data class Collection(val collectionId: String, val collectionName: String) : NavEvent
     }
 }

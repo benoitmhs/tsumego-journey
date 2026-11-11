@@ -8,12 +8,27 @@ import com.mrsanglier.tsumegohero.game.model.SgfNode
 import com.mrsanglier.tsumegohero.game.model.SgfNodeOutcome
 import com.mrsanglier.tsumegohero.game.model.Stone
 
+/**
+ * Regexes are compiled once: compiling one costs far more than matching the short SGF tokens,
+ * and [parseMoveNode] runs for every move of the tree.
+ */
 object SgfParser {
+    private val TOKEN_REGEX = Regex("\\(|\\)|;[^;()]+")
+    private val MOVE_REGEX = Regex(";([BW])\\[([^]]*)]")
+    private val COMMENT_REGEX = Regex("C\\[([^]]+)]")
+    private val CELL_REGEX = Regex("\\[([a-z]{2})]")
+    // Immutable: the parser may run on several threads at once
+    private val INITIAL_STONES_REGEXES: Map<String, Regex> =
+        listOf("AB", "AW").associateWith { key -> Regex("$key(\\[[a-z]{2}])+") }
+
+    private fun initialStonesRegex(key: String): Regex =
+        INITIAL_STONES_REGEXES[key] ?: Regex("$key(\\[[a-z]{2}])+")
+
     fun parseInitialStones(sgf: String, key: String): List<Cell> =
-        Regex("$key(\\[[a-z]{2}])+")
+        initialStonesRegex(key)
             .find(sgf)?.value
             ?.let {
-                Regex("\\[([a-z]{2})]")
+                CELL_REGEX
                     .findAll(it)
                     .map { parseCell(it.groupValues[1]) }
                     .toList()
@@ -23,7 +38,7 @@ object SgfParser {
         Cell(s[0] - 'a', s[1] - 'a')
 
     fun tokenize(s: String): List<String> =
-        Regex("\\(|\\)|;[^;()]+")
+        TOKEN_REGEX
             .findAll(s)
             .map { it.value }
             .toList()
@@ -55,7 +70,7 @@ object SgfParser {
     }
 
     fun parseMoveNode(token: String): MoveNode? {
-        val moveMatch = Regex(";([BW])\\[([^]]*)]")
+        val moveMatch = MOVE_REGEX
             .find(token) ?: return null
 
         val stone =
@@ -67,7 +82,7 @@ object SgfParser {
         val point = parseCell(coord)
 
         val comment =
-            Regex("C\\[([^]]+)]")
+            COMMENT_REGEX
                 .find(token)?.groupValues?.get(1)?.lowercase() ?: ""
 
         val outcome = if (SUCCESS_COMMENT.contains(comment)) SgfNodeOutcome.SUCCESS else SgfNodeOutcome.NONE
